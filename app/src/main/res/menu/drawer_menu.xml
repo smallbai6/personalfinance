@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:checkableBehavior="single">
+    <item
+        android:id="@+id/drawermenu_yusuan"
+        android:title="yusuan"
+        android:icon="@mipmap/xiajiantou"
+        />
+    <item
+        android:id="@+id/drawermenu_licai"
+        android:title="licai"
+        />
+    <item
+        android:id="@+id/drawermenu_gupiao"
+        android:title="gupiao"
+        />
+</group>
+</menu>

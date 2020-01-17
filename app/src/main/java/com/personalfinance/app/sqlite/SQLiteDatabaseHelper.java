@@ -1,4 +1,4 @@
-package com.personalfinance.app;
+package com.personalfinance.app.sqlite;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +11,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     public static final String create_userinfo = "CREATE TABLE userinfo ("
             + " User_Name varchar(45)  NOT NULL,"
             + " User_Password varchar(45) DEFAULT NULL,"
+            + "User_Login int(11) NOT NULL,"
             + " PRIMARY KEY (User_Name))";
     public static final String create_incomtype = "CREATE TABLE incometype("
             + "IncomeType_Name varchar(45)  NOT NULL,"
@@ -22,7 +23,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + "User_Name varchar(45)  NOT NULL,"
             + "Income_Money int(11) NOT NULL,"
             + "Income_Type varchar(45)  NOT NULL,"
-            + "Income_Time datetime NOT NULL,"
+            + "Income_Time varchar(45) NOT NULL,"
             + "Income_Message text ,"
             + "CONSTRAINT incomeinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + "CONSTRAINT incomeinfo_ibfk_2 FOREIGN KEY (Income_Type) REFERENCES incometype (IncomeType_Name) ON DELETE CASCADE ON UPDATE CASCADE"
@@ -31,7 +32,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " User_Name varchar(45)  NOT NULL,"
             + " Expend_Money int(11) NOT NULL,"
             + " Expend_Type varchar(45)  NOT NULL,"
-            + " Expend_Time datetime NOT NULL,"
+            + " Expend_Time varchar(45) NOT NULL,"
             + " Expend_Message text ,"
             + " CONSTRAINT expendinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT expendinfo_ibfk_2 FOREIGN KEY (Expend_Type) REFERENCES expendtype (ExpendType_Name) ON DELETE CASCADE ON UPDATE CASCADE"
@@ -80,6 +81,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             db.insert("expendtype", null, values);
             values.clear();
         }
+        values.put("User_Name","请立即登录");
+        values.put("User_Login",0);
+        db.insert("userinfo",null,values);
         Log.d("SQLiteDatabasemy", "a");
     }
 
