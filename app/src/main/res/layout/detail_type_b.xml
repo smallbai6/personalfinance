@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@color/colorwhitegray">
+
+
+    <TextView
+        android:id="@+id/b_detail_day"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="23号"
+        android:layout_marginLeft="10dp"
+        android:textSize="22dp"
+        />
+
+    <TextView
+        android:id="@+id/b_detail_week"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/b_detail_day"
+        android:layout_alignLeft="@+id/b_detail_day"
+        android:text="周一"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/b_detail_consumetype"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="早午晚餐"
+        android:layout_toRightOf="@+id/b_detail_day"
+        android:layout_marginLeft="85dp"
+        android:textSize="20dp"
+        />
+    <TextView
+        android:id="@+id/b_detail_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15:25"
+        android:layout_alignLeft="@+id/b_detail_consumetype"
+        android:layout_below="@+id/b_detail_consumetype"
+        android:textSize="16dp"
+        />
+    <TextView
+        android:id="@+id/b_detail_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15.00"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentRight="true"
+        android:textSize="20dp"
+        />
+
+
+</RelativeLayout>

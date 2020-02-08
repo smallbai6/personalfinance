@@ -55,13 +55,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:orientation="horizontal">
-
+                        <Button
+                            android:id="@+id/maindetail_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:layout_weight="1"
+                            android:text="流水" />
                         <Button
                             android:id="@+id/maintally_button"
                             android:layout_width="wrap_content"
                             android:layout_height="60dp"
                             android:layout_weight="1"
-                            android:text="Button" />
+                            android:text="记账" />
                     </LinearLayout>
 
                 </RelativeLayout>

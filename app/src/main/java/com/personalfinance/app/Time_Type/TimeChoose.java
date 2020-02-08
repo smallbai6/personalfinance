@@ -1,15 +1,18 @@
-package com.personalfinance.app;
+package com.personalfinance.app.Time_Type;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnValueChangeListener;
+
+import com.personalfinance.app.R;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -22,18 +25,31 @@ public class TimeChoose extends FrameLayout {
     private final NumberPicker mMinuteSpinner;
     private Calendar mDate;
     private int mYear, mMonth,mHour,mMinute;
+    private int select_mYear,select_mMonth,select_mDay,select_mHour,select_mMinute;
     private String[] mYearDisplayValues = new String[152];
     private String[] mMonthDisplayValues = new String[12];
     private String[] mDateDisplayValues = new String[7];
     private OnDateTimeChangedListener mOnDateTimeChangedListener;
 
-    public TimeChoose(Context context) {
+    public TimeChoose(Context context,String selectTime) {
         super(context);
+        Log.d("liang","进入TimeChoose");
+        select_mYear = Integer.valueOf(selectTime.substring(0,4));
+        select_mMonth = Integer.valueOf(selectTime.substring(5,7));
+        select_mDay=Integer.valueOf(selectTime.substring(8,10));
+        select_mHour=Integer.valueOf(selectTime.substring(12,14));
+        select_mMinute=Integer.valueOf(selectTime.substring(15));
+        Log.d("liang","selectTime="+selectTime);
+       // Log.d("liang",selectTime.substring(0,4)+" "+selectTime.substring(5,7)+" "+selectTime.substring(8,10)+
+       //         " "+selectTime.substring(12,14)+" "+selectTime.substring(15));
+       // Log.d("liang",select_mYear+" "+select_mMonth+" "+" "+select_mDay+" "+select_mHour+" "+select_mMinute);
         mDate = Calendar.getInstance();
         mYear = mDate.get(Calendar.YEAR);
         mMonth = mDate.get(Calendar.MONTH);
-        mHour=mDate.get(Calendar.HOUR_OF_DAY);
-        mMinute=mDate.get(Calendar.MINUTE);
+       // mHour=mDate.get(Calendar.HOUR_OF_DAY);
+       // mMinute=mDate.get(Calendar.MINUTE);
+        mHour=select_mHour;
+        mMinute=select_mMinute;
         inflate(context, R.layout.time, this);
         mYearSpinner = (NumberPicker) this.findViewById(R.id.time_year);
         setNumberPickerDividerColor(mYearSpinner);
@@ -41,7 +57,7 @@ public class TimeChoose extends FrameLayout {
         mYearSpinner.setMinValue(mYear - 71);
         mYearSpinner.setMaxValue(mYear + 80);
         updateYearControl();
-        mYearSpinner.setValue(mYear);
+        mYearSpinner.setValue(select_mYear);
         mYearSpinner.setWrapSelectorWheel(true);//设置为不可循环
         mYearSpinner.setOnValueChangedListener(mOnYearChangedListener);
 
@@ -51,15 +67,18 @@ public class TimeChoose extends FrameLayout {
         mMonthSpinner.setMaxValue(12);
         mMonthSpinner.setMinValue(1);
         updateMonthControl();
+        mMonthSpinner.setValue(select_mMonth);
         mMonthSpinner.setWrapSelectorWheel(true);
         mMonthSpinner.setOnValueChangedListener(mOnMonthChangedListener);
 
+        mDate.set(select_mYear, select_mMonth, select_mDay,select_mHour,select_mMinute);
         mDaySpinner = (NumberPicker) this.findViewById(R.id.time_day);
         setNumberPickerDividerColor(mDaySpinner);
         mDaySpinner.getChildAt(0).setFocusable(false);
         mDaySpinner.setMaxValue(6);
         mDaySpinner.setMinValue(0);
         updateDateControl();
+       // mDaySpinner.setValue(select_mDay);
         mDaySpinner.setWrapSelectorWheel(true);
         mDaySpinner.setOnValueChangedListener(mOnDayChangedListener);
 
@@ -68,7 +87,8 @@ public class TimeChoose extends FrameLayout {
         mHourSpinner.getChildAt(0).setFocusable(false);
         mHourSpinner.setMaxValue(23);
         mHourSpinner.setMinValue(0);
-        mHourSpinner.setValue(mHour);
+        mHourSpinner.setValue(select_mHour);
+       // mHourSpinner.setValue(mHour);
         mHourSpinner.setWrapSelectorWheel(true);
         mHourSpinner.setOnValueChangedListener(mOnHourChangedListener);
 
@@ -77,16 +97,19 @@ public class TimeChoose extends FrameLayout {
         mMinuteSpinner.getChildAt(0).setFocusable(false);
         mMinuteSpinner.setMaxValue(59);
         mMinuteSpinner.setMinValue(0);
-        mMinuteSpinner.setValue(mMinute);
+        mMinuteSpinner.setValue(select_mMinute);
+       // mMinuteSpinner.setValue(mMinute);
         mMinuteSpinner.setWrapSelectorWheel(true);
         mMinuteSpinner.setOnValueChangedListener(mOnMinuteChangedListener);
+       // Log.d("liang", "onValueChangedListener  " + mDate.get(Calendar.YEAR));
+
     }
 
     private OnValueChangeListener mOnYearChangedListener = new OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mYear = mYearSpinner.getValue();
-            mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH));
+            mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
         }
@@ -199,7 +222,7 @@ public class TimeChoose extends FrameLayout {
                 pf.setAccessible(true);
                 try {
                     //设置分割线的颜色值
-                    pf.set(picker, new ColorDrawable(this.getResources().getColor(R.color.colorAccent)));
+                    pf.set(picker, new ColorDrawable(this.getResources().getColor(R.color.colorwhitegray)));
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 } catch (Resources.NotFoundException e) {

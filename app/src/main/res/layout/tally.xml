@@ -3,6 +3,8 @@
     android:id="@+id/parent_tally"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -10,15 +12,15 @@
         android:layout_height="45dp"
         android:background="@color/colorwhite">
 
-        <Button
+        <TextView
             android:id="@+id/tally_back"
-            android:layout_width="104dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:background="#FFFFFF"
+            android:layout_centerVertical="true"
             android:text="记账返回"
             android:textColor="@color/colorblack"
             android:textSize="20sp" />
+
 
         <TextView
             android:id="@+id/tally_choose"
@@ -32,15 +34,17 @@
             android:textColor="@color/colorblack"
             android:textSize="20sp" />
 
-        <Button
+        <TextView
             android:id="@+id/tally_save"
-            android:layout_width="104dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:background="@color/colorwhite"
+            android:layout_marginRight="10dp"
             android:text="保存"
             android:textColor="@color/coloryellow"
+            android:layout_centerVertical="true"
             android:textSize="20sp" />
+
     </RelativeLayout>
 
     <View

@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button drawerbutton;
 
-    private Button tallybutton;
+    private Button tallybutton,detailbutton;
     private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         dbHelper = new SQLiteDatabaseHelper(this, "personal.db", null, 1);
         db = dbHelper.getWritableDatabase();
-        //Intent intent = new Intent(MainActivity.this, tally.class);
+        //Intent intent = new Intent(MainActivity.this, TallyActivity.class);
         //startActivity(intent);
         // finish();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -57,6 +57,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         userheaderlayout.setOnClickListener(this);
         tallybutton = (Button) findViewById(R.id.maintally_button);
         tallybutton.setOnClickListener(this);
+        detailbutton=(Button)findViewById(R.id.maindetail_button);
+        detailbutton.setOnClickListener(this);
+
+
+
         draweruserrname = (TextView) userheaderView.findViewById(R.id.drawer_username);
         //用户名和头像获取
         Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
@@ -89,13 +94,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                    intent = new Intent(MainActivity.this, UserCenter.class);
                     startActivity(intent);
                 }
-
                 break;
             case R.id.maintally_button://进入记账
-                Toast.makeText(MainActivity.this, "进入记账tally.java中", Toast.LENGTH_SHORT).show();
-                intent = new Intent(MainActivity.this, tally.class);
+                Toast.makeText(MainActivity.this, "进入记账中", Toast.LENGTH_SHORT).show();
+                intent = new Intent(MainActivity.this, TallyActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.maindetail_button://进入流水
+                Toast.makeText(MainActivity.this, "进入流水中", Toast.LENGTH_SHORT).show();
+                intent = new Intent(MainActivity.this, DetailActivity.class);
+                startActivity(intent);
+                break;
+
         }
     }
 
