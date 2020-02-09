@@ -23,7 +23,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + "User_Name varchar(45)  NOT NULL,"
             + "Income_Money double NOT NULL,"
             + "Income_Type varchar(45)  NOT NULL,"
-           // + "Income_Time varchar(45) NOT NULL,"
             + "Income_Time int(11) NOT NULL,"
             + "Income_Message text ,"
             + "CONSTRAINT incomeinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
