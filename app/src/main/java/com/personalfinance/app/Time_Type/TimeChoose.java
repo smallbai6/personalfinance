@@ -70,8 +70,8 @@ public class TimeChoose extends FrameLayout {
         mMonthSpinner.setValue(select_mMonth);
         mMonthSpinner.setWrapSelectorWheel(true);
         mMonthSpinner.setOnValueChangedListener(mOnMonthChangedListener);
-
         mDate.set(select_mYear, select_mMonth, select_mDay,select_mHour,select_mMinute);
+
         mDaySpinner = (NumberPicker) this.findViewById(R.id.time_day);
         setNumberPickerDividerColor(mDaySpinner);
         mDaySpinner.getChildAt(0).setFocusable(false);
@@ -102,13 +102,16 @@ public class TimeChoose extends FrameLayout {
         mMinuteSpinner.setWrapSelectorWheel(true);
         mMinuteSpinner.setOnValueChangedListener(mOnMinuteChangedListener);
        // Log.d("liang", "onValueChangedListener  " + mDate.get(Calendar.YEAR));
-
+        mYear=select_mYear;
+        mMonth=select_mMonth-1;
+       //  Log.d("liang", "主mMonth = " + mMonth);
     }
 
     private OnValueChangeListener mOnYearChangedListener = new OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mYear = mYearSpinner.getValue();
+          //  Log.d("liang", "yearchangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
@@ -118,6 +121,7 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mMonth = mMonthSpinner.getValue() - 1;
+           // Log.d("liang", "monthchangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
@@ -127,6 +131,7 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mDate.add(Calendar.DAY_OF_MONTH, newVal - oldVal);
+           // Log.d("liang", "daychangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
@@ -136,6 +141,7 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mHour=mHourSpinner.getValue();
+           // Log.d("liang", "hourchangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             onDateTimeChanged();
         }
@@ -145,6 +151,7 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mMinute=mMinuteSpinner.getValue();
+           // Log.d("liang", "Miniutechangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             onDateTimeChanged();
         }

@@ -15,15 +15,15 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
     private List<T> firstLevelNodes = new ArrayList<>();
     private SparseIntArray addedChildNodeIds = new SparseIntArray();
     private OnInnerItemClickListener<T> listener;
-    private OnInnerItemLongClickListener<T> longListener;
+    //private OnInnerItemLongClickListener<T> longListener;
 
     public interface OnInnerItemClickListener<T> {
         void onClick(T node);
     }
 
-    public interface OnInnerItemLongClickListener<T> {
+  /*  public interface OnInnerItemLongClickListener<T> {
         void onLongClick(T node);
-    }
+    }*/
 
     public TreeAdapter(List<T> nodes) {
         setNodes(nodes);
@@ -33,9 +33,9 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
         this.listener = listener;
     }
 
-    public void setOnInnerItemLongClickListener(OnInnerItemLongClickListener<T> listener) {
+ /*   public void setOnInnerItemLongClickListener(OnInnerItemLongClickListener<T> listener) {
         longListener = listener;
-    }
+    }*/
 
     public void setNodes(List<T> nodes) {
         if (nodes != null) {
@@ -145,9 +145,9 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
       //  Log.d("liang", "holder.position= "+holder.position);
         View view = holder.getConvertView();
         view.setOnClickListener(clickListener);
-        if (!node.hasChild()) {
+       /* if (!node.hasChild()) {
             view.setOnLongClickListener(longClickListener);
-        }
+        }*/
         return view;
     }
 
@@ -156,7 +156,7 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
         int position;
 
         public Holder() {
-            convertView = createConvertView(position);
+            convertView = createConvertView();
             convertView.setTag(this);
         }
 
@@ -166,7 +166,7 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
         /**
          * 创建界面
          */
-        protected abstract View createConvertView(int position);
+        protected abstract View createConvertView();
         /**
          * 设置数据
          */
@@ -187,18 +187,20 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
                 if (!node.isExpand) {
                     fold(node.childNodes);
                 }
+
                 showNodes.clear();
                 addedChildNodeIds.clear();
                 showNodes.addAll(firstLevelNodes);
                 filterShowAndSortNodes();
                 TreeAdapter.super.notifyDataSetChanged();//更改列表的数据
+
             } else if (listener != null) {
                 listener.onClick(node);
             }
         }
     };
 
-    private View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+    /*private View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
             if (longListener != null) {
@@ -207,7 +209,7 @@ public abstract class TreeAdapter<T extends Node<T>> extends BaseAdapter {
             }
             return true;
         }
-    };
+    };*/
 
     //递归收起节点及子节点
     private void fold(List<T> list) {

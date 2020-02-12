@@ -21,7 +21,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + "PRIMARY KEY (ExpendType_Name))";
     public static final String create_incomeinfo = "CREATE TABLE incomeinfo("
             + "User_Name varchar(45)  NOT NULL,"
-            + "Income_Money double NOT NULL,"
+            + "Income_Money varchar(45) NOT NULL,"
             + "Income_Type varchar(45)  NOT NULL,"
             + "Income_Time int(11) NOT NULL,"
             + "Income_Message text ,"
@@ -30,7 +30,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + ")";
     public static final String create_expendinfo = "CREATE TABLE expendinfo("
             + " User_Name varchar(45)  NOT NULL,"
-            + " Expend_Money double NOT NULL,"
+            + " Expend_Money varchar(45) NOT NULL,"
             + " Expend_Type varchar(45)  NOT NULL,"
           //  + " Expend_Time varchar(45) NOT NULL,"
             + " Expend_Time int(11) NOT NULL,"
@@ -41,14 +41,14 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     public static final String create_incomebudget = "CREATE TABLE incomebudget("
             + " User_Name varchar(45)  NOT NULL,"
             + " IncomeBudget_Type varchar(45)  NOT NULL,"
-            + " IncomeBudget_Money double DEFAULT NULL,"
+            + " IncomeBudget_Money varchar(45) DEFAULT NULL,"
             + " CONSTRAINT incomebudget_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT incomebudget_ibfk_2 FOREIGN KEY (IncomeBudget_Type) REFERENCES incometype (IncomeType_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";
     public static final String create_expendbudget = "CREATE TABLE expendbudget ("
             + " User_Name varchar(45)  NOT NULL,"
             + " ExpendBudget_Type varchar(45)  NOT NULL,"
-            + " ExpendBudget_Money double DEFAULT NULL,"
+            + " ExpendBudget_Money varchar(45) DEFAULT NULL,"
             + " CONSTRAINT expendbudget_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT expendbudget_ibfk_2 FOREIGN KEY (ExpendBudget_Type) REFERENCES expendtype (ExpendType_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";

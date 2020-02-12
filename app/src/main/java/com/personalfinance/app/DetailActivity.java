@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,10 +39,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private Cursor cursor;
     private String Username;
     private Intent intent;
-    /*按键
-
+    /*
+    按键
      */
     private TextView backbutton, choosermd;
+    private ImageView addtally;
+    /*
+    年结余
+     */
+    private TextView detail_year_money, detail_year_incomemoney, detail_year_expendmoney;
     /*
     年份和季月天选择
      */
@@ -60,11 +64,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView choosey;//点击进行上一年 下一年选择
     private Calendar calendar = Calendar.getInstance();//获得当前时间
     private int showyear;//当前需要显示时间
+
     /*
     总列表和各个等级排序列表
      */
     private ListView listView;
+    private Item currentitem;
     private List<Item> list = new ArrayList<>();
+    private boolean[] listisExpand = new boolean[10000];
     private MyAdapter adapter;
     private List<DetailInfo> InfoList = new ArrayList<>();
     private List<DetailSurplus> day_dayList = new ArrayList<>();
@@ -77,7 +84,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.detail);
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         listView = (ListView) findViewById(R.id.listview);//流水列表
-        // seasonlist();
 
         backbutton = (TextView) findViewById(R.id.detail_back_button);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
@@ -87,17 +93,22 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         backbutton.setText(showyear + "年");
 
         choosermd = (TextView) findViewById(R.id.detail_choose_rmd);//选择季月
-        drawable = getResources().getDrawable(R.mipmap.xiasanjiao);
+        choosermd.setText(rmdString[0]);
+        drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
         drawable2tubiao();
 
+        addtally = (ImageView) findViewById(R.id.detail_year_tianjia);
+
         choosey = (ImageView) findViewById(R.id.detail_year_shengluetubiao);
+        detail_year_money = (TextView) findViewById(R.id.detail_year_money);
+        detail_year_incomemoney = (TextView) findViewById(R.id.detail_year_incomemoney);
+        detail_year_expendmoney = (TextView) findViewById(R.id.detail_year_expendmoney);
 
         contentView = getLayoutInflater().inflate(R.layout.textlist, null);
         chooselistView = contentView.findViewById(R.id.textlist_View);
         yrmdadapter = new ArrayAdapter<>(DetailActivity.this, android.R.layout.simple_list_item_1, yrmdchooseList);
         chooselistView.setAdapter(yrmdadapter);
         InitPopupWindow();//初始化popupWindow
-
 
         chooselistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -109,8 +120,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         showyear = showyear + 1;
                     }
                     backbutton.setText(showyear + "年");
+
                 } else if (choosetype == 1) {//点击的是季月日
                     choosermd.setText(yrmdchooseList.get(position));
+                }
+                for (int i = 0; i < list.size(); i++) {
+                    listisExpand[i] = false;
+                }
+                //不管点击的是什么，都进行列表重建
+                if (choosermd.getText().equals(rmdString[0])) {
+                    detailseason_list();
+                } else if (choosermd.getText().equals(rmdString[1])) {
+                    detailmonth_list();
+                } else if (choosermd.getText().equals(rmdString[2])) {
+                    detailday_list();
                 }
                 choosePopupWindow.dismiss();
             }
@@ -119,7 +142,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onDismiss() {
                 if (choosetype == 1) {
-                    drawable = getResources().getDrawable(R.mipmap.xiasanjiao);
+                    drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
                     drawable2tubiao();
                 }
             }
@@ -127,6 +150,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         backbutton.setOnClickListener(this);
         choosermd.setOnClickListener(this);
         choosey.setOnClickListener(this);
+        addtally.setOnClickListener(this);
 
         cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
         if (cursor.moveToFirst()) {
@@ -134,8 +158,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         } else {//没有登录用户时用户名就为请立即登录
             Username = "请立即登录";
         }
-        // detail_list();
-        // detailmonth_list();
         detailseason_list();
     }
 
@@ -175,40 +197,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         chooselistView.setSelection(0);
     }
 
-    private void seasonlist() {
-        list.clear();
-        list.add(new Item(0, 0, 0, false, "3月", "2020", "5.00", "7.00", "2.00", ""));
-        list.add(new Item(1, 0, 1, false, "3月", "2020", "5.00", "7.00", "2.00", ""));
-        list.add(new Item(2, 1, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        list.add(new Item(3, 1, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        list.add(new Item(4, 0, 1, false, "3月", "2020", "5.00", "7.00", "2.00", ""));
-        list.add(new Item(5, 4, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        list.add(new Item(6, 4, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-
-        list.add(new Item(7, 0, 0, false, "3月", "2020", "5.00", "7.00", "2.00", ""));
-        list.add(new Item(8, 7, 1, false, "3月", "2020", "5.00", "7.00", "2.00", ""));
-        list.add(new Item(9, 8, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        list.add(new Item(10, 8, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        list.add(new Item(11, 7, 1, false, "3月", "2020", "5.00", "7.00", "2.00", ""));
-        list.add(new Item(12, 11, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        list.add(new Item(13, 11, 2, false, "23", "周四", "早午晚餐", "13:23", "5.00", "meiyou"));
-        adapter = new MyAdapter(list);
-        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
-            @Override
-            public void onClick(Item node) {
-                Toast.makeText(DetailActivity.this, "click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        adapter.setOnInnerItemLongClickListener(new TreeAdapter.OnInnerItemLongClickListener<Item>() {
-            @Override
-            public void onLongClick(Item node) {
-                Toast.makeText(DetailActivity.this, "long click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        listView.setAdapter(adapter);
-    }
-
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.detail_back_button://返回主活动
@@ -225,19 +213,84 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Init2rmdlist();
                 choosePopupWindow.showAsDropDown(choosermd);
                 if (choosePopupWindow.isShowing()) {
-                    drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
+                    drawable = getResources().getDrawable(R.mipmap.xiasanjiao);
                     drawable2tubiao();
                 }
                 choosetype = 1;
                 break;
+
+            case R.id.detail_year_tianjia://添加数据
+                intent = new Intent(DetailActivity.this, TallyActivity.class);
+                intent.putExtra("HuoDong", "DetailActivity.java");
+                startActivityForResult(intent, 1);//requestCode=1为进入TallyActivity.class中
+                // startActivity(intent);
+                //finish();
         }
     }
 
+    private void list_adapter() {
+        adapter = new MyAdapter(list);
+        listView.setAdapter(adapter);
+        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
+            @Override
+            public void onClick(Item node) {
+
+            }
+        });
+        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
+            @Override
+            public void onClick(Item node) {
+                // Toast.makeText(DetailActivity.this, "click: ", Toast.LENGTH_SHORT).show();
+                // 将信息传到下一个活动中
+                intent = new Intent(DetailActivity.this, TallyEditorActivity.class);
+                intent.putExtra("money", node.e);
+                intent.putExtra("type", node.c);
+                intent.putExtra("time", node.time);
+                intent.putExtra("message", node.f);
+                startActivityForResult(intent, 1);
+                //startActivity(intent);
+            }
+        });
+        /*adapter.setOnInnerItemLongClickListener(new TreeAdapter.OnInnerItemLongClickListener<Item>() {
+            @Override
+            public void onLongClick(Item node) {
+                Toast.makeText(DetailActivity.this, "long click: ", Toast.LENGTH_SHORT).show();
+            }
+        });*/
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 1:
+                if (resultCode == RESULT_OK) {
+                    Log.d("shijian", "时间未更改，更新数据");
+                    for (int i = 0; i < list.size(); i++) {
+                        listisExpand[i] = list.get(i).isExpand;
+                        // Log.d("liangjialing", listisExpand[i]+"");
+                    }
+                } else if (resultCode == RESULT_CANCELED) { //如果时间更改了的话
+                    Log.d("shijian", "时间更改了并且数据有删除的");
+                    for (int i = 0; i < list.size(); i++) {
+                        listisExpand[i] = false;
+                    }
+                }
+                if (choosermd.getText().equals(rmdString[0])) {
+                    detailseason_list();
+                } else if (choosermd.getText().equals(rmdString[1])) {
+                    detailmonth_list();
+                } else if (choosermd.getText().equals(rmdString[2])) {
+                    detailday_list();
+                }
+                break;
+            default:
+        }
+    }
     /*
     日详情列表
      */
     private void detail_DetailInfo(String currentyear) {
-        Log.d("DetailActivity.liang", "进入detail_DetailInfo");
+        Log.d("DetailActivity.liang", "进入detail_DetailInfo currentyear==  " + currentyear);
         //获得消费详情
         InfoList.clear();
         //支出信息
@@ -247,11 +300,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             do {
                 long time = cursor.getLong(cursor.getColumnIndex("Expend_Time"));
                 if (LongToString(time).substring(0, 4).equals(currentyear)) {
-                    double money = cursor.getDouble(cursor.getColumnIndex("Expend_Money"));
+                    String money = cursor.getString(cursor.getColumnIndex("Expend_Money"));
                     String type = 0 + cursor.getString(cursor.getColumnIndex("Expend_Type"));
-                    //long time = cursor.getLong(cursor.getColumnIndex("Expend_Time"));
                     String text = cursor.getString(cursor.getColumnIndex("Expend_Message"));
-                    DetailInfo detailInfo = new DetailInfo(money, type, time, text);
+                    DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
                     InfoList.add(detailInfo);
                 }
             } while (cursor.moveToNext());
@@ -261,12 +313,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 new String[]{Username}, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                double money = cursor.getDouble(cursor.getColumnIndex("Income_Money"));
-                String type = 1 + cursor.getString(cursor.getColumnIndex("Income_Type"));
                 long time = cursor.getLong(cursor.getColumnIndex("Income_Time"));
-                String text = cursor.getString(cursor.getColumnIndex("Income_Message"));
-                DetailInfo detailInfo = new DetailInfo(money, type, time, text);
-                InfoList.add(detailInfo);
+                if (LongToString(time).substring(0, 4).equals(currentyear)) {
+                    String money = cursor.getString(cursor.getColumnIndex("Income_Money"));
+                    String type = 1 + cursor.getString(cursor.getColumnIndex("Income_Type"));
+                    String text = cursor.getString(cursor.getColumnIndex("Income_Message"));
+                    DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
+                    InfoList.add(detailInfo);
+                }
+
             } while (cursor.moveToNext());
         }
         Collections.sort(InfoList);
@@ -331,11 +386,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
         // Log.d("DetailActivity.liang", "1级流水");
 
-        for (DetailSurplus detailSurplus : day_dayList) {
+       /* for (DetailSurplus detailSurplus : day_dayList) {
             Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
                     + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
                     detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));
-        }
+        }*/
     }
 
     /*
@@ -389,11 +444,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 createnew = true;
             }
         }
+        //总结出年
+        double totalyearmoney = 0;
+        double totalyearexpendmoney = 0;
+        double totalyeaerincomemoney = 0;
         for (DetailSurplus detailSurplus : day_monthList) {
+            totalyearmoney = totalyearmoney + detailSurplus.getJieyu();
+            totalyearexpendmoney = totalyearexpendmoney + detailSurplus.getZhichu();
+            totalyeaerincomemoney = totalyeaerincomemoney + detailSurplus.getShouru();
             Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
                     + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
                     detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));
         }
+        detail_year_money.setText(formatPrice(totalyearmoney));
+        detail_year_expendmoney.setText(formatPrice(totalyearexpendmoney));
+        detail_year_incomemoney.setText(formatPrice(totalyeaerincomemoney));
+        /*for (DetailSurplus detailSurplus : day_monthList) {
+            Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
+                    + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
+                    detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));
+        }*/
     }
 
     /*
@@ -449,12 +519,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
             // Log.d("liangaa","day=  "+day);
         }
-
+        //总结出年
+        double totalyearmoney = 0;
+        double totalyearexpendmoney = 0;
+        double totalyeaerincomemoney = 0;
         for (DetailSurplus detailSurplus : month_monthList) {
+            totalyearmoney = totalyearmoney + detailSurplus.getJieyu();
+            totalyearexpendmoney = totalyearexpendmoney + detailSurplus.getZhichu();
+            totalyeaerincomemoney = totalyeaerincomemoney + detailSurplus.getShouru();
             Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
                     + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
                     detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));
         }
+        detail_year_money.setText(formatPrice(totalyearmoney));
+        detail_year_expendmoney.setText(formatPrice(totalyearexpendmoney));
+        detail_year_incomemoney.setText(formatPrice(totalyeaerincomemoney));
+       /* for (DetailSurplus detailSurplus : month_monthList) {
+            Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
+                    + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
+                    detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));
+        }*/
     }
 
     /*
@@ -600,6 +684,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         // Log.d("DetailActivity.liangji", "季0级流水");
     }
 
+
     /*
     季列表
      */
@@ -614,37 +699,38 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         int i = 0;//为指针在list中的位置
         int leveldivide01, leveldivide12;//等级划分关联
         for (a = 0; a < season_seasonList.size(); a++) {
-            list.add(new Item(i, 0, 0, false,
+            list.add(new Item(i, 0, 0, listisExpand[i],
                     season_seasonList.get(a).getDay(),
                     season_seasonList.get(a).getDate(),
                     formatPrice(season_seasonList.get(a).getJieyu()),
                     formatPrice(season_seasonList.get(a).getShouru()),
                     formatPrice(season_seasonList.get(a).getZhichu()),
-                    ""));
-            //Log.d("DetailActivity.liang","i=  "+i);
+                    "",
+                    season_seasonList.get(a).getTime()));
             leveldivide01 = i;
             i++;
             int ji = Integer.valueOf(season_seasonList.get(a).getDay().substring(0, 1));//     .equals(day_dayList.get(b).getDate().substring(5, 7) + "月")
-            //season_seasonList.get(a).getDay().equals(day_dayList.get(b).getDate().substring(5, 7) + "月")
             while ((Integer.valueOf(month_monthList.get(b).getDay().substring(0, 2)) <= (ji * 3))
                     && (Integer.valueOf(month_monthList.get(b).getDay().substring(0, 2)) >= (ji * 3 - 2))) {
-                list.add(new Item(i, leveldivide01, 1, false,
+                list.add(new Item(i, leveldivide01, 1, listisExpand[i],
                         month_monthList.get(b).getDay(),
                         month_monthList.get(b).getDate(),
                         formatPrice(month_monthList.get(b).getJieyu()),
                         formatPrice(month_monthList.get(b).getShouru()),
                         formatPrice(month_monthList.get(b).getZhichu()),
-                        ""));
+                        "",
+                        month_monthList.get(b).getTime()));
                 leveldivide12 = i;
                 i++;
                 while (month_monthList.get(b).getDay().equals(LongToString(InfoList.get(c).getTime()).substring(5, 8))) {
-                    list.add(new Item(i, leveldivide12, 2, false,
+                    list.add(new Item(i, leveldivide12, 2, listisExpand[i],
                             LongToString(InfoList.get(c).getTime()).substring(8, 10),
                             LongToString(InfoList.get(c).getTime()).substring(16, 18),
                             InfoList.get(c).getType(),
                             LongToString(InfoList.get(c).getTime()).substring(11, 16),
-                            String.valueOf(InfoList.get(c).getMoney()),
-                            InfoList.get(c).getText()));
+                            formatPrice(InfoList.get(c).getMoney()),
+                            InfoList.get(c).getText(),
+                            InfoList.get(c).getTime()));
                     i++;
                     c++;
                     if (c >= InfoList.size()) {
@@ -657,26 +743,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
         }
-        Log.d("DetailActivity.liang", "季0级流水");
-        for (Item detailSurplus : list) {
-            Log.d("DetailActivity.liang", detailSurplus.a + "  " + detailSurplus.b
-                    + "  " + detailSurplus.c + "   " + detailSurplus.d + "      " +
-                    detailSurplus.e + "     " + detailSurplus.f);
-        }
-        adapter = new MyAdapter(list);
-        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
-            @Override
-            public void onClick(Item node) {
-                Toast.makeText(DetailActivity.this, "click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        adapter.setOnInnerItemLongClickListener(new TreeAdapter.OnInnerItemLongClickListener<Item>() {
-            @Override
-            public void onLongClick(Item node) {
-                Toast.makeText(DetailActivity.this, "long click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        listView.setAdapter(adapter);
+        list_adapter();
     }
 
     /*
@@ -692,26 +759,25 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         int i = 0;//为指针在list中的位置
         int leveldivide01;//等级划分关联
         for (a = 0; a < month_monthList.size(); a++) {
-            list.add(new Item(i, 0, 0, false,
+            list.add(new Item(i, 0, 0, listisExpand[i],
                     month_monthList.get(a).getDay(),
                     month_monthList.get(a).getDate(),
                     formatPrice(month_monthList.get(a).getJieyu()),
                     formatPrice(month_monthList.get(a).getShouru()),
                     formatPrice(month_monthList.get(a).getZhichu()),
-                    ""));
-            //Log.d("DetailActivity.liang","i=  "+i);
+                    "",
+                    month_monthList.get(a).getTime()));
             leveldivide01 = i;
             i++;
-            //LongtoString(day_monthList.get(a).getTime()).substring(5,7)==LongtoString(day_dayList.get(b).getTime()).substring(5,7)
             while (month_monthList.get(a).getDay().equals(LongToString(InfoList.get(b).getTime()).substring(5, 8))) {
-                list.add(new Item(i, leveldivide01, 1, false,
+                list.add(new Item(i, leveldivide01, 1, listisExpand[i],
                         LongToString(InfoList.get(b).getTime()).substring(8, 10),
                         LongToString(InfoList.get(b).getTime()).substring(16, 18),
                         InfoList.get(b).getType(),
                         LongToString(InfoList.get(b).getTime()).substring(11, 16),
-                        String.valueOf(InfoList.get(b).getMoney()),
-                        InfoList.get(b).getText()));
-                //Log.d("DetailActivity.liang","i=  "+i);
+                        formatPrice(InfoList.get(b).getMoney()),
+                        InfoList.get(b).getText(),
+                        InfoList.get(b).getTime()));
                 i++;
                 b++;
                 if (b >= InfoList.size()) {
@@ -719,20 +785,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
         }
-        adapter = new MyAdapter(list);
-        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
-            @Override
-            public void onClick(Item node) {
-                Toast.makeText(DetailActivity.this, "click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        adapter.setOnInnerItemLongClickListener(new TreeAdapter.OnInnerItemLongClickListener<Item>() {
-            @Override
-            public void onLongClick(Item node) {
-                Toast.makeText(DetailActivity.this, "long click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        listView.setAdapter(adapter);
+        list_adapter();
     }
 
     /*
@@ -748,40 +801,42 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         int a, b = 0, c = 0;//a为月，b为日，c为日详情
         int i = 0;//为指针在list中的位置
-        int leveldivide01, leveldivide12;//等级划分关联
+        int leveldivide01, leveldivide12;//等级划分关联listisExpand[i]
         for (a = 0; a < day_monthList.size(); a++) {
-            list.add(new Item(i, 0, 0, false,
+            list.add(new Item(i, 0, 0, listisExpand[i],
                     day_monthList.get(a).getDay(),
                     day_monthList.get(a).getDate(),
                     formatPrice(day_monthList.get(a).getJieyu()),
                     formatPrice(day_monthList.get(a).getShouru()),
                     formatPrice(day_monthList.get(a).getZhichu()),
-                    ""));
-            //Log.d("DetailActivity.liang","i=  "+i);
+                    "",
+                    day_monthList.get(a).getTime()
+            ));
             leveldivide01 = i;
             i++;
-            //LongtoString(day_monthList.get(a).getTime()).substring(5,7)==LongtoString(day_dayList.get(b).getTime()).substring(5,7)
+
             while (day_monthList.get(a).getDay().equals(day_dayList.get(b).getDate().substring(5, 7) + "月")) {
-                list.add(new Item(i, leveldivide01, 1, false,
+                list.add(new Item(i, leveldivide01, 1, listisExpand[i],
                         day_dayList.get(b).getDay(),
                         day_dayList.get(b).getDate(),
                         formatPrice(day_dayList.get(b).getJieyu()),
                         formatPrice(day_dayList.get(b).getShouru()),
                         formatPrice(day_dayList.get(b).getZhichu()),
-                        ""));
-                //Log.d("DetailActivity.liang","i=  "+i);
+                        "",
+                        day_dayList.get(b).getTime()
+                ));
                 leveldivide12 = i;
                 i++;
                 while (LongToString(day_dayList.get(b).getTime()).substring(0, 11).equals(
                         LongToString(InfoList.get(c).getTime()).substring(0, 11))) {
-                    list.add(new Item(i, leveldivide12, 2, false,
+                    list.add(new Item(i, leveldivide12, 2, listisExpand[i],
                             LongToString(InfoList.get(c).getTime()).substring(8, 10),
                             LongToString(InfoList.get(c).getTime()).substring(16, 18),
                             InfoList.get(c).getType(),
                             LongToString(InfoList.get(c).getTime()).substring(11, 16),
-                            String.valueOf(InfoList.get(c).getMoney()),
-                            InfoList.get(c).getText()));
-                    // Log.d("DetailActivity.liang","i=  "+i);
+                            formatPrice(InfoList.get(c).getMoney()),
+                            InfoList.get(c).getText(),
+                            InfoList.get(c).getTime()));
                     i++;
                     c++;
                     if (c >= InfoList.size()) {
@@ -794,22 +849,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
         }
-        adapter = new MyAdapter(list);
-        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
-            @Override
-            public void onClick(Item node) {
-                Toast.makeText(DetailActivity.this, "click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        adapter.setOnInnerItemLongClickListener(new TreeAdapter.OnInnerItemLongClickListener<Item>() {
-            @Override
-            public void onLongClick(Item node) {
-                Toast.makeText(DetailActivity.this, "long click: ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        listView.setAdapter(adapter);
-    }
+        list_adapter();
 
+    }
     /*
     适配器
      */
@@ -817,12 +859,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         MyAdapter(List<Item> nodes) {
             super(nodes);
         }
-
         @Override
         public int getViewTypeCount() {
             return super.getViewTypeCount() + 1;
         }
-
         /**
          * 获取当前位置的条目类型
          */
@@ -841,13 +881,16 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     return new Holder<Item>() {
                         private ImageView iv;
                         private TextView tva, tvb, tvc, tvd, tve;
-
+                        private RelativeLayout relativeLayout;
                         @Override
                         protected void setData(Item node) {
                             iv.setVisibility(node.hasChild() ? View.VISIBLE : View.INVISIBLE);
                             iv.setBackgroundResource(node.isExpand ? R.mipmap.xiajiantou : R.mipmap.shangjiantou);
                             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tva.getLayoutParams();
                             params.leftMargin = node.level * 20 + 10;
+                            if (node.level == 1) {
+                                relativeLayout.setBackgroundColor(getResources().getColor(R.color.colorwhitewhitegray));
+                            }
                             tva.setLayoutParams(params);
                             tva.setText(node.a);
                             tvb.setText(node.b);
@@ -857,8 +900,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         }
 
                         @Override
-                        protected View createConvertView(int position) {
+                        protected View createConvertView() {
                             View view = View.inflate(DetailActivity.this, R.layout.detail_type_a, null);
+                            relativeLayout = (RelativeLayout) view.findViewById(R.id.a_detail_relativeLayout);
                             iv = (ImageView) view.findViewById(R.id.a_detail_jiantou);
                             tva = (TextView) view.findViewById(R.id.a_detail_month);
                             tvb = (TextView) view.findViewById(R.id.a_detail_year);
@@ -893,7 +937,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         }
 
                         @Override
-                        protected View createConvertView(int position) {
+                        protected View createConvertView() {
                             View view = View.inflate(DetailActivity.this, R.layout.detail_type_b, null);
                             tva = (TextView) view.findViewById(R.id.b_detail_day);
                             tvb = (TextView) view.findViewById(R.id.b_detail_week);
@@ -910,8 +954,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private class Item extends Node<Item> {
         String a, b, c, d, e, f;
+        long time;
 
-        Item(int id, int pId, int level, boolean isExpand, String a, String b, String c, String d, String e, String f) {
+        Item(int id, int pId, int level, boolean isExpand, String a, String b, String c, String d, String e, String f, long time) {
             super(id, pId, level, isExpand);
             this.a = a;
             this.b = b;
@@ -919,6 +964,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             this.d = d;
             this.e = e;
             this.f = f;
+            this.time = time;
         }
     }
 

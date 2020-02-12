@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -38,7 +37,7 @@ public class TypeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mType = mTypeSpinner.getValue();
-            Log.d("liang",mType+"??");
+           // Log.d("liang",mType+"??");
             onTypeChanged();
         }
     };

@@ -94,16 +94,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                    intent = new Intent(MainActivity.this, UserCenter.class);
                     startActivity(intent);
                 }
+                finish();
                 break;
             case R.id.maintally_button://进入记账
                 Toast.makeText(MainActivity.this, "进入记账中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, TallyActivity.class);
+                intent.putExtra("HuoDong","MainActivity.java");
                 startActivity(intent);
+                finish();
                 break;
             case R.id.maindetail_button://进入流水
                 Toast.makeText(MainActivity.this, "进入流水中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, DetailActivity.class);
                 startActivity(intent);
+                finish();
                 break;
 
         }

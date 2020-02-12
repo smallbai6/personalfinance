@@ -32,6 +32,17 @@ import java.util.Date;
 import java.util.List;
 
 public class TallyActivity extends AppCompatActivity implements View.OnClickListener {
+
+    /*
+     *数据库
+     */
+    private SQLiteDatabase db;
+    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    /*
+     *活动跳转
+     */
+    private Intent intent;
+    private String huodong;
     /*
      *顶部按钮
      */
@@ -56,11 +67,7 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
     private String[] income_expend = {"支付", "收入"};
     private ArrayAdapter<String> adapter;
     private List<String> chooseList = new ArrayList<>();
-    /*
-     *数据库
-     */
-    private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+
     /*
      *标识符记录
      */
@@ -82,14 +89,13 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
      *进行保存操作
      */
     private String username;
-    /*
-     *活动跳转
-     */
-    private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tally);
+       intent=getIntent();
+       huodong=intent.getStringExtra("HuoDong");
+
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.tally_back);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
@@ -269,10 +275,18 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
                     income();
                 }
                 //退出记账活动
-                //Toast.makeText(TallyActivity.this, "tally_save", Toast.LENGTH_SHORT).show();
-                intent = new Intent(TallyActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                //判断是由哪一个活动进入的TallyActivity
+                if(huodong.equals("MainActivity.java")){
+                    intent = new Intent(TallyActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else if(huodong.equals("DetailActivity.java")){
+                    intent = new Intent(TallyActivity.this, DetailActivity.class);
+                    //startActivity(intent);
+                    setResult(RESULT_OK,intent);
+                    finish();
+                }
+
                 break;
             case R.id.tallycontent_again:
                 //再记一笔先保存再将内容清空
@@ -287,9 +301,16 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.tally_back:
                 //直接退出记账活动
-                intent = new Intent(TallyActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                if(huodong.equals("MainActivity.java")){
+                    intent = new Intent(TallyActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else if(huodong.equals("DetailActivity.java")){
+                    intent = new Intent(TallyActivity.this, DetailActivity.class);
+                    //startActivity(intent);
+                    setResult(RESULT_OK,intent);
+                    finish();
+                }
                 //Toast.makeText(TallyActivity.this, "tally_back", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -303,7 +324,8 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
     private void expend() {
         ContentValues values = new ContentValues();
         values.put("User_Name", username);
-        values.put("Expend_Money", Double.parseDouble(money.getText().toString()));
+        values.put("Expend_Money", money.getText().toString());
+       // Log.d("jinxingbaocun","数据库中有money= "+Double.parseDouble(money.getText().toString()));
         values.put("Expend_Type", type.getText().toString());
         // values.put("Expend_Time", time.getText().toString());
         values.put("Expend_Time", currentdate);
@@ -318,9 +340,8 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
     private void income() {
         ContentValues values = new ContentValues();
         values.put("User_Name", username);
-        values.put("Income_Money", Double.parseDouble(money.getText().toString()));
+        values.put("Income_Money", money.getText().toString());
         values.put("Income_Type", type.getText().toString());
-        //values.put("Income_Time", time.getText().toString());
         values.put("Income_Time", currentdate);
         values.put("Income_Message", message.getText().toString());
         db.insert("incomeinfo", null, values);

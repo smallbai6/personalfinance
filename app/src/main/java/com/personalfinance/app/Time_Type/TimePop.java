@@ -61,6 +61,7 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
                 mDate.set(Calendar.HOUR_OF_DAY,hour);
                 mDate.set(Calendar.MINUTE,minute);
                 mDate.set(Calendar.SECOND,0);
+                mDate.set(Calendar.MILLISECOND, 0);
                 if (mOnDateTimeSetListener != null) {
                     mOnDateTimeSetListener.OnDateTimeSet(mDate.getTimeInMillis());
                }

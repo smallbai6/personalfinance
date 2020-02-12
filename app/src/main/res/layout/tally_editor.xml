@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_tallyeditor"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/colorwhite">
+
+        <TextView
+            android:id="@+id/tally_editor_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="编辑"
+            android:textColor="@color/colorblack"
+            android:textSize="20sp" />
+
+
+        <TextView
+            android:id="@+id/tally_editor_choose"
+            android:layout_width="wrap_content"
+            android:layout_height="53dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:text="支付"
+            android:textColor="@color/colorblack"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tally_editor_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:text="保存"
+            android:textColor="@color/coloryellow"
+            android:layout_centerVertical="true"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/colorblack" />
+
+    <LinearLayout
+        android:id="@+id/son_tallyeditor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="620dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/tally_content" />
+            </LinearLayout>
+        </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/tallycontent_editor_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/coloryellow"
+                    android:text="保存"
+                    android:textColor="@color/colorwhite"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/tallycontent_editor_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/coloryellow"
+                    android:text="删除"
+                    android:textColor="@color/colorwhite"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
