@@ -234,12 +234,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
             @Override
             public void onClick(Item node) {
-
-            }
-        });
-        adapter.setOnInnerItemClickListener(new TreeAdapter.OnInnerItemClickListener<Item>() {
-            @Override
-            public void onClick(Item node) {
                 // Toast.makeText(DetailActivity.this, "click: ", Toast.LENGTH_SHORT).show();
                 // 将信息传到下一个活动中
                 intent = new Intent(DetailActivity.this, TallyEditorActivity.class);
