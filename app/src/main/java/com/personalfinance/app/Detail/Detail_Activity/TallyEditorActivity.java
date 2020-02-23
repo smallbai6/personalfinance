@@ -1,8 +1,8 @@
 package com.personalfinance.app;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.personalfinance.app.Time_Type.CaculatorPop;
@@ -91,14 +92,15 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
 
 
         //获取用户名称
-        Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
+        /*Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
         if (cursor.moveToFirst()) {
             username = cursor.getString(cursor.getColumnIndex("User_Name"));
         } else {//没有登录用户时用户名就为请立即登录
             username = "请立即登录";
-        }
+        }*/
 //获得上一个活动的信息
         intent = getIntent();
+        username=intent.getStringExtra("username");
         if (intent.getStringExtra("type").substring(0, 1).equals("0")) {
             choose.setText(income_expend[0]);
             record = 0;
@@ -178,15 +180,36 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 }
                 //返回到上一个活动中
                 intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
-                if(currentdate!=InitializeTime){
+               /* if(currentdate!=InitializeTime){
                     //时间更改了
                     setResult(RESULT_CANCELED,intent);
                 }else{
                     setResult(RESULT_OK, intent);
-                }
+                }*/
+                setResult(RESULT_OK,intent);
                 finish();
                 break;
             case R.id.tallycontent_editor_delete://删除该条数据
+                delete_Dialog();
+                break;
+            case R.id.tally_editor_back:
+                //返回到上一个活动中
+                intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
+                //startActivity(intent);
+                setResult(RESULT_CANCELED, intent);
+                finish();
+                break;
+            default:
+                break;
+        }
+    }
+    private void delete_Dialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("删除提示");
+        builder.setMessage("是否删除该条记录");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
                     db.delete("expendinfo", "User_Name=? AND Expend_Money=? " +
                                     "AND Expend_Type=? AND Expend_Time=? AND Expend_Message=?",
@@ -199,21 +222,20 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 //返回到上一个活动中
                 intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
                 //startActivity(intent);
-                setResult(RESULT_CANCELED, intent);
-                finish();
-                break;
-            case R.id.tally_editor_back:
-                //返回到上一个活动中
-                intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
-                //startActivity(intent);
                 setResult(RESULT_OK, intent);
                 finish();
-                break;
-            default:
-                break;
-        }
-    }
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
     /*
      *保存更改后的支付信息
      */
