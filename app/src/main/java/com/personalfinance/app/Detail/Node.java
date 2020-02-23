@@ -1,4 +1,4 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail;
 
 import java.util.ArrayList;
 import java.util.List;

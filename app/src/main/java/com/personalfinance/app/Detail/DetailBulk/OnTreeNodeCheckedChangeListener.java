@@ -1,6 +1,8 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail.DetailBulk;
+
+import com.personalfinance.app.Detail.Node;
 
 public interface OnTreeNodeCheckedChangeListener {
 
-    void onCheckChange(DENode node, int position, boolean isChecked);
+    void onCheckChange(Node node, int position, boolean isChecked);
 }

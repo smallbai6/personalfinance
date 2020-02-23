@@ -1,4 +1,4 @@
-package com.personalfinance.app.sqlite;
+package com.personalfinance.app.Sqlite;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -42,6 +42,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " User_Name varchar(45)  NOT NULL,"
             + " IncomeBudget_Type varchar(45)  NOT NULL,"
             + " IncomeBudget_Money varchar(45) DEFAULT NULL,"
+            + " IncomeBudget_DMSY varchar(45) NOT NULL,"
+            + " IncomeBudget_Time int(11) NOT NULL,"
             + " CONSTRAINT incomebudget_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT incomebudget_ibfk_2 FOREIGN KEY (IncomeBudget_Type) REFERENCES incometype (IncomeType_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";
@@ -49,6 +51,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " User_Name varchar(45)  NOT NULL,"
             + " ExpendBudget_Type varchar(45)  NOT NULL,"
             + " ExpendBudget_Money varchar(45) DEFAULT NULL,"
+            + " ExpendBudget_DMSY varchar(45) NOT NULL,"
+            + " ExpendBudget_Time int(11) NOT NULL,"
             + " CONSTRAINT expendbudget_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT expendbudget_ibfk_2 FOREIGN KEY (ExpendBudget_Type) REFERENCES expendtype (ExpendType_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";

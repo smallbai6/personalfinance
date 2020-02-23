@@ -44,20 +44,19 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
     private Intent intent;
     private String huodong;
     /*
-     *顶部按钮
+     *顶部按钮  底部保存按钮 判断数据是否有保存（点击过再记一笔和保存）
      */
     private TextView back,save,choose;
     private Drawable drawable;
+    private Button buttonback, buttonagain;
+    private int issave = 0;
     /*
      *填写的内容
      */
     private TextView money, process, type, time;
     private EditText message;
     private LinearLayout layout_money, layout_type, layout_time;
-    /*
-     *底部保存按钮
-     */
-    private Button buttonback, buttonagain;
+
     /*
      *PopupWindow的配置内容
      */
@@ -202,7 +201,7 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
         } else if (position == 1) {
             cursor = db.query("incometype", null, null, null, null, null, null);
         }
-        if (cursor.moveToNext()) {
+        if (cursor.moveToFirst()) {
             String name = "";
             if (position == 0) {
                 name = cursor.getString(cursor.getColumnIndex("ExpendType_Name"));
@@ -269,6 +268,7 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.tally_save:
             case R.id.tallycontent_save://进行保存
+                //issave++;
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
                     expend();
                 } else if (choose.getText().toString().equals(income_expend[1])) {//收入
@@ -289,6 +289,7 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
 
                 break;
             case R.id.tallycontent_again:
+                issave++;
                 //再记一笔先保存再将内容清空
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
                     expend();
@@ -304,13 +305,14 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
                 if(huodong.equals("MainActivity.java")){
                     intent = new Intent(TallyActivity.this, MainActivity.class);
                     startActivity(intent);
-                    finish();
+                    // finish();
                 }else if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyActivity.this, DetailActivity.class);
                     //startActivity(intent);
-                    setResult(RESULT_OK,intent);
-                    finish();
+                    intent.putExtra("issave", issave);
+                    setResult(RESULT_CANCELED,intent);
                 }
+                finish();
                 //Toast.makeText(TallyActivity.this, "tally_back", Toast.LENGTH_SHORT).show();
                 break;
             default:

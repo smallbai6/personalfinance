@@ -1,6 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/detail_bulkeditor_back"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:src="@mipmap/chahaotubiao" />
+
+            <TextView
+                android:id="@+id/detail_bulkeditor_allchoose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="全选"
+                android:textColor="@color/coloryellow"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/detail_bulkeditor_showchoosetotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="批量编辑"
+                android:textColor="@color/colorblack"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/detail_bulkeditor_showtotalmoney"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/detail_bulkeditor_showchoosetotal"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:text="合计:13.00"
+                android:textSize="16dp" />
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorblack" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/detail_bulkeditor_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:background="@color/colorwhitegray">
+
+            <Button
+                android:id="@+id/detail_bulkeditor_allchoosebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorgray"
+                android:text="全选"
+                android:textColor="@color/colorwhite"
+                android:textSize="20sp" />
+            <Button
+                android:id="@+id/detail_bulkeditor_deletebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorgray"
+                android:text="删除"
+                android:textColor="@color/colorwhite"
+                android:textSize="20sp" />
+            <Button
+                android:id="@+id/detail_bulkeditor_allnochoosebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorgray"
+                android:text="全不选"
+                android:textColor="@color/colorwhite"
+                android:textSize="20sp" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 
 </LinearLayout>

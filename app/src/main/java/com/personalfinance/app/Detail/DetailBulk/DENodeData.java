@@ -1,4 +1,4 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail.DetailBulk;
 /**
  * 每个节点的具体数据
  * Created by xiaoyehai on 2018/7/11 0011.

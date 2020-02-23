@@ -1,4 +1,4 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+
+import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,7 +213,7 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
      * @param node
      * @param checked
      */
-    protected void setChecked(final Node node, boolean checked) {
+    public void setChecked(final Node node, boolean checked) {
         node.setChecked(checked);
         setChildChecked(node, checked);
         //判断其父节点下的所有子节点都被点击

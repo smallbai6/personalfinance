@@ -16,7 +16,7 @@ public class DetailInfo implements Comparable<DetailInfo>{
         //降序
         //return o.time - this.time;
         //升序
-       // return this.time - o.time;
+        // return this.time - o.time;
         if(this.time<o.time){
             return 1;
         }else if(this.time>o.time){

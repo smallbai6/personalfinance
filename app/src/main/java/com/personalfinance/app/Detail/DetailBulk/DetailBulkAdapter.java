@@ -1,4 +1,4 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail.DetailBulk;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,12 +9,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.personalfinance.app.Detail.TreeListViewAdapter;
+import com.personalfinance.app.Detail.Node;
 import com.personalfinance.app.R;
 
 import java.util.List;
 
 
-public class ListViewAdapter extends TreeListViewAdapter {
+public class DetailBulkAdapter extends TreeListViewAdapter {
 
     private OnTreeNodeCheckedChangeListener checkedChangeListener;
 
@@ -23,12 +25,12 @@ public class ListViewAdapter extends TreeListViewAdapter {
     }
 
     //进行LiistViewAdapter中的内容
-    public ListViewAdapter(ListView listView, Context context, List<DENode> datas, int defaultExpandLevel, int iconExpand, int iconNoExpand) {
+    public DetailBulkAdapter(ListView listView, Context context, List<Node> datas, int defaultExpandLevel, int iconExpand, int iconNoExpand) {
         super(listView, context, datas, defaultExpandLevel, iconExpand, iconNoExpand);
     }
 
     @Override
-    public View getConvertView(final DENode node, final int position, View convertView, ViewGroup parent) {
+    public View getConvertView(final Node node, final int position, View convertView, ViewGroup parent) {
         final ViewHoldera holdera;
         final ViewHolderb holderb;
         DENodeData data;

@@ -1,5 +1,7 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail.DetailBulk;
+
+import com.personalfinance.app.Detail.Node;
 
 public interface OnTreeNodeClickListener {
-    void onClick(DENode node, int position);
+    void onClick(Node node, int position);
 }

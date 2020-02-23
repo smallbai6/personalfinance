@@ -13,7 +13,9 @@
         <activity android:name=".RegisterLogin"></activity>
         <activity android:name=".TallyActivity"></activity>
         <activity android:name=".DetailActivity"></activity>
-        <activity android:name=".TallyEditorActivity"></activity>
+        <activity android:name=".Detail.Detail_Activity.TallyEditorActivity"></activity>
+        <activity android:name=".BudgetActivity"></activity>
+        <activity android:name=".Detail.Detail_Activity.DetailEditorActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

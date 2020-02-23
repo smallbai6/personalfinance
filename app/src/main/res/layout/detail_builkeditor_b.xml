@@ -1,6 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-</LinearLayout>
+
+    <!--<RadioButton
+       android:id="@+id/b_builkeditor_checkbox"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerVertical="true"
+       android:layout_marginLeft="10dp"
+       android:focusable="false" />
+  -->
+  <CheckBox
+       android:id="@+id/b_builkeditor_checkbox"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerVertical="true"
+       android:layout_marginLeft="10dp"
+       android:focusable="false"
+       />
+
+    <TextView
+        android:id="@+id/b_builkeditor_consumetype"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="早午晚餐"
+        android:layout_toRightOf="@+id/b_builkeditor_checkbox"
+        android:layout_marginLeft="15dp"
+        android:textColor="@color/colorblack"
+        android:textSize="20dp"
+        />
+    <TextView
+        android:id="@+id/b_builkeditor_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15:25"
+        android:layout_alignLeft="@+id/b_builkeditor_consumetype"
+        android:layout_below="@+id/b_builkeditor_consumetype"
+        android:textSize="16dp"
+        />
+
+
+
+    <TextView
+        android:id="@+id/b_builkeditor_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15.00"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentRight="true"
+        android:ellipsize="end"
+        android:maxWidth="90dp"
+        android:singleLine="true"
+        android:textSize="20dp"
+        />
+
+   <!-- <ImageView
+        android:id="@+id/b_builkeditor_jiantou"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_alignParentRight="true"
+        app:srcCompat="@mipmap/bianxiebutiao" />
+-->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/b_builkeditor_time"
+       />
+
+</RelativeLayout>

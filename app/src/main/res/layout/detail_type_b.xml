@@ -45,7 +45,7 @@
 
     <TextView
         android:id="@+id/b_detail_text"
-        android:layout_width="wrap_content"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:text="备注"
         android:layout_alignLeft="@+id/b_detail_consumetype"
@@ -60,6 +60,9 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="20dp"
         android:layout_alignParentRight="true"
+        android:ellipsize="end"
+        android:maxWidth="90dp"
+        android:singleLine="true"
         android:textSize="20dp"
         />
     <View

@@ -24,13 +24,14 @@
             android:id="@+id/tallycontent_process"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
             android:textSize="15sp"/>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginRight="7dp"
+        android:layout_marginRight="10dp"
         android:background="@color/colorAccent"/>
 
     <LinearLayout
@@ -63,6 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="分类"
+                android:layout_marginRight="10dp"
                 android:textColor="@color/colorblack"
                 android:textSize="20sp" />
 
@@ -78,7 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginRight="7dp"
+        android:layout_marginRight="10dp"
         android:background="@color/colorgray" />
 
     <LinearLayout
@@ -110,8 +112,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="时间"
+                android:layout_marginRight="10dp"
                 android:textColor="@color/colorblack"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                />
 
         </LinearLayout>
 
@@ -124,7 +128,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginRight="7dp"
+        android:layout_marginRight="10dp"
         android:background="@color/colorgray" />
 
     <LinearLayout
@@ -159,6 +163,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:hint="备注"
+                android:layout_marginRight="20dp"
                 android:textColor="@color/colorblack"
                 android:textSize="20sp"
                 />

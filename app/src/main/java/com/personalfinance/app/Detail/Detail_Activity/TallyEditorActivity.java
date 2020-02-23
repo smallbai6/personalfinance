@@ -1,4 +1,4 @@
-package com.personalfinance.app;
+package com.personalfinance.app.Detail.Detail_Activity;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -15,6 +15,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.personalfinance.app.DetailActivity;
+import com.personalfinance.app.R;
 import com.personalfinance.app.Time_Type.CaculatorPop;
 import com.personalfinance.app.Time_Type.TimePop;
 import com.personalfinance.app.Time_Type.TypePop;

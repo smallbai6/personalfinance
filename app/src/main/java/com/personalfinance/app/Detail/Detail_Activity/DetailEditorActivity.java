@@ -1,4 +1,4 @@
-package com.personalfinance.app.DetailBulk;
+package com.personalfinance.app.Detail.Detail_Activity;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,7 +14,12 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.personalfinance.app.Detail.DetailInfo;
+import com.personalfinance.app.Detail.Node;
 import com.personalfinance.app.DetailActivity;
+import com.personalfinance.app.Detail.DetailBulk.DENodeData;
+import com.personalfinance.app.Detail.DetailBulk.DetailBulkAdapter;
+import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeCheckedChangeListener;
+import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeClickListener;
 import com.personalfinance.app.R;
 
 import java.text.DecimalFormat;
@@ -37,8 +42,8 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     private List<DetailInfo> InfoList = new ArrayList<>();
     private List<String> day_dayList = new ArrayList<>();
     private ListView listView;
-    private List<DENode> list = new ArrayList<>();
-    private ListViewAdapter mAdapter;
+    private List<Node> list = new ArrayList<>();
+    private DetailBulkAdapter mAdapter;
     /*
     显示的textview和按键
      */
@@ -58,7 +63,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         currentyear = intent.getStringExtra("year");
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
         detailmonth_list();
-        mAdapter = new ListViewAdapter(listView, this, list,
+        mAdapter = new DetailBulkAdapter(listView, this, list,
                 1, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
         listView.setAdapter(mAdapter);
         allchoose = (TextView) findViewById(R.id.detail_bulkeditor_allchoose);
@@ -78,13 +83,13 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         //选中状态监听
         mAdapter.setCheckedChangeListener(new OnTreeNodeCheckedChangeListener() {
             @Override
-            public void onCheckChange(DENode node, int position, boolean isChecked) {
+            public void onCheckChange(Node node, int position, boolean isChecked) {
                 showchoosetotal_totalmoney();
             }
         });
         mAdapter.setOnTreeNodeClickListener(new OnTreeNodeClickListener() {
             @Override
-            public void onClick(DENode node, int position) {
+            public void onClick(Node node, int position) {
                 showchoosetotal_totalmoney();
             }
         });
@@ -95,12 +100,12 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         //获取所有选中节点
         int total = 0;
         double totalmoney = 0;
-        List<DENode> selectedNode = mAdapter.getSelectedNode();
+        List<Node> selectedNode = mAdapter.getSelectedNode();
         if (selectedNode.size() == 0) {//选中的节点为空，都没有选中；
             showchoosetotal.setText("未进行选择");
             showtotalmoney.setText("");
         } else {
-            for (DENode n : selectedNode) {
+            for (Node n : selectedNode) {
                 if (n.isLeaf()) {//1级计入数内
                     DENodeData deNodeData = (DENodeData) n.getData();
                     total++;
@@ -128,15 +133,15 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.detail_bulkeditor_allchoosebutton:
             case R.id.detail_bulkeditor_allchoose://全选
-                List<DENode> allNode = mAdapter.getAllNodes();
-                for (DENode node : allNode) {
+                List<Node> allNode = mAdapter.getAllNodes();
+                for (Node node : allNode) {
                     mAdapter.setChecked(node, true);
                 }
                 showchoosetotal_totalmoney();
                 break;
             case R.id.detail_bulkeditor_allnochoosebutton://全不选
-                List<DENode> allNodec = mAdapter.getAllNodes();
-                for (DENode node : allNodec) {
+                List<Node> allNodec = mAdapter.getAllNodes();
+                for (Node node : allNodec) {
                     mAdapter.setChecked(node, false);
                 }
                 showchoosetotal_totalmoney();
@@ -149,8 +154,8 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void delete() {
-        List<DENode> selectedNode = mAdapter.getSelectedNode();
-        for (DENode node : selectedNode) {
+        List<Node> selectedNode = mAdapter.getSelectedNode();
+        for (Node node : selectedNode) {
             DENodeData deNodeData = (DENodeData) node.getData();
             if (node.isLeaf()) {
                 //如果是叶子节点,进行删除
@@ -296,7 +301,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                     "",
                     day_dayList.get(a).getTime()));*/
             deNodeData = new DENodeData(day_dayList.get(a), "", "", 0);
-            list.add(new DENode<DENodeData>(i + "", "-1", deNodeData, "0"));
+            list.add(new Node<DENodeData>(i + "", "-1", deNodeData, "0"));
             leveldivide01 = i;
             i++;
             // Log.d("aaaaad","InfoList.get(b).getTime() =  "+LongToString(InfoList.get(b).getTime()).substring(0,11));
@@ -309,7 +314,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 deNodeData = new DENodeData(InfoList.get(b).getType(),
                         LongToString(InfoList.get(b).getTime()).substring(11, 16), formatPrice(InfoList.get(b).getMoney()),
                         InfoList.get(b).getTime());
-                list.add(new DENode<DENodeData>(i + "", leveldivide01 + "", deNodeData, "1"));
+                list.add(new Node<DENodeData>(i + "", leveldivide01 + "", deNodeData, "1"));
                 i++;
                 b++;
                 if (b >= InfoList.size()) {

@@ -1,4 +1,5 @@
 package com.personalfinance.app.Detail;
 
-public class OnInnerItemClickListener {
+public interface OnInnerItemClickListener {
+    void onClick(Node node, int position);
 }
