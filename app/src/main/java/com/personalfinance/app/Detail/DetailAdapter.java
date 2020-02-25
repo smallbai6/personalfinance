@@ -23,11 +23,7 @@ public class DetailAdapter extends TreeListViewAdapter {
     public void setOnInnerItemLongClickListener(OnInnerItemLongClickListener longListener){
         this.longListener=longListener;
     }
-    /*private OnTreeNodeCheckedChangeListener checkedChangeListener;
 
-    public void setCheckedChangeListener(OnTreeNodeCheckedChangeListener checkedChangeListener) {
-        this.checkedChangeListener = checkedChangeListener;
-    }*/
 
     //进行ListViewAdapter中的内容
     public DetailAdapter(ListView listView, Context context, List<Node> datas, int defaultExpandLevel, int iconExpand, int iconNoExpand) {

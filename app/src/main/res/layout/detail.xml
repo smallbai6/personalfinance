@@ -49,7 +49,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginRight="10dp"
-               android:layout_toLeftOf="@id/detail_year_tianjia"
+                android:layout_toLeftOf="@id/detail_year_tianjia"
                 android:layout_centerVertical="true"
                 app:srcCompat="@mipmap/shengluetubiao" />
 
@@ -164,6 +164,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scrollbars="none" />
+
 
             </LinearLayout>
         </ScrollView>

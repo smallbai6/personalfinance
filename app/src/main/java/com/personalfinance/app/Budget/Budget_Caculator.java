@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -16,7 +17,7 @@ import com.personalfinance.app.R;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class Budget_Caculator extends FrameLayout  {
+public class Budget_Caculator extends FrameLayout implements View.OnClickListener {
     private OnCaculatorSetListener mOnCaculatorSetListener;//回调
     private PopupWindow moneyPop;
     //private Button btncancel;
@@ -25,7 +26,8 @@ public class Budget_Caculator extends FrameLayout  {
 
     private TextView result_tv;
     private Button[] btnNum = new Button[11];// 数值按钮
-    private Button[] btnCommand = new Button[4];// 符号按钮
+    private Button[] btnCommand = new Button[3];// 符号按钮
+    private ImageButton backspace;
     private double result; // 计算结果
     private String process;//计算过程
     private String lastCommand; // 用于保存运算符当前运算符
@@ -58,8 +60,9 @@ public class Budget_Caculator extends FrameLayout  {
         btnCommand[0] = (Button) contentView.findViewById(R.id.add);
         btnCommand[1] = (Button) contentView.findViewById(R.id.subtract);
         btnCommand[2] = (Button) contentView.findViewById(R.id.equal);
-        btnCommand[3] = (Button) contentView.findViewById(R.id.backspace);
-
+       // btnCommand[3] = (Button) contentView.findViewById(R.id.backspace);
+        backspace=(ImageButton)contentView.findViewById(R.id.backspace);
+        backspace.setOnClickListener(this);
         // 获取数字
         btnNum[0] = (Button) contentView.findViewById(R.id.num0);
         btnNum[1] = (Button) contentView.findViewById(R.id.num1);
@@ -86,13 +89,13 @@ public class Budget_Caculator extends FrameLayout  {
         result_tv.setText("0.00");
         result = 0;
         process = "";
-        lastCommand = "=";
+        lastCommand = "确\n定";
         commonClick = false;
         firstFlag = true;
         lastresult = "";
         lastvalues.clear();
         lastfuhao.clear();
-        lastfuhao.add("=");
+        lastfuhao.add("确\n定");
         lastpoint.clear();
         pointjudge = false;
         pointdigit = 0;
@@ -102,14 +105,14 @@ public class Budget_Caculator extends FrameLayout  {
         // 初始化各项值
         result = 0; // 结果值
         process = "";//过程为空
-        lastCommand = "="; // 运算符
+        lastCommand = "确\n定"; // 运算符
         commonClick = false;//每点击符号按钮
         firstFlag = true; // 是首次运算
         //mOnCaculatorSetListener.OnCaculatorSet(2, process);
         lastresult = "";
         lastvalues.clear();
         lastfuhao.clear();
-        lastfuhao.add("=");
+        lastfuhao.add("确\n定");
         pointjudge = false;
         pointdigit = 0;
     }
@@ -130,14 +133,23 @@ public class Budget_Caculator extends FrameLayout  {
         }
     };
 
-    /*public void onClick(View v) {
+    public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.money_cancel:
+           /* case R.id.money_cancel:
                 moneyPop.dismiss();
                 calculator();
+                break;*/
+            case R.id.backspace:
+                if (firstFlag) {// 首次输入"-"的情况
+                    return;
+                } else {
+                    deletebtn();
+                }
+                break;
+            default:
                 break;
         }
-    }*/
+    }
 
     // 数字按钮监听器
     private class NumberAction implements OnClickListener {
@@ -221,7 +233,7 @@ public class Budget_Caculator extends FrameLayout  {
                     lastresult = lastresult + inputCommand + "0";
                     calculate(Double.parseDouble(lastresult));
                     firstFlag = false;
-                }else if(inputCommand.equals("=")){
+                }else if(inputCommand.equals("确\n定")){
                     mOnCaculatorSetListener.OnCaculatorSet(formatPrice(result));
                     moneyPop.dismiss();
                     return;
@@ -229,9 +241,11 @@ public class Budget_Caculator extends FrameLayout  {
                 else {//首次输入其他运算符
                     return;
                 }
-            } else if (btn.getId() == R.id.backspace) {
+            }
+           /* else if (btn.getId() == R.id.backspace) {
                 deletebtn();//点击删除键
-            } else if (inputCommand.equals("=")) {
+            }*/
+            else if (inputCommand.equals("确\n定")) {
                 //calculator();
                 mOnCaculatorSetListener.OnCaculatorSet(formatPrice(result));
                 moneyPop.dismiss();
@@ -354,7 +368,7 @@ public class Budget_Caculator extends FrameLayout  {
             }
            // Log.d("liang", "c:  result:" + result + "   process:" + process + "   lastresult:" + lastresult);
 
-            if (lastCommand.equals("=") && process.substring(process.length() - 1).equals(".")) {
+            if (lastCommand.equals("确\n定") && process.substring(process.length() - 1).equals(".")) {
                 process = process.substring(0, process.length() - 1);
                 lastresult = lastresult.substring(0, lastresult.length() - 1);
                 calculate(Double.parseDouble(lastresult));
@@ -380,7 +394,7 @@ public class Budget_Caculator extends FrameLayout  {
             result += x;
         } else if (lastCommand.equals("-")) {
             result -= x;
-        } else if (lastCommand.equals("=")) {
+        } else if (lastCommand.equals("确\n定")) {
             result = x;
         }
         result_tv.setText(formatPrice(result));

@@ -60,7 +60,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("username");
-        currentyear = intent.getStringExtra("year");
+        currentyear = String.valueOf(intent.getIntExtra("year",0));
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
         detailmonth_list();
         mAdapter = new DetailBulkAdapter(listView, this, list,
@@ -284,7 +284,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     private void detailmonth_list() {
         Log.d("DEAliang", "进入detailmonth_list");
         list.clear();
-        detail_DetailInfo("2020");
+        detail_DetailInfo(currentyear);
         detail_Detailday_day();
         //开始综合list，实现流水列表
         int a = 0, b = 0, c = 0;//a为月，b为日详情

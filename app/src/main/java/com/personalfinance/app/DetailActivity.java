@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.personalfinance.app.Detail.DetailAdapter;
 import com.personalfinance.app.Detail.DetailInfo;
@@ -62,7 +63,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private List<String> yrmdchooseList = new ArrayList<>();
     private ArrayAdapter<String> yrmdadapter;
 
-    private String[] yearString = {"上一年", "下一年"};
+    private String[] yearString = {"上一年", "下一年","批量删除"};
     private String[] rmdString = {"季", "月", "日"};
     private Drawable drawable;//按键旁的图标显示
     private int choosetype;//选择类型是yearString 还是rmdString
@@ -84,6 +85,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private List<DetailSurplus> day_monthList = new ArrayList<>();
     private List<DetailSurplus> month_monthList = new ArrayList<>();
     private List<DetailSurplus> season_seasonList = new ArrayList<>();
+    /*
+
+     */
+    DrawerLayout mDrawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +129,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         showyear = showyear - 1;
                     } else if (position == 1) {//下一年
                         showyear = showyear + 1;
+                    }else if(position==2){//批量删除
+                        intent = new Intent(DetailActivity.this, DetailEditorActivity.class);
+                        intent.putExtra("username", Username);
+                        intent.putExtra("year", showyear);
+                        startActivityForResult(intent, 3);
                     }
                     backbutton.setText(showyear + "年");
 
@@ -233,6 +243,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         adapter = new DetailAdapter(listView, this, list,
                 2, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
         listView.setAdapter(adapter);
+         year_show();
         adapter.setOnInnerItemClickListener(new OnInnerItemClickListener() {
             @Override
             public void onClick(Node node, int position) {
@@ -261,7 +272,23 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
-
+    private void year_show(){
+        double totalyearmoney = 0;
+        double totalyearexpendmoney = 0;
+        double totalyeaerincomemoney = 0;
+        for(Node node:list){
+            if(node.isRootNode()){
+                //为根节点
+                DetailNodeData detailNodeData =(DetailNodeData)node.getData();
+                totalyearmoney+=Double.valueOf(detailNodeData.getC());
+                totalyeaerincomemoney+=Double.valueOf(detailNodeData.getD());
+                totalyearexpendmoney+=Double.valueOf(detailNodeData.getE());
+            }
+        }
+        detail_year_money.setText(formatPrice(totalyearmoney));
+        detail_year_expendmoney.setText(formatPrice(totalyearexpendmoney));
+        detail_year_incomemoney.setText(formatPrice(totalyeaerincomemoney));
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -467,7 +494,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
         //总结出年
-        double totalyearmoney = 0;
+      /*  double totalyearmoney = 0;
         double totalyearexpendmoney = 0;
         double totalyeaerincomemoney = 0;
         for (DetailSurplus detailSurplus : day_monthList) {
@@ -481,7 +508,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         detail_year_money.setText(formatPrice(totalyearmoney));
         detail_year_expendmoney.setText(formatPrice(totalyearexpendmoney));
         detail_year_incomemoney.setText(formatPrice(totalyeaerincomemoney));
-        /*for (DetailSurplus detailSurplus : day_monthList) {
+        for (DetailSurplus detailSurplus : day_monthList) {
             Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
                     + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
                     detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));
@@ -542,7 +569,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             // Log.d("liangaa","day=  "+day);
         }
         //总结出年
-        double totalyearmoney = 0;
+        /* double totalyearmoney = 0;
         double totalyearexpendmoney = 0;
         double totalyeaerincomemoney = 0;
         for (DetailSurplus detailSurplus : month_monthList) {
@@ -556,7 +583,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         detail_year_money.setText(formatPrice(totalyearmoney));
         detail_year_expendmoney.setText(formatPrice(totalyearexpendmoney));
         detail_year_incomemoney.setText(formatPrice(totalyeaerincomemoney));
-       /* for (DetailSurplus detailSurplus : month_monthList) {
+       for (DetailSurplus detailSurplus : month_monthList) {
             Log.d("DetailActivity.liang", detailSurplus.getDay() + "  " + detailSurplus.getDate()
                     + "  " + detailSurplus.getJieyu() + "   " + detailSurplus.getShouru() + "      " +
                     detailSurplus.getZhichu() + "     " + LongToString(detailSurplus.getTime()));

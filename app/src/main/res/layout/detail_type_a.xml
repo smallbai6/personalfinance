@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:text="结余"
         android:layout_toRightOf="@+id/a_detail_month"
-        android:layout_marginLeft="85dp"
+        android:layout_marginLeft="60dp"
         android:layout_alignBottom="@+id/a_detail_totalmoney"
 
         android:textSize="16dp" />
