@@ -62,15 +62,6 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
                         }
                     }
                 });
-                /*holdera.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        setChecked(node, holdera.checkBox.isChecked());
-                        if (checkedChangeListener != null) {
-                            checkedChangeListener.onCheckChange(node, position, holdera.checkBox.isChecked());
-                        }
-                    }
-                });*/
                 if (node.isChecked()) {
                     holdera.checkBox.setChecked(true);
                 } else {
@@ -115,15 +106,6 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
                         }
                     }
                 });
-                /*holderb.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        setChecked(node, holderb.checkBox.isChecked());
-                        if (checkedChangeListener != null) {
-                            checkedChangeListener.onCheckChange(node, position, holderb.checkBox.isChecked());
-                        }
-                    }
-                });*/
 
                 if (node.isChecked()) {
                     holderb.checkBox.setChecked(true);

@@ -32,7 +32,7 @@ import java.util.Date;
 import java.util.List;
 
 public class TallyActivity extends AppCompatActivity implements View.OnClickListener {
-
+private Cursor cursor;
     /*
      *数据库
      */
@@ -195,7 +195,6 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
      */
     private void Typelist(int position) {
         //获取数据库中的数据
-        Cursor cursor = db.query("expendtype", null, null, null, null, null, null);
         if (position == 0) {
             cursor = db.query("expendtype", null, null, null, null, null, null);
         } else if (position == 1) {
@@ -204,9 +203,9 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
         if (cursor.moveToFirst()) {
             String name = "";
             if (position == 0) {
-                name = cursor.getString(cursor.getColumnIndex("ExpendType_Name"));
+                name = cursor.getString(cursor.getColumnIndex("Type_Name"));
             } else if (position == 1) {
-                name = cursor.getString(cursor.getColumnIndex("IncomeType_Name"));
+                name = cursor.getString(cursor.getColumnIndex("Type_Name"));
             }
             type.setText(name);
         }
@@ -269,11 +268,7 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tally_save:
             case R.id.tallycontent_save://进行保存
                 //issave++;
-                if (choose.getText().toString().equals(income_expend[0])) {//支付
-                    expend();
-                } else if (choose.getText().toString().equals(income_expend[1])) {//收入
-                    income();
-                }
+                income_expend(choose.getText().toString());
                 //退出记账活动
                 //判断是由哪一个活动进入的TallyActivity
                 if(huodong.equals("MainActivity.java")){
@@ -291,11 +286,7 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tallycontent_again:
                 issave++;
                 //再记一笔先保存再将内容清空
-                if (choose.getText().toString().equals(income_expend[0])) {//支付
-                    expend();
-                } else if (choose.getText().toString().equals(income_expend[1])) {//收入
-                    income();
-                }
+                income_expend(choose.getText().toString());
                 //清空金额
                 money.setText("0.00");
                 //Toast.makeText(TallyActivity.this, "tallycontent_again", Toast.LENGTH_SHORT).show();
@@ -323,32 +314,21 @@ public class TallyActivity extends AppCompatActivity implements View.OnClickList
     /*
      *保存支付信息
      */
-    private void expend() {
+    private void income_expend(String typeString){
         ContentValues values = new ContentValues();
         values.put("User_Name", username);
-        values.put("Expend_Money", money.getText().toString());
-       // Log.d("jinxingbaocun","数据库中有money= "+Double.parseDouble(money.getText().toString()));
-        values.put("Expend_Type", type.getText().toString());
-        // values.put("Expend_Time", time.getText().toString());
-        values.put("Expend_Time", currentdate);
-        values.put("Expend_Message", message.getText().toString());
-        db.insert("expendinfo", null, values);
+        values.put("Money", money.getText().toString());
+        values.put("Type", type.getText().toString());
+        values.put("Time", currentdate);
+        values.put("Message", message.getText().toString());
+        if(typeString.equals(income_expend[0])){
+            db.insert("expendinfo", null, values);
+        }else if(typeString.equals(income_expend[1])){
+            db.insert("incomeinfo", null, values);
+        }
         values.clear();
     }
 
-    /*
-     *保存收入信息
-     */
-    private void income() {
-        ContentValues values = new ContentValues();
-        values.put("User_Name", username);
-        values.put("Income_Money", money.getText().toString());
-        values.put("Income_Type", type.getText().toString());
-        values.put("Income_Time", currentdate);
-        values.put("Income_Message", message.getText().toString());
-        db.insert("incomeinfo", null, values);
-        values.clear();
-    }
     /*
      *背景透明度
      */

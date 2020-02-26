@@ -45,9 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         dbHelper = new SQLiteDatabaseHelper(this, "personal.db", null, 1);
         db = dbHelper.getWritableDatabase();
-        //Intent intent = new Intent(MainActivity.this, TallyActivity.class);
-        //startActivity(intent);
-        // finish();
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         drawerbutton = (Button) findViewById(R.id.drawer_button);

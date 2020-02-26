@@ -1,4 +1,4 @@
-package com.personalfinance.app.Detail.Detail_Activity;
+package com.personalfinance.app;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,12 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.personalfinance.app.Detail.DetailInfo;
 import com.personalfinance.app.Detail.Node;
-import com.personalfinance.app.DetailActivity;
 import com.personalfinance.app.Detail.DetailBulk.DENodeData;
 import com.personalfinance.app.Detail.DetailBulk.DetailBulkAdapter;
 import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeCheckedChangeListener;
 import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeClickListener;
-import com.personalfinance.app.R;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -165,12 +163,12 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 if (type.substring(0, 1).equals("0")) {
                     //支出
 
-                    db.delete("expendinfo", "User_Name=? AND Expend_Money=? " +
-                                    "AND Expend_Type=? AND Expend_Time=?",
+                    db.delete("expendinfo", "User_Name=? AND Money=? " +
+                                    "AND Type=? AND Time=?",
                             new String[]{Username, money, type.substring(1), time});
                 } else if (type.substring(0, 1).equals("1")) {
-                    db.delete("incomeinfo", "User_Name=? AND Income_Money=? " +
-                                    "AND Income_Type=? AND Income_Time=? ",
+                    db.delete("incomeinfo", "User_Name=? AND Money=? " +
+                                    "AND Type=? AND Time=? ",
                             new String[]{Username, money, type.substring(1), time});
                 }
             }
@@ -187,36 +185,28 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         //获得消费详情
         InfoList.clear();
         //支出信息
-        cursor = db.query("expendinfo", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                long time = cursor.getLong(cursor.getColumnIndex("Expend_Time"));
-                if (LongToString(time).substring(0, 4).equals(currentyear)) {
-                    String money = cursor.getString(cursor.getColumnIndex("Expend_Money"));
-                    String type = 0 + cursor.getString(cursor.getColumnIndex("Expend_Type"));
-                    String text = cursor.getString(cursor.getColumnIndex("Expend_Message"));
-                    DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
-                    InfoList.add(detailInfo);
-                }
-            } while (cursor.moveToNext());
+        for(int i=0;i<2;i++){
+            if(i==0){
+                cursor = db.query("expendinfo", null, "User_Name=?",
+                        new String[]{Username}, null, null, null);
+            }else if(i==1){
+                cursor = db.query("incomeinfo", null, "User_Name=?",
+                        new String[]{Username}, null, null, null);
+            }
+            if (cursor.moveToFirst()) {
+                do {
+                    long time = cursor.getLong(cursor.getColumnIndex("Time"));
+                    if (LongToString(time).substring(0, 4).equals(currentyear)) {
+                        String money = cursor.getString(cursor.getColumnIndex("Money"));
+                        String type = 0 + cursor.getString(cursor.getColumnIndex("Type"));
+                        String text = cursor.getString(cursor.getColumnIndex("Message"));
+                        DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
+                        InfoList.add(detailInfo);
+                    }
+                } while (cursor.moveToNext());
+            }
         }
-        //收入信息
-        cursor = db.query("incomeinfo", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                long time = cursor.getLong(cursor.getColumnIndex("Income_Time"));
-                if (LongToString(time).substring(0, 4).equals(currentyear)) {
-                    String money = cursor.getString(cursor.getColumnIndex("Income_Money"));
-                    String type = 1 + cursor.getString(cursor.getColumnIndex("Income_Type"));
-                    String text = cursor.getString(cursor.getColumnIndex("Income_Message"));
-                    DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
-                    InfoList.add(detailInfo);
-                }
 
-            } while (cursor.moveToNext());
-        }
         Collections.sort(InfoList);
 
         for (DetailInfo detailInfo : InfoList) {

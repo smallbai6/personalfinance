@@ -14,6 +14,7 @@ import android.widget.PopupWindow;
 import com.personalfinance.app.R;
 
 public class TypePop extends PopupWindow implements View.OnClickListener {
+    private Cursor cursor;
     private Button btncancel;
     private PopupWindow timepop;
     private TypeChoose mTypeChoose;
@@ -31,7 +32,7 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
         this.context = context;
         //  Log.d("liang","数据库");
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
-        Cursor cursor = db.query("expendtype", null, null, null, null, null, null);
+        //cursor = db.query("expendtype", null, null, null, null, null, null);
         if (typecategory == 0) {
             cursor = db.query("expendtype", null, null, null, null, null, null);
         } else if (typecategory == 1) {

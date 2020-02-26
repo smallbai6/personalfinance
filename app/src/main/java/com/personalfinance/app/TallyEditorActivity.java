@@ -1,4 +1,4 @@
-package com.personalfinance.app.Detail.Detail_Activity;
+package com.personalfinance.app;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -15,8 +15,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.personalfinance.app.DetailActivity;
-import com.personalfinance.app.R;
 import com.personalfinance.app.Time_Type.CaculatorPop;
 import com.personalfinance.app.Time_Type.TimePop;
 import com.personalfinance.app.Time_Type.TypePop;
@@ -67,7 +65,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      *进行保存操作
      */
     private String username;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,14 +89,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         buttonback = (Button) findViewById(R.id.tallycontent_editor_save);
         buttondelete = (Button) findViewById(R.id.tallycontent_editor_delete);
 
-
-        //获取用户名称
-        /*Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
-        if (cursor.moveToFirst()) {
-            username = cursor.getString(cursor.getColumnIndex("User_Name"));
-        } else {//没有登录用户时用户名就为请立即登录
-            username = "请立即登录";
-        }*/
 //获得上一个活动的信息
         intent = getIntent();
         username=intent.getStringExtra("username");
@@ -173,21 +162,9 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.tally_editor_save:
             case R.id.tallycontent_editor_save://进行更新保存
-                if (choose.getText().toString().equals(income_expend[0])) {//支付
-                    expend();
-                  //  Log.d("jinxingbaocun", "zhifu");
-                } else if (choose.getText().toString().equals(income_expend[1])) {//收入
-                   // Log.d("jinxingbaocun", "shouru");
-                    income();
-                }
+                income_expend(choose.getText().toString());
                 //返回到上一个活动中
                 intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
-               /* if(currentdate!=InitializeTime){
-                    //时间更改了
-                    setResult(RESULT_CANCELED,intent);
-                }else{
-                    setResult(RESULT_OK, intent);
-                }*/
                 setResult(RESULT_OK,intent);
                 finish();
                 break;
@@ -197,7 +174,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
             case R.id.tally_editor_back:
                 //返回到上一个活动中
                 intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
-                //startActivity(intent);
+
                 setResult(RESULT_CANCELED, intent);
                 finish();
                 break;
@@ -213,12 +190,12 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
-                    db.delete("expendinfo", "User_Name=? AND Expend_Money=? " +
-                                    "AND Expend_Type=? AND Expend_Time=? AND Expend_Message=?",
+                    db.delete("expendinfo", "User_Name=? AND Money=? " +
+                                    "AND Type=? AND Time=? AND Message=?",
                             new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
                 } else if (choose.getText().toString().equals(income_expend[1])) {//收入
-                    db.delete("incomeinfo", "User_Name=? AND Income_Money=? " +
-                                    "AND Income_Type=? AND Income_Time=? AND Income_Message=?",
+                    db.delete("incomeinfo", "User_Name=? AND Money=? " +
+                                    "AND Type=? AND Time=? AND Message=?",
                             new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
                 }
                 //返回到上一个活动中
@@ -239,35 +216,26 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         dialog.show();
     }
     /*
-     *保存更改后的支付信息
+     *保存更改后的支付和收入信息
      */
-    private void expend() {
+    private void income_expend(String typeString) {
         ContentValues values = new ContentValues();
         values.put("User_Name", username);
-        values.put("Expend_Money", money.getText().toString());
-        values.put("Expend_Type", type.getText().toString());
-        // values.put("Expend_Time", time.getText().toString());
-        values.put("Expend_Time", currentdate);
-        values.put("Expend_Message", message.getText().toString());
+        values.put("Money", money.getText().toString());
+        values.put("Type", type.getText().toString());
+        values.put("Time", currentdate);
+        values.put("Message", message.getText().toString());
+        if (typeString.equals(income_expend[0])) {
+            db.update("expendinfo", values, "User_Name=? AND Money=? " +
+                            "AND Type=? AND Time=? AND Message=?",
+                    new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+        } else if (typeString.equals(income_expend[1])) {
+            db.update("incomeinfo", values, "User_Name=? AND Money=? " +
+                            "AND Type=? AND Time=? AND Message=?",
+                    new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+        }
+    }
 
-        db.update("expendinfo", values, "User_Name=? AND Expend_Money=? " +
-                        "AND Expend_Type=? AND Expend_Time=? AND Expend_Message=?",
-                new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
-    }
-    /*
-     *保存收入信息
-     */
-    private void income() {
-        ContentValues values = new ContentValues();
-        values.put("User_Name", username);
-        values.put("Income_Money", money.getText().toString());
-        values.put("Income_Type", type.getText().toString());
-        values.put("Income_Time", currentdate);
-        values.put("Income_Message", message.getText().toString());
-        db.update("incomeinfo", values, "User_Name=? AND Income_Money=? " +
-                        "AND Income_Type=? AND Income_Time=? AND Income_Message=?",
-                new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
-    }
 
     /*
      *获取系统时间

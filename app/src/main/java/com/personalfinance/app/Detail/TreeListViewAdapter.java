@@ -125,7 +125,7 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
         }
     }
     /*
-    获取可见的Node
+    获取可见的Node,使用在批量删除
      */
     public void getVisibleNodes(){
         List<Node> allNode= getAllNodes();
@@ -140,7 +140,6 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
         mNodes = TreeHelper.filterVisibleNode(mAllNodes);
         notifyDataSetChanged();// 刷新视图
     }
-
     @Override
     public int getCount() {
         return mNodes.size();
@@ -190,6 +189,14 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
         return mAllNodes;
     }
 
+    /**
+     * 获取可见的节点
+     */
+    public List<Node> getmNodes() {
+        if (mNodes == null)
+            mNodes = new ArrayList<Node>();
+        return mNodes;
+    }
     /**
      * 获取所有选中节点
      *
