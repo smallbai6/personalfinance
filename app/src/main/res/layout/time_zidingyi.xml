@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+
+        <TextView
+            android:id="@+id/time_sure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:textSize="20dp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/coloryellow"
+            android:text="确定" />
+        <TextView
+            android:id="@+id/time_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textSize="20dp"
+            android:layout_centerVertical="true"
+            android:text="取消" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorgray"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <!-- -->
+
+        <LinearLayout
+            android:id="@+id/statistical_zidingyi_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/zhongjian"
+            android:layout_marginRight="40dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="开始时间" />
+
+            <TextView
+                android:id="@+id/statistical_starttime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2020.01.23"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/colorblack"
+                android:textSize="18dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/zhongjian"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/statistical_zidingyi_start"
+            android:layout_centerHorizontal="true"
+
+            android:text="~"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+        <LinearLayout
+            android:id="@+id/statistical_zidingyi_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_toRightOf="@+id/zhongjian"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="结束时间" />
+
+            <TextView
+                android:id="@+id/statistical_endtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="2020.01.23"
+                android:textColor="@color/colorblack"
+                android:textSize="18dp" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp" />
+
+
+    <include layout="@layout/time_widget"/>
+</LinearLayout>

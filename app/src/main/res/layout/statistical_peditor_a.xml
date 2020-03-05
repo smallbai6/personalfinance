@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/a_statistical_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="26日"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/colorblack"
+        android:textSize="25dp" />
+
+    <TextView
+        android:id="@+id/a_statistical_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="2020.01 周三"
+        android:layout_toRightOf="@+id/a_statistical_day"
+        android:layout_alignBottom="@+id/a_statistical_day"
+        android:textSize="18dp" />
+
+    <ImageView
+        android:id="@+id/a_statistical_imageView"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        app:srcCompat="@mipmap/shangjiantou" />
+
+</RelativeLayout>

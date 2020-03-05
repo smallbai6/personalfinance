@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:id="@+id/statistical_pediotr_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="早午晚餐(支出)"
+            android:textSize="18dp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/colorblack"
+            />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/colorblack"/>
+    <ListView
+        android:id="@+id/statistical_pediotr_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

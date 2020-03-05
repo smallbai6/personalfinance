@@ -1,6 +1,6 @@
-package com.personalfinance.app.Detail.DetailBulk;
+package com.personalfinance.app.Detail;
 
-import com.personalfinance.app.Detail.Node;
+import com.personalfinance.app.Sqlite.Node;
 
 public interface OnTreeNodeCheckedChangeListener {
 

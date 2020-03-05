@@ -31,26 +31,34 @@ public class TimeChoose extends FrameLayout {
     private String[] mDateDisplayValues = new String[7];
     private OnDateTimeChangedListener mOnDateTimeChangedListener;
 
-    public TimeChoose(Context context,String selectTime) {
+    public TimeChoose(Context context,String selectTime,int status) {
         super(context);
-        Log.d("liang","进入TimeChoose");
-        select_mYear = Integer.valueOf(selectTime.substring(0,4));
-        select_mMonth = Integer.valueOf(selectTime.substring(5,7));
-        select_mDay=Integer.valueOf(selectTime.substring(8,10));
-        select_mHour=Integer.valueOf(selectTime.substring(12,14));
-        select_mMinute=Integer.valueOf(selectTime.substring(15));
-        Log.d("liang","selectTime="+selectTime);
-       // Log.d("liang",selectTime.substring(0,4)+" "+selectTime.substring(5,7)+" "+selectTime.substring(8,10)+
-       //         " "+selectTime.substring(12,14)+" "+selectTime.substring(15));
-       // Log.d("liang",select_mYear+" "+select_mMonth+" "+" "+select_mDay+" "+select_mHour+" "+select_mMinute);
+        Log.d("showtime", "进入TimeChoose");
+        //Log.d("jinxing","进入TimeChoose");
+        //Log.d("liang", "进入TimeChoose");
+        select_mYear = Integer.valueOf(selectTime.substring(0, 4));
+        select_mMonth = Integer.valueOf(selectTime.substring(5, 7));
+        select_mDay = Integer.valueOf(selectTime.substring(8, 10));
+        select_mHour = Integer.valueOf(selectTime.substring(12, 14));
+        select_mMinute = Integer.valueOf(selectTime.substring(15));
+       // Log.d("liang", "selectTime=" + selectTime);
+       //  Log.d("jinxing",selectTime.substring(0,4)+" "+selectTime.substring(5,7)+" "+selectTime.substring(8,10)+
+       //          " "+selectTime.substring(12,14)+" "+selectTime.substring(15));
+        // Log.d("liang",select_mYear+" "+select_mMonth+" "+" "+select_mDay+" "+select_mHour+" "+select_mMinute);
         mDate = Calendar.getInstance();
         mYear = mDate.get(Calendar.YEAR);
         mMonth = mDate.get(Calendar.MONTH);
-       // mHour=mDate.get(Calendar.HOUR_OF_DAY);
-       // mMinute=mDate.get(Calendar.MINUTE);
-        mHour=select_mHour;
-        mMinute=select_mMinute;
-        inflate(context, R.layout.time, this);
+        // mHour=mDate.get(Calendar.HOUR_OF_DAY);
+        // mMinute=mDate.get(Calendar.MINUTE);
+        mHour = select_mHour;
+        mMinute = select_mMinute;
+        if(status==0){
+            inflate(context, R.layout.time, this);
+        }
+       else if(status==1){
+            inflate(context, R.layout.time_zidingyi, this);
+        }
+
         mYearSpinner = (NumberPicker) this.findViewById(R.id.time_year);
         setNumberPickerDividerColor(mYearSpinner);
         mYearSpinner.getChildAt(0).setFocusable(false);
@@ -58,6 +66,7 @@ public class TimeChoose extends FrameLayout {
         mYearSpinner.setMaxValue(mYear + 80);
         updateYearControl();
         mYearSpinner.setValue(select_mYear);
+       // mYearSpinner.setEnabled();
         mYearSpinner.setWrapSelectorWheel(true);//设置为不可循环
         mYearSpinner.setOnValueChangedListener(mOnYearChangedListener);
 
@@ -68,9 +77,10 @@ public class TimeChoose extends FrameLayout {
         mMonthSpinner.setMinValue(1);
         updateMonthControl();
         mMonthSpinner.setValue(select_mMonth);
+       // Log.d("showtime","getMonthvalue   "+mMonthSpinner.getValue());
         mMonthSpinner.setWrapSelectorWheel(true);
         mMonthSpinner.setOnValueChangedListener(mOnMonthChangedListener);
-        mDate.set(select_mYear, select_mMonth, select_mDay,select_mHour,select_mMinute);
+        mDate.set(select_mYear, select_mMonth, select_mDay, select_mHour, select_mMinute);
 
         mDaySpinner = (NumberPicker) this.findViewById(R.id.time_day);
         setNumberPickerDividerColor(mDaySpinner);
@@ -78,9 +88,9 @@ public class TimeChoose extends FrameLayout {
         mDaySpinner.setMaxValue(6);
         mDaySpinner.setMinValue(0);
         updateDateControl();
-       // mDaySpinner.setValue(select_mDay);
+        // mDaySpinner.setValue(select_mDay);
         mDaySpinner.setWrapSelectorWheel(true);
-        mDaySpinner.setOnValueChangedListener(mOnDayChangedListener);
+       mDaySpinner.setOnValueChangedListener(mOnDayChangedListener);
 
         mHourSpinner = (NumberPicker) this.findViewById(R.id.time_hour);
         setNumberPickerDividerColor(mHourSpinner);
@@ -88,7 +98,7 @@ public class TimeChoose extends FrameLayout {
         mHourSpinner.setMaxValue(23);
         mHourSpinner.setMinValue(0);
         mHourSpinner.setValue(select_mHour);
-       // mHourSpinner.setValue(mHour);
+        // mHourSpinner.setValue(mHour);
         mHourSpinner.setWrapSelectorWheel(true);
         mHourSpinner.setOnValueChangedListener(mOnHourChangedListener);
 
@@ -98,13 +108,19 @@ public class TimeChoose extends FrameLayout {
         mMinuteSpinner.setMaxValue(59);
         mMinuteSpinner.setMinValue(0);
         mMinuteSpinner.setValue(select_mMinute);
-       // mMinuteSpinner.setValue(mMinute);
+        // mMinuteSpinner.setValue(mMinute);
         mMinuteSpinner.setWrapSelectorWheel(true);
         mMinuteSpinner.setOnValueChangedListener(mOnMinuteChangedListener);
-       // Log.d("liang", "onValueChangedListener  " + mDate.get(Calendar.YEAR));
-        mYear=select_mYear;
-        mMonth=select_mMonth-1;
-       //  Log.d("liang", "主mMonth = " + mMonth);
+        // Log.d("liang", "onValueChangedListener  " + mDate.get(Calendar.YEAR));
+        mYear = select_mYear;
+        mMonth = select_mMonth - 1;
+        //  Log.d("liang", "主mMonth = " + mMonth);
+        if (status == 1) {
+            mHourSpinner.setVisibility(GONE);
+            mMinuteSpinner.setVisibility(GONE);
+       }
+
+ Log.d("showtime",mYearSpinner.getValue()+"   "+mMonthSpinner.getValue());
     }
 
     private OnValueChangeListener mOnYearChangedListener = new OnValueChangeListener() {

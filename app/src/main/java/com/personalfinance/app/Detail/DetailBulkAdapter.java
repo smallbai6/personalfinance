@@ -1,4 +1,4 @@
-package com.personalfinance.app.Detail.DetailBulk;
+package com.personalfinance.app.Detail;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.personalfinance.app.Detail.TreeListViewAdapter;
-import com.personalfinance.app.Detail.Node;
 import com.personalfinance.app.R;
+import com.personalfinance.app.Sqlite.Node;
+import com.personalfinance.app.Sqlite.NodeData;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
     public View getConvertView(final Node node, final int position, View convertView, ViewGroup parent) {
         final ViewHoldera holdera;
         final ViewHolderb holderb;
-        DENodeData data;
+        NodeData nodeData;
         switch (getItemViewType(position)){
             case 1:
                 if(convertView==null){
@@ -43,8 +43,8 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
                 }else{
                     holdera=(ViewHoldera)convertView.getTag();
                 }
-                data = (DENodeData) node.getData();
-                holdera.tv.setText(data.getType());
+                nodeData= ( NodeData) node.getData();
+                holdera.tv.setText(nodeData.getA());
                 if (node.getIcon() == -1) {
                     holdera.ivExpand.setVisibility(View.INVISIBLE);
                 } else {
@@ -76,17 +76,18 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
                 }else{
                     holderb=(ViewHolderb)convertView.getTag();
                 }
-                data = (DENodeData) node.getData();
-                if(data.getType().substring(0,1).equals("0")){
+                nodeData= ( NodeData) node.getData();
+                holderb.tvtype.setText(nodeData.getA().substring(1));
+                holderb.tvshowtime.setText(nodeData.getB());
+                if(nodeData.getA().substring(0,1).equals("0")){
                     //支出
                     holderb.tvmoney.setTextColor(mContext.getResources().getColor(R.color.colorgreen));
                 }
                 else{
                     holderb.tvmoney.setTextColor(mContext.getResources().getColor(R.color.colorred));
                 }
-                holderb.tvtype.setText(data.getType().substring(1));
-                holderb.tvshowtime.setText(data.getShowtime());
-                holderb.tvmoney.setText(data.getMoney());
+
+                holderb.tvmoney.setText(nodeData.getC());
 
                 /*if (node.getIcon() == -1) {
                     holderb.ivExpand.setVisibility(View.INVISIBLE);

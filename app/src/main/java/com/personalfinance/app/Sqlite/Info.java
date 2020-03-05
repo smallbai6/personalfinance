@@ -1,18 +1,18 @@
-package com.personalfinance.app.Detail;
+package com.personalfinance.app.Sqlite;
 
-public class DetailInfo implements Comparable<DetailInfo>{
+public class Info implements Comparable<Info>{
     private double money;
     private String type;
     private long time;
     private String text;
 
-    public DetailInfo(double money, String type, long time, String text) {
+    public Info(double money, String type, long time, String text) {
         this.money = money;
         this.type = type;
         this.time = time;
         this.text = text;
     }
-    public int compareTo(DetailInfo o) {
+    public int compareTo(Info o) {
         //降序
         //return o.time - this.time;
         //升序

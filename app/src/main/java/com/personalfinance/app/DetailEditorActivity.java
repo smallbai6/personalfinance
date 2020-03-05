@@ -13,12 +13,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.personalfinance.app.Detail.DetailInfo;
-import com.personalfinance.app.Detail.Node;
-import com.personalfinance.app.Detail.DetailBulk.DENodeData;
-import com.personalfinance.app.Detail.DetailBulk.DetailBulkAdapter;
-import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeCheckedChangeListener;
-import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeClickListener;
+import com.personalfinance.app.Detail.DetailBulkAdapter;
+import com.personalfinance.app.Detail.OnTreeNodeCheckedChangeListener;
+import com.personalfinance.app.Detail.OnTreeNodeClickListener;
+import com.personalfinance.app.Sqlite.Info;
+import com.personalfinance.app.Sqlite.Node;
+import com.personalfinance.app.Sqlite.NodeData;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +37,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     /*
     列表
      */
-    private List<DetailInfo> InfoList = new ArrayList<>();
+    private List<Info> InfoList = new ArrayList<>();
     private List<String> day_dayList = new ArrayList<>();
     private ListView listView;
     private List<Node> list = new ArrayList<>();
@@ -60,7 +60,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         Username = intent.getStringExtra("username");
         currentyear = String.valueOf(intent.getIntExtra("year",0));
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
-        detailmonth_list();
+        detail_list();
         mAdapter = new DetailBulkAdapter(listView, this, list,
                 1, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
         listView.setAdapter(mAdapter);
@@ -105,12 +105,12 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         } else {
             for (Node n : selectedNode) {
                 if (n.isLeaf()) {//1级计入数内
-                    DENodeData deNodeData = (DENodeData) n.getData();
+                    NodeData nodeData = (NodeData) n.getData();
                     total++;
-                    if (deNodeData.getType().substring(0, 1).equals("0")) {
-                        totalmoney -= Double.valueOf(deNodeData.getMoney());
+                    if (nodeData.getA().substring(0, 1).equals("0")) {
+                        totalmoney -= Double.valueOf(nodeData.getC());
                     } else {
-                        totalmoney += Double.valueOf(deNodeData.getMoney());
+                        totalmoney += Double.valueOf(nodeData.getC());
                     }
                 }
             }
@@ -154,15 +154,14 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     private void delete() {
         List<Node> selectedNode = mAdapter.getSelectedNode();
         for (Node node : selectedNode) {
-            DENodeData deNodeData = (DENodeData) node.getData();
+            NodeData nodeData = (NodeData) node.getData();
             if (node.isLeaf()) {
                 //如果是叶子节点,进行删除
-                String type = deNodeData.getType();
-                String money = deNodeData.getMoney();
-                String time = String.valueOf(deNodeData.getTime());
+                String type = nodeData.getA();
+                String money = nodeData.getC();
+                String time = String.valueOf(nodeData.getTime());
                 if (type.substring(0, 1).equals("0")) {
                     //支出
-
                     db.delete("expendinfo", "User_Name=? AND Money=? " +
                                     "AND Type=? AND Time=?",
                             new String[]{Username, money, type.substring(1), time});
@@ -198,10 +197,10 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                     long time = cursor.getLong(cursor.getColumnIndex("Time"));
                     if (LongToString(time).substring(0, 4).equals(currentyear)) {
                         String money = cursor.getString(cursor.getColumnIndex("Money"));
-                        String type = 0 + cursor.getString(cursor.getColumnIndex("Type"));
+                        String type = i + cursor.getString(cursor.getColumnIndex("Type"));
                         String text = cursor.getString(cursor.getColumnIndex("Message"));
-                        DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
-                        InfoList.add(detailInfo);
+                        Info info = new Info(Double.valueOf(money), type, time, text);
+                        InfoList.add(info);
                     }
                 } while (cursor.moveToNext());
             }
@@ -209,18 +208,15 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
 
         Collections.sort(InfoList);
 
-        for (DetailInfo detailInfo : InfoList) {
-            Log.d("DetailActivity.liang", detailInfo.getMoney() + "  " + detailInfo.getType()
-                    + "  " + detailInfo.getTime() + "   " + detailInfo.getText() + "      " + LongToString(detailInfo.getTime()));
+        for (Info info : InfoList) {
+           // Log.d("DetailActivity.liang", info.getMoney() + "  " + info.getType()
+          //          + "  " + info.getTime() + "   " + info.getText() + "      " + LongToString(info.getTime()));
         }
     }
 
     private void detail_Detailday_day() {
         //Log.d("DetailActivity.liang", "进入detail_Detailday_day");
         day_dayList.clear();
-        //获得天的结余
-        double expendmoney = 0;
-        double incomemoney = 0;
         String time;
         boolean createnew = true;
         for (int i = 0; i < InfoList.size(); i++) {
@@ -232,35 +228,12 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 time = LongToString(InfoList.get(i - 1).getTime()).substring(0, 11);
             }
             if (LongToString(InfoList.get(i).getTime()).substring(0, 11).equals(time)) {//如果是同一天
-                if (InfoList.get(i).getType().substring(0, 1).equals("0")) {//判断是为支出
-                    expendmoney = expendmoney + InfoList.get(i).getMoney();
-                } else if (InfoList.get(i).getType().substring(0, 1).equals("1")) {//判断是为收入
-                    incomemoney = incomemoney + InfoList.get(i).getMoney();
-                }
                 createnew = false;
                 if (i == (InfoList.size() - 1)) {
-                   /* String day = LongToString(InfoList.get(i).getTime()).substring(8, 11);
-                    String date = LongToString(InfoList.get(i).getTime()).substring(0, 7);
-                    double jieyu = incomemoney - expendmoney;
-                    double shouru = incomemoney;
-                    double zhichu = expendmoney;
-                    long lasttime = InfoList.get(i).getTime();
-                    DetailSurplus detailday_day = new DetailSurplus(day, date, jieyu, shouru, zhichu, lasttime);
-                    day_dayList.add(detailday_day);*/
-                    day_dayList.add(LongToString(InfoList.get(i).getTime()).substring(0, 11));
+                    day_dayList.add(time);
                 }
             } else {//总结出一个
-                /*String day = LongToString(InfoList.get(i - 1).getTime()).substring(8, 11);
-                String date = LongToString(InfoList.get(i - 1).getTime()).substring(0, 7);
-                double jieyu = incomemoney - expendmoney;
-                double shouru = incomemoney;
-                double zhichu = expendmoney;
-                long lasttime = InfoList.get(i - 1).getTime();
-                DetailSurplus detailday_day = new DetailSurplus(day, date, jieyu, shouru, zhichu, lasttime);
-                day_dayList.add(detailday_day);*/
-                day_dayList.add(LongToString(InfoList.get(i - 1).getTime()).substring(0, 11));
-                incomemoney = 0;
-                expendmoney = 0;
+                day_dayList.add(time);
                 i = i - 1;
                 createnew = true;
             }
@@ -271,40 +244,27 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private void detailmonth_list() {
-        Log.d("DEAliang", "进入detailmonth_list");
+    private void detail_list() {
         list.clear();
         detail_DetailInfo(currentyear);
         detail_Detailday_day();
-        //开始综合list，实现流水列表
-        int a = 0, b = 0, c = 0;//a为月，b为日详情
+        int a = 0, b = 0;
         int i = 0;//为指针在list中的位置
         int leveldivide01;//等级划分关联
-        DENodeData deNodeData;
+        NodeData nodeData;
         for (a = 0; a < day_dayList.size(); a++) {
-            /*list.add(new Item(i, 0, 0, false,
-                    day_dayList.get(a).getDay(),
-                    day_dayList.get(a).getDate(),
-                    formatPrice(day_dayList.get(a).getJieyu()),
-                    formatPrice(day_dayList.get(a).getShouru()),
-                    formatPrice(day_dayList.get(a).getZhichu()),
-                    "",
-                    day_dayList.get(a).getTime()));*/
-            deNodeData = new DENodeData(day_dayList.get(a), "", "", 0);
-            list.add(new Node<DENodeData>(i + "", "-1", deNodeData, "0"));
+            nodeData = new NodeData(day_dayList.get(a),"","", "", "", "",0);
+            list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
             i++;
             // Log.d("aaaaad","InfoList.get(b).getTime() =  "+LongToString(InfoList.get(b).getTime()).substring(0,11));
             while (day_dayList.get(a).equals(LongToString(InfoList.get(b).getTime()).substring(0, 11))) {
-                /*list.add(new Item(i, leveldivide01, 1, false,false,
-                        InfoList.get(b).getType(),
+                nodeData = new  NodeData(InfoList.get(b).getType(),
                         LongToString(InfoList.get(b).getTime()).substring(11, 16),
-                        formatPrice(InfoList.get(b).getMoney())));*/
-                //  Log.d("aaaaad","list");
-                deNodeData = new DENodeData(InfoList.get(b).getType(),
-                        LongToString(InfoList.get(b).getTime()).substring(11, 16), formatPrice(InfoList.get(b).getMoney()),
+                        formatPrice(InfoList.get(b).getMoney()),
+                        "","","",
                         InfoList.get(b).getTime());
-                list.add(new Node<DENodeData>(i + "", leveldivide01 + "", deNodeData, "1"));
+                list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
                 i++;
                 b++;
                 if (b >= InfoList.size()) {

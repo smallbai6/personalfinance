@@ -9,13 +9,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".UserCenter"></activity>
         <activity android:name=".RegisterLogin"></activity>
-        <activity android:name=".TallyActivity"></activity>
+        <activity
+            android:name=".TallyActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
         <activity android:name=".DetailActivity"></activity>
-        <activity android:name=".TallyEditorActivity"></activity>
+        <activity
+            android:name=".TallyEditorActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
         <activity android:name=".BudgetActivity"></activity>
         <activity android:name=".DetailEditorActivity"></activity>
+        <activity android:name=".StatisticalActivity"></activity>
+        <activity android:name=".StatisticalEditorActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

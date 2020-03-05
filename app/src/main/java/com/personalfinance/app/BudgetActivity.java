@@ -43,7 +43,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     /*
     年季月日支出收入
      */
-    PopupWindow choosePopupWindow;
+    private PopupWindow choosePopupWindow;
     private View contentView;
     private ListView chooselistView;
     private ArrayList<String> chooseList = new ArrayList<>();

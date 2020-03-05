@@ -37,7 +37,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      */
     private TextView back, save, choose;
     private int record;
-    private String[] income_expend = {"支付", "收入"};
+    private String[] income_expend = {"支出", "收入"};
     private Drawable drawable;
     /*
      *填写的内容
@@ -253,11 +253,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         String sDateTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(dateOld);// 把date类型的时间转换为string
         return sDateTime;
     }
-    private String LongToStringa(long date) {
-        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
-        String sDateTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss").format(dateOld);// 把date类型的时间转换为string
-        return sDateTime;
-    }
+
     // date要转换的date类型的时间
     public static long DateToLong(Date date) {
         return date.getTime();

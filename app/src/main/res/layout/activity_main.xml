@@ -73,6 +73,12 @@
                             android:layout_height="60dp"
                             android:layout_weight="1"
                             android:text="预算" />
+                        <Button
+                            android:id="@+id/mainstatistical_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:layout_weight="1"
+                            android:text="统计" />
                     </LinearLayout>
 
                 </RelativeLayout>

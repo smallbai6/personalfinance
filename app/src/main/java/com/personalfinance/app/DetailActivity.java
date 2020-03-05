@@ -22,10 +22,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.personalfinance.app.Detail.DetailAdapter;
-import com.personalfinance.app.Detail.DetailInfo;
-import com.personalfinance.app.Detail.DetailNodeData;
-import com.personalfinance.app.Detail.DetailSurplus;
-import com.personalfinance.app.Detail.Node;
+import com.personalfinance.app.Sqlite.Info;
+import com.personalfinance.app.Sqlite.NodeData;
+import com.personalfinance.app.Sqlite.DetailSurplus;
+import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Detail.OnInnerItemClickListener;
 import com.personalfinance.app.Detail.OnInnerItemLongClickListener;
 
@@ -73,12 +73,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     总列表和各个等级排序列表
      */
     private MyListView listView;
-    //private List<Item> list = new ArrayList<>();
     private List<Node> list = new ArrayList<>();
-    //private boolean[] listisExpand = new boolean[10000];
-    // private MyAdapter adapter;
     private DetailAdapter adapter;
-    private List<DetailInfo> InfoList = new ArrayList<>();
+    private List<Info> InfoList = new ArrayList<>();
     private List<DetailSurplus> day_dayList = new ArrayList<>();
     private List<DetailSurplus> day_monthList = new ArrayList<>();
     private List<DetailSurplus> month_monthList = new ArrayList<>();
@@ -238,29 +235,29 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private void list_adapter() {
         adapter = new DetailAdapter(listView, this, list,
-                2, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
+                0, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
         listView.setAdapter(adapter);
          year_show();
         adapter.setOnInnerItemClickListener(new OnInnerItemClickListener() {
             @Override
             public void onClick(Node node, int position) {
                 Log.d("onClick"," position    "+position);
-                DetailNodeData detailNodeData = (DetailNodeData) node.getData();
-                Toast.makeText(DetailActivity.this, "短点  " + detailNodeData.getC(), Toast.LENGTH_SHORT).show();
+                NodeData nodeData = (NodeData) node.getData();
+                Toast.makeText(DetailActivity.this, "短点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(DetailActivity.this, TallyEditorActivity.class);
                 intent.putExtra("username", Username);
-                intent.putExtra("money", detailNodeData.getE());
-                intent.putExtra("type", detailNodeData.getC());
-                intent.putExtra("time", detailNodeData.getTime());
-                intent.putExtra("message", detailNodeData.getF());
+                intent.putExtra("money", nodeData.getE());
+                intent.putExtra("type", nodeData.getC());
+                intent.putExtra("time", nodeData.getTime());
+                intent.putExtra("message", nodeData.getF());
                 startActivityForResult(intent, 2);
             }
         });
         adapter.setOnInnerItemLongClickListener(new OnInnerItemLongClickListener() {
             @Override
             public void onClick(Node node, int position) {
-                DetailNodeData detailNodeData = (DetailNodeData) node.getData();
-                Toast.makeText(DetailActivity.this, "长点  " + detailNodeData.getC(), Toast.LENGTH_SHORT).show();
+                NodeData nodeData = (NodeData) node.getData();
+                Toast.makeText(DetailActivity.this, "长点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(DetailActivity.this, DetailEditorActivity.class);
                 intent.putExtra("username", Username);
                 intent.putExtra("year", showyear);
@@ -276,10 +273,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         for(Node node:list){
             if(node.isRootNode()){
                 //为根节点
-                DetailNodeData detailNodeData =(DetailNodeData)node.getData();
-                totalyearmoney+=Double.valueOf(detailNodeData.getC());
-                totalyeaerincomemoney+=Double.valueOf(detailNodeData.getD());
-                totalyearexpendmoney+=Double.valueOf(detailNodeData.getE());
+                NodeData nodeData =(NodeData)node.getData();
+                totalyearmoney+=Double.valueOf(nodeData.getC());
+                totalyeaerincomemoney+=Double.valueOf(nodeData.getD());
+                totalyearexpendmoney+=Double.valueOf(nodeData.getE());
             }
         }
         detail_year_money.setText(formatPrice(totalyearmoney));
@@ -354,18 +351,18 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     long time = cursor.getLong(cursor.getColumnIndex("Time"));
                     if (LongToString(time).substring(0, 4).equals(currentyear)) {
                         String money = cursor.getString(cursor.getColumnIndex("Money"));
-                        String type = 0 + cursor.getString(cursor.getColumnIndex("Type"));
+                        String type = i + cursor.getString(cursor.getColumnIndex("Type"));
                         String text = cursor.getString(cursor.getColumnIndex("Message"));
-                        DetailInfo detailInfo = new DetailInfo(Double.valueOf(money), type, time, text);
-                        InfoList.add(detailInfo);
+                        Info info = new Info(Double.valueOf(money), type, time, text);
+                        InfoList.add(info);
                     }
                 } while (cursor.moveToNext());
             }
         }
         Collections.sort(InfoList);
-        for (DetailInfo detailInfo : InfoList) {
-            Log.d("DetailActivity.liang", detailInfo.getMoney() + "  " + detailInfo.getType()
-                    + "  " + detailInfo.getTime() + "   " + detailInfo.getText() + "      " + LongToString(detailInfo.getTime()));
+        for (Info info : InfoList) {
+            Log.d("DetailActivity.liang", info.getMoney() + "  " + info.getType()
+                    + "  " + info.getTime() + "   " + info.getText() + "      " + LongToString(info.getTime()));
         }
     }
     /*
@@ -533,7 +530,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     /*
     季中的季结余
      */
-    private void detail_Detailseason_season() {//Integer.valueOf(month_monthList.get(0).getDay().substring(0,2))
+    private void detail_Detailseason_season() {
+        //Integer.valueOf(month_monthList.get(0).getDay().substring(0,2))
        // Log.d("DetailActivity.liang", "进入detail_Detailseason_season");
         season_seasonList.clear();
         double expendmoney = 0;
@@ -667,37 +665,37 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         detail_Detailmonth_month();
         detail_Detailseason_season();
         //开始综合成list，实现流水列表
-        DetailNodeData detailNodeData;
+        NodeData nodeData;
         int a, b = 0, c = 0;//a为季，b为月，c为日详情
         int i = 0;//为指针在list中的位置
         int leveldivide01, leveldivide12;//等级划分关联
         for (a = 0; a < season_seasonList.size(); a++) {
 
-            detailNodeData = new DetailNodeData(season_seasonList.get(a).getDay(), season_seasonList.get(a).getDate(),
+            nodeData = new NodeData(season_seasonList.get(a).getDay(), season_seasonList.get(a).getDate(),
                     formatPrice(season_seasonList.get(a).getJieyu()), formatPrice(season_seasonList.get(a).getShouru()),
                     formatPrice(season_seasonList.get(a).getZhichu()), "",
                     season_seasonList.get(a).getTime());
-            list.add(new Node<DetailNodeData>(i + "", "-1", detailNodeData, "0"));
+            list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
             i++;
             int ji = Integer.valueOf(season_seasonList.get(a).getDay().substring(0, 1));//     .equals(day_dayList.get(b).getDate().substring(5, 7) + "月")
             while ((Integer.valueOf(month_monthList.get(b).getDay().substring(0, 2)) <= (ji * 3))
                     && (Integer.valueOf(month_monthList.get(b).getDay().substring(0, 2)) >= (ji * 3 - 2))) {
 
-                detailNodeData = new DetailNodeData(month_monthList.get(b).getDay(), month_monthList.get(b).getDate(),
+                nodeData = new NodeData(month_monthList.get(b).getDay(), month_monthList.get(b).getDate(),
                         formatPrice(month_monthList.get(b).getJieyu()), formatPrice(month_monthList.get(b).getShouru()),
                         formatPrice(month_monthList.get(b).getZhichu()), "",
                         month_monthList.get(b).getTime());
-                list.add(new Node<DetailNodeData>(i + "", leveldivide01 + "", detailNodeData, "0"));
+                list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "0"));
                 leveldivide12 = i;
                 i++;
                 while (month_monthList.get(b).getDay().equals(LongToString(InfoList.get(c).getTime()).substring(5, 8))) {
 
-                    detailNodeData = new DetailNodeData(LongToString(InfoList.get(c).getTime()).substring(8, 10),
+                    nodeData = new NodeData(LongToString(InfoList.get(c).getTime()).substring(8, 10),
                             LongToString(InfoList.get(c).getTime()).substring(16, 18), InfoList.get(c).getType(),
                             LongToString(InfoList.get(c).getTime()).substring(11, 16), formatPrice(InfoList.get(c).getMoney()),
                             InfoList.get(c).getText(), InfoList.get(c).getTime());
-                    list.add(new Node<DetailNodeData>(i + "", leveldivide12 + "", detailNodeData, "1"));
+                    list.add(new Node<NodeData>(i + "", leveldivide12 + "", nodeData, "1"));
                     i++;
                     c++;
                     if (c >= InfoList.size()) {
@@ -722,26 +720,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         detail_DetailInfo(String.valueOf(showyear));
         detail_Detailmonth_month();
         //开始综合list，实现流水列表
-        DetailNodeData detailNodeData;
+        NodeData nodeData;
         int a, b = 0, c = 0;//a为月，b为日详情
         int i = 0;//为指针在list中的位置
         int leveldivide01;//等级划分关联
         for (a = 0; a < month_monthList.size(); a++) {
 
-            detailNodeData = new DetailNodeData(month_monthList.get(a).getDay(), month_monthList.get(a).getDate(),
+            nodeData = new NodeData(month_monthList.get(a).getDay(), month_monthList.get(a).getDate(),
                     formatPrice(month_monthList.get(a).getJieyu()), formatPrice(month_monthList.get(a).getShouru()),
                     formatPrice(month_monthList.get(a).getZhichu()), "",
                     month_monthList.get(a).getTime());
-            list.add(new Node<DetailNodeData>(i + "", "-1", detailNodeData, "0"));
+            list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
             i++;
             while (month_monthList.get(a).getDay().equals(LongToString(InfoList.get(b).getTime()).substring(5, 8))) {
 
-                detailNodeData = new DetailNodeData(LongToString(InfoList.get(b).getTime()).substring(8, 10),
+                nodeData = new NodeData(LongToString(InfoList.get(b).getTime()).substring(8, 10),
                         LongToString(InfoList.get(b).getTime()).substring(16, 18), InfoList.get(b).getType(),
                         LongToString(InfoList.get(b).getTime()).substring(11, 16), formatPrice(InfoList.get(b).getMoney()),
                         InfoList.get(b).getText(), InfoList.get(b).getTime());
-                list.add(new Node<DetailNodeData>(i + "", leveldivide01 + "", detailNodeData, "1"));
+                list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
                 i++;
                 b++;
                 if (b >= InfoList.size()) {
@@ -763,40 +761,40 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         detail_Detailday_month();
         //开始进行将三个day_monthList+day_dayList+InfoList进行综合，综合成list，实现流水列表
 
-        DetailNodeData detailNodeData;
+        NodeData nodeData;
         int a, b = 0, c = 0;//a为月，b为日，c为日详情
         int i = 0;//为指针在list中的位置
         int leveldivide01, leveldivide12;//等级划分关联listisExpand[i]
         for (a = 0; a < day_monthList.size(); a++) {
 
-            detailNodeData = new DetailNodeData(day_monthList.get(a).getDay(), day_monthList.get(a).getDate(),
+            nodeData = new NodeData(day_monthList.get(a).getDay(), day_monthList.get(a).getDate(),
                     formatPrice(day_monthList.get(a).getJieyu()), formatPrice(day_monthList.get(a).getShouru()),
                     formatPrice(day_monthList.get(a).getZhichu()), "",
                     day_monthList.get(a).getTime());
-            list.add(new Node<DetailNodeData>(i + "", "-1", detailNodeData, "0"));
+            list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
             i++;
 
             while (day_monthList.get(a).getDay().equals(day_dayList.get(b).getDate().substring(5, 7) + "月")) {
 
-                detailNodeData = new DetailNodeData(day_dayList.get(b).getDay(), day_dayList.get(b).getDate(),
+                nodeData = new NodeData(day_dayList.get(b).getDay(), day_dayList.get(b).getDate(),
                         formatPrice(day_dayList.get(b).getJieyu()), formatPrice(day_dayList.get(b).getShouru()),
                         formatPrice(day_dayList.get(b).getZhichu()), "",
                         day_dayList.get(b).getTime());
-                list.add(new Node<DetailNodeData>(i + "", leveldivide01 + "", detailNodeData, "0"));
+                list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "0"));
                 leveldivide12 = i;
                 i++;
                 while (LongToString(day_dayList.get(b).getTime()).substring(0, 11).equals(
                         LongToString(InfoList.get(c).getTime()).substring(0, 11))) {
 
-                    detailNodeData = new DetailNodeData(LongToString(InfoList.get(c).getTime()).substring(8, 10),
+                    nodeData = new NodeData(LongToString(InfoList.get(c).getTime()).substring(8, 10),
                             LongToString(InfoList.get(c).getTime()).substring(16, 18),
                             InfoList.get(c).getType(),
                             LongToString(InfoList.get(c).getTime()).substring(11, 16),
                             formatPrice(InfoList.get(c).getMoney()),
                             InfoList.get(c).getText(),
                             InfoList.get(c).getTime());
-                    list.add(new Node<DetailNodeData>(i + "", leveldivide12 + "", detailNodeData, "1"));
+                    list.add(new Node<NodeData>(i + "", leveldivide12 + "", nodeData, "1"));
                     i++;
                     c++;
                     if (c >= InfoList.size()) {

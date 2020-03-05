@@ -9,7 +9,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.personalfinance.app.Detail.DetailBulk.OnTreeNodeClickListener;
+import com.personalfinance.app.Sqlite.Node;
 
 import java.util.ArrayList;
 import java.util.List;

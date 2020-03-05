@@ -1,4 +1,4 @@
-package com.personalfinance.app.Detail;
+package com.personalfinance.app.Statistical;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,16 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.personalfinance.app.R;
 import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Sqlite.NodeData;
+import com.personalfinance.app.Detail.OnInnerItemClickListener;
+import com.personalfinance.app.Detail.OnInnerItemLongClickListener;
+import com.personalfinance.app.Detail.TreeListViewAdapter;
+import com.personalfinance.app.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-public class DetailAdapter extends TreeListViewAdapter {
+public class StatisticalAdapter extends TreeListViewAdapter {
 
     private OnInnerItemClickListener listener;
     private OnInnerItemLongClickListener longListener;
@@ -28,7 +32,7 @@ public class DetailAdapter extends TreeListViewAdapter {
 
 
     //进行ListViewAdapter中的内容
-    public DetailAdapter(ListView listView, Context context, List<Node> datas, int defaultExpandLevel, int iconExpand, int iconNoExpand) {
+    public StatisticalAdapter(ListView listView, Context context, List<Node> datas, int defaultExpandLevel, int iconExpand, int iconNoExpand) {
         super(listView, context, datas, defaultExpandLevel, iconExpand, iconNoExpand);
     }
 
@@ -40,7 +44,7 @@ public class DetailAdapter extends TreeListViewAdapter {
         switch (getItemViewType(position)){
             case 1:
                 if(convertView==null){
-                    convertView = LayoutInflater.from(mContext).inflate(R.layout.detail_type_a, null);
+                    convertView = LayoutInflater.from(mContext).inflate(R.layout.statistical_peditor_a, null);
                     holdera = new ViewHoldera(convertView);
                     convertView.setTag(holdera);
                 }else{
@@ -52,38 +56,34 @@ public class DetailAdapter extends TreeListViewAdapter {
                     holdera.iv.setVisibility(View.VISIBLE);
                     holdera.iv.setImageResource(node.getIcon());
                 }
-                nodeData =(NodeData)node.getData();
-                holdera.tva.setText(nodeData.getA());
-                holdera.tvb.setText(nodeData.getB());
-                holdera.tvc.setText(nodeData.getC());
-                holdera.tvd.setText(nodeData.getD());
-                holdera.tve.setText(nodeData.getE());
+                nodeData=(NodeData)node.getData();
+                holdera.tva.setText(nodeData.getA().substring(8,10)+"日");
+                holdera.tvb.setText(nodeData.getA().substring(0,7)+nodeData.getA().substring(16));
                 break;
             case 0:
                 if(convertView==null){
-                    convertView = LayoutInflater.from(mContext).inflate(R.layout.detail_type_b, null);
+                    convertView = LayoutInflater.from(mContext).inflate(R.layout.statistical_peditor_b, null);
                     holderb = new ViewHolderb(convertView);
                     convertView.setTag(holderb);
                 }else{
                     holderb=(ViewHolderb)convertView.getTag();
                 }
-                nodeData =(NodeData)node.getData();
+                nodeData=(NodeData)node.getData();
 
                 //RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tva.getLayoutParams();
                 //params.leftMargin = 60;
                 //tva.setLayoutParams(params);
-                holderb.tva.setText(nodeData.getA());
+                holderb.tva.setText(nodeData.getA().substring(1));
                 holderb.tvb.setText(nodeData.getB());
-                holderb.tvc.setText(nodeData.getC().substring(1));
-                holderb.tvd.setText(nodeData.getD());
-                if (nodeData.getC().substring(0, 1).equals("0")) {
-                    holderb.tve.setTextColor(mContext.getResources().getColor(R.color.colorgreen));
+                holderb.tvc.setVisibility((nodeData.getC().equals("")) ? View.GONE : View.VISIBLE);
+                holderb.tvc.setText(nodeData.getC());
+                if (nodeData.getA().substring(0, 1).equals("0")) {
+                    holderb.tvd.setTextColor(mContext.getResources().getColor(R.color.colorgreen));
                 } else {
-                    holderb.tve.setTextColor(mContext.getResources().getColor(R.color.colorred));
+                    holderb.tvd.setTextColor(mContext.getResources().getColor(R.color.colorred));
                 }
-                holderb.tve.setText(nodeData.getE());
-                holderb.tvf.setVisibility((nodeData.getF().equals("")) ? View.GONE : View.VISIBLE);
-                holderb.tvf.setText(nodeData.getF());
+                holderb.tvd.setText(nodeData.getD());
+
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -108,30 +108,30 @@ public class DetailAdapter extends TreeListViewAdapter {
 
     class ViewHoldera {
         private ImageView iv;
-        private TextView tva, tvb, tvc, tvd, tve;
-        private RelativeLayout relativeLayout;
+        private TextView tva, tvb;
+       // private RelativeLayout relativeLayout;
 
         public ViewHoldera(View convertView) {
-            relativeLayout = (RelativeLayout) convertView.findViewById(R.id.a_detail_relativeLayout);
-            iv = (ImageView) convertView.findViewById(R.id.a_detail_jiantou);
-            tva = (TextView) convertView.findViewById(R.id.a_detail_month);
-            tvb = (TextView) convertView.findViewById(R.id.a_detail_year);
-            tvc = (TextView) convertView.findViewById(R.id.a_detail_totalmoney);
-            tvd = (TextView) convertView.findViewById(R.id.a_detail_incomemoney);
-            tve = (TextView) convertView.findViewById(R.id.a_detail_expendmoney);
+            //relativeLayout = (RelativeLayout) convertView.findViewById(R.id.a_detail_relativeLayout);
+            iv = (ImageView) convertView.findViewById(R.id.a_statistical_imageView);
+            tva = (TextView) convertView.findViewById(R.id.a_statistical_day);
+            tvb = (TextView) convertView.findViewById(R.id.a_statistical_date);
         }
     }
 
 
     static class ViewHolderb {
-        private TextView tva, tvb, tvc, tvd, tve, tvf;
+        private TextView tva, tvb, tvc,tvd;
         public ViewHolderb(View convertView) {
-            tva = (TextView) convertView.findViewById(R.id.b_detail_day);
-            tvb = (TextView) convertView.findViewById(R.id.b_detail_week);
-            tvc = (TextView) convertView.findViewById(R.id.b_detail_consumetype);
-            tvd = (TextView) convertView.findViewById(R.id.b_detail_time);
-            tve = (TextView) convertView.findViewById(R.id.b_detail_money);
-            tvf = (TextView) convertView.findViewById(R.id.b_detail_text);
+            tva = (TextView) convertView.findViewById(R.id.b_statistical_type);
+            tvb = (TextView) convertView.findViewById(R.id.b_statistical_time);
+            tvc = (TextView) convertView.findViewById(R.id.b_statistical_text);
+            tvd=(TextView)convertView.findViewById(R.id.b_statistical_money);
         }
+    }
+    private String LongToString(long date) {
+        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间HH:mm:ss SSS
+        String sDateTime = new SimpleDateFormat("yyyy.MM.dd HH:mm EE").format(dateOld);// 把date类型的时间转换为string
+        return sDateTime;
     }
 }

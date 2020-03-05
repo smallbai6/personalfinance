@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/PieChart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/piechart_legend1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="30dp"
+            android:layout_toLeftOf="@+id/textView1"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/piechart_legend2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_toRightOf="@+id/textView1"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/piechart_legend3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/piechart_legend1"
+            android:layout_alignRight="@+id/piechart_legend1"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+
+
+        <TextView
+            android:id="@+id/piechart_legend4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/piechart_legend2"
+            android:layout_marginLeft="60dp"
+            android:layout_toRightOf="@id/piechart_legend3"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/piechart_legend5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/piechart_legend3"
+            android:layout_alignRight="@+id/piechart_legend1"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/piechart_legend6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/piechart_legend3"
+            android:layout_marginLeft="60dp"
+            android:layout_toRightOf="@id/piechart_legend5"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/piechart_legend7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/piechart_legend5"
+            android:layout_centerHorizontal="true"
+            android:text="早午晚餐"
+            android:textColor="@color/colorblack"
+            android:textSize="20dp" />
+
+
+    </RelativeLayout>
+
+
+
+</LinearLayout>

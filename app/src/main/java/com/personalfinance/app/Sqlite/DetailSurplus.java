@@ -1,4 +1,4 @@
-package com.personalfinance.app.Detail;
+package com.personalfinance.app.Sqlite;
 
 public class DetailSurplus {
     private String day;

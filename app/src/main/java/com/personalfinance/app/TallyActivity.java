@@ -63,7 +63,7 @@ private Cursor cursor;
     private PopupWindow choosePopupWindow;
     private ListView list;
     private View contentView, PopParent;
-    private String[] income_expend = {"支付", "收入"};
+    private String[] income_expend = {"支出", "收入"};
     private ArrayAdapter<String> adapter;
     private List<String> chooseList = new ArrayList<>();
 

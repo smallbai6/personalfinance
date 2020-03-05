@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button drawerbutton;
 
-    private Button tallybutton,detailbutton,budgetbutton;
+    private Button tallybutton,detailbutton,budgetbutton,statisticalbutton;
     private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         detailbutton.setOnClickListener(this);
         budgetbutton=(Button)findViewById(R.id.mainbudget_button);
         budgetbutton.setOnClickListener(this);
-
+        statisticalbutton=(Button)findViewById(R.id.mainstatistical_button);
+        statisticalbutton.setOnClickListener(this);
 
         draweruserrname = (TextView) userheaderView.findViewById(R.id.drawer_username);
         //用户名和头像获取
@@ -111,6 +112,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.mainbudget_button://进入预算
                 Toast.makeText(MainActivity.this, "进入预算中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, BudgetActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.mainstatistical_button://进入统计
+                Toast.makeText(MainActivity.this, "进入统计中", Toast.LENGTH_SHORT).show();
+                intent = new Intent(MainActivity.this, StatisticalActivity.class);
                 startActivity(intent);
                 finish();
                 break;

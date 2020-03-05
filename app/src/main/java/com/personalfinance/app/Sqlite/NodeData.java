@@ -1,10 +1,10 @@
-package com.personalfinance.app.Detail;
+package com.personalfinance.app.Sqlite;
 
-public class DetailNodeData {
+public class NodeData {
     String a, b, c, d, e, f;
     long time;
 
-    public DetailNodeData(String a, String b, String c, String d, String e, String f, long time) {
+    public NodeData(String a, String b, String c, String d, String e, String f, long time) {
         this.a = a;
         this.b = b;
         this.c = c;

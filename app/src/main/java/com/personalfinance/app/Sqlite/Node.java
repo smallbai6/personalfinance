@@ -1,4 +1,4 @@
-package com.personalfinance.app.Detail;
+package com.personalfinance.app.Sqlite;
 
 import java.util.ArrayList;
 import java.util.List;

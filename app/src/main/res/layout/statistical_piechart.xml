@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:id="@+id/piechart_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="图表统计"
+            android:textColor="@color/colorblack"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/piechart_choose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="支付"
+            android:textColor="@color/colorblack"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorblack" />
+
+    <include
+        layout="@layout/piechart_statistical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="15" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+
+        <ImageView
+            android:id="@+id/statistical_time_lastyear"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/statistical_time"
+            android:layout_marginRight="6dp"
+            app:srcCompat="@mipmap/zuosanjiao" />
+
+        <TextView
+            android:id="@+id/statistical_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:text="2020.01.01-2020.01.31"
+            android:textSize="20dp" />
+
+        <ImageView
+            android:id="@+id/statistical_time_nextyear"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/statistical_time"
+            android:layout_marginLeft="6dp"
+            app:srcCompat="@mipmap/yousanjiao" />
+
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -43,9 +43,9 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
             do {
                 String name = "";
                 if (typecategory == 0) {
-                    name = cursor.getString(cursor.getColumnIndex("ExpendType_Name"));
+                    name = cursor.getString(cursor.getColumnIndex("Type_Name"));
                 } else if (typecategory == 1) {
-                    name = cursor.getString(cursor.getColumnIndex("IncomeType_Name"));
+                    name = cursor.getString(cursor.getColumnIndex("Type_Name"));
                 }
                 chooseList[truth_long] = name;
                 truth_long++;

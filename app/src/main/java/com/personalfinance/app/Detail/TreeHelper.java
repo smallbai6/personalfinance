@@ -1,6 +1,8 @@
 package com.personalfinance.app.Detail;
 
 
+import com.personalfinance.app.Sqlite.Node;
+
 import java.util.ArrayList;
 import java.util.List;
 

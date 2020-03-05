@@ -34,7 +34,7 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
 
 
 
-        mTimeChoose=new TimeChoose(context,selectTime);
+        mTimeChoose=new TimeChoose(context,selectTime,0);
         buttoncancel=(Button)mTimeChoose.findViewById(R.id.time_cancel);
         timepop = new PopupWindow(mTimeChoose,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

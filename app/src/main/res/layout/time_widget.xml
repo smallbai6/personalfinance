@@ -1,28 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/time_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:text="quxiao" />
-    </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/colorgray"/>
-
-    <include layout="@layout/time_widget"/>
-  <!--  <LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -60,7 +42,7 @@
         <View
             android:layout_width="20dp"
             android:layout_height="wrap_content"
-             />
+            />
 
         <NumberPicker
             android:id="@+id/time_hour"
@@ -83,5 +65,5 @@
             android:layout_width="10dp"
             android:layout_height="wrap_content"
             />
-    </LinearLayout>-->
+    </LinearLayout>
 </LinearLayout>
