@@ -17,68 +17,128 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
+                    android:background="@color/colorwhite"
                     android:layout_height="60dp">
 
-                    <Button
-                        android:id="@+id/drawer_button"
+                    <ImageView
+                        android:id="@+id/main_opendrawera"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="-20dp"
+                        android:src="@mipmap/sanhengxian" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/main_opendrawerb"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/main_opendrawera"
+                        android:src="@mipmap/backgroundpicture" />
+
+
+
+                    <TextView
+                        android:id="@+id/mainbudget_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Button" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
+                        android:layout_alignParentRight="true"
                         android:layout_alignParentBottom="true"
-                        android:background="@color/colorgray" />
+                        android:layout_marginRight="15dp"
+                        android:textSize="16dp"
+                        android:text=" 预算 " />
+
 
                 </RelativeLayout>
-
-                <LinearLayout
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="3dp"
+                    android:background="@color/colorgray" />
 
-                    <include layout="@layout/main_center" />
-                </LinearLayout>
+                <ListView
+                    android:id="@+id/main_center_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_alignParentBottom="true"
                         android:orientation="horizontal">
-                        <Button
-                            android:id="@+id/maindetail_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:text="流水" />
-                        <Button
-                            android:id="@+id/maintally_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:text="记账" />
-                        <Button
-                            android:id="@+id/mainbudget_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:text="预算" />
-                        <Button
-                            android:id="@+id/mainstatistical_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:text="统计" />
+                        <!--   <Button
+                               android:id="@+id/maindetail_button"
+                               android:layout_width="wrap_content"
+                               android:layout_height="60dp"
+                               android:layout_weight="1"
+                               android:text="流水" />
+                           <Button
+                               android:id="@+id/maintally_button"
+                               android:layout_width="wrap_content"
+                               android:layout_height="60dp"
+                               android:layout_weight="1"
+                               android:text="记账" />
+                           <Button
+                               android:id="@+id/mainbudget_button"
+                               android:layout_width="wrap_content"
+                               android:layout_height="60dp"
+                               android:layout_weight="1"
+                               android:text="预算" />
+
+                         <Button
+                               android:id="@+id/mainstatistical_button"
+                               android:layout_width="wrap_content"
+                               android:layout_height="60dp"
+                               android:layout_weight="1"
+                               android:text="统计" />-->
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorwhite"
+                            >
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="2dp"
+                                android:background="@color/colorwhitegray" />
+                            <TextView
+                                android:id="@+id/maindetail_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" 流水 "
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_marginLeft="50dp"
+                                android:textSize="16dp" />
+
+                            <Button
+                                android:id="@+id/maintally_button"
+                                android:layout_width="150dp"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/mainjizhang"
+                                android:text="记账"
+                                android:textSize="20dp" />
+
+                            <TextView
+                                android:id="@+id/mainstatistical_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginRight="50dp"
+                                android:text=" 统计 "
+                                android:textSize="16dp" />
+                        </RelativeLayout>
+
                     </LinearLayout>
 
                 </RelativeLayout>

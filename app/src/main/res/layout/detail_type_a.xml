@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/a_detail_month"
-        android:layout_width="50dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:text="12月"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:text="结余"
         android:layout_toRightOf="@+id/a_detail_month"
-        android:layout_marginLeft="60dp"
+        android:layout_marginLeft="40dp"
         android:layout_alignBottom="@+id/a_detail_totalmoney"
 
         android:textSize="16dp" />

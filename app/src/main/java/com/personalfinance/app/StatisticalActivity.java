@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +41,6 @@ import com.personalfinance.app.Statistical.TimeZDYPop;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +68,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     private long start_time, end_time;
     private View view_dialog;
     private Dialog timedialog;//本日月季年自定义
-    private int choosetimetype=0;//时间类型选择 0本日 1本月 2本季 3本年 4自定义
+    private int choosetimetype=3;//时间类型选择 0本日 1本月 2本季 3本年 4自定义
     //private TextView[] time_tv = new TextView[5];
     private LinearLayout[] linearLayouts=new LinearLayout[5];
     private TimeZDYPop timeZDYPop;
@@ -99,19 +97,21 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.statistical_piechart);
 
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
-        cursor = db.query("userinfo", null, "User_Login=?",
+       /* cursor = db.query("userinfo", null, "User_Login=?",
                 new String[]{"1"}, null, null, null);
         if (cursor.moveToFirst()) {
             Username = cursor.getString(cursor.getColumnIndex("User_Name"));
         } else {//没有登录用户时用户名就为请立即登录
             Username = "请立即登录";
-        }
+        }*/
+        intent=getIntent();
+        Username=intent.getStringExtra("Username");
         pieChart = (PieChart) findViewById(R.id.PieChart);
         InitChoosePopupWindow();//初始化收入支出的弹窗
         SetChoosePopupWindow();//进行弹窗中数据的适配监听
         Set_Legend();//进行饼图标签控件的设置
         backbutton = (TextView) findViewById(R.id.piechart_back);//退出活动
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+       drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 40, 40);
         backbutton.setCompoundDrawables(drawable, null, null, null);
         backbutton.setCompoundDrawablePadding(10);
@@ -132,7 +132,10 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
 
         //一开始支出收入部分和时间部分进行初始化显示
         choosebutton.setText(chooseString[0]);
-        GetYear();
+        long[] SE_time=StartEndTime.GetYear();
+        //GetYear();
+        start_time=SE_time[0];
+        end_time=SE_time[1];
         choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
         GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
 
@@ -229,48 +232,52 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         for (LinearLayout linearLayout : linearLayouts) {
             linearLayout.setOnClickListener(dc);
         }
-
-        /*timedialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                //   Log.d("liangjialing", "setOnCancelListener");
-            }
-        });*/
     }
 
     private class DialogClick implements View.OnClickListener {
         public void onClick(View v) {
+            long[] SE_time;
             switch (v.getId()) {
                 case R.id.statistical_time_day://本日
-                    GetDay();
                     choosetimetype=0;
+                    SE_time=StartEndTime.GetDay();
+                    start_time=SE_time[0];
+                    end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                    Log.d("liangjialing",start_time+"    "+end_time);
+                   // Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_month://本月
-                    GetMonth();
                     choosetimetype=1;
+                    SE_time=StartEndTime.GetMonth();
+                    start_time=SE_time[0];
+                    end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                    Log.d("liangjialing",start_time+"    "+end_time);
+                   // Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_season://本季
-                    GetSeason();
+
                     choosetimetype=2;
+                    SE_time=StartEndTime.GetSeason();
+                    start_time=SE_time[0];
+                    end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                    Log.d("liangjialing",start_time+"    "+end_time);
+                   // Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_year://本年
-                    GetYear();
+
                     choosetimetype=3;
+                    SE_time=StartEndTime.GetYear();
+                    start_time=SE_time[0];
+                    end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                    Log.d("liangjialing",start_time+"    "+end_time);
+                  //  Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_zidingyi://自定义
@@ -297,10 +304,12 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void onClick(View v) {
+        StartEndTime startEndTime;
+        long[] SE_time;
         switch (v.getId()) {
             case R.id.piechart_back://返回到主界面
                 intent = new Intent(StatisticalActivity.this, MainActivity.class);
-                startActivity(intent);
+                setResult(RESULT_OK,intent);
                 finish();
                 break;
             case R.id.piechart_choose://进行支出收入选择
@@ -314,13 +323,19 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 //  Log.d("tiancai","进行时间选择");
                 break;
             case R.id.statistical_time_lastyear://上
-                SetLast();
+                startEndTime=new StartEndTime(start_time,end_time,choosetimetype);
+                SE_time=startEndTime.SetLast();
+                start_time=SE_time[0];
+                end_time=SE_time[1];
                 choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                // Log.d("liangjialing",start_time+"    "+end_time);
                 GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                 break;
             case R.id.statistical_time_nextyear://下
-                SetNext();
+                startEndTime=new StartEndTime(start_time,end_time,choosetimetype);
+                SE_time=startEndTime.SetNext();
+                start_time=SE_time[0];
+                end_time=SE_time[1];
                 choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                // Log.d("liangjialing",start_time+"    "+end_time);
                 GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
@@ -329,77 +344,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 break;
         }
     }
-private void SetLast(){
-    Calendar start_calendar = Calendar.getInstance();
-    Calendar end_calendar = Calendar.getInstance();
-    start_calendar.setTimeInMillis(start_time);
-    end_calendar.setTimeInMillis(end_time);
-    if(choosetimetype==0){//本日
-        start_calendar.add(Calendar.DAY_OF_MONTH, -1);//倒回到前一天
-        end_calendar.add(Calendar.DAY_OF_MONTH, -1);//倒回到前一天
-    }else if(choosetimetype==1) {//本月
-        start_calendar.add(Calendar.MONTH,-1);
-        end_calendar.set(Calendar.DAY_OF_MONTH,1);
-        end_calendar.add(Calendar.DAY_OF_MONTH,-1);
-    }else if(choosetimetype==2){//本季
-        start_calendar.add(Calendar.MONTH,-3);
-        end_calendar.add(Calendar.DAY_OF_MONTH,1);
-        end_calendar.add(Calendar.MONTH,-3);
-        end_calendar.add(Calendar.DAY_OF_MONTH,-1);
-    }else if(choosetimetype==3){//本年
-        start_calendar.add(Calendar.YEAR,-1);
-        end_calendar.add(Calendar.YEAR,-1);
-    }
-    end_calendar.set(Calendar.HOUR_OF_DAY, 23);
-    end_calendar.set(Calendar.MINUTE, 59);
-    end_calendar.set(Calendar.SECOND, 59);
-    end_calendar.set(Calendar.MILLISECOND, 999);
-    start_time = start_calendar.getTimeInMillis();
-    end_time = end_calendar.getTimeInMillis();
-    if(choosetimetype==4){//自定义
-        long init_start_time=start_time;
-        long init_end_time=end_time;
-        // end_time-start_time;
-        end_time=init_start_time-1;
-        start_time=end_time-(init_end_time-init_start_time);
 
-    }
-}
-private void SetNext(){
-    Calendar start_calendar = Calendar.getInstance();
-    Calendar end_calendar = Calendar.getInstance();
-    start_calendar.setTimeInMillis(start_time);
-    end_calendar.setTimeInMillis(end_time);
-    if(choosetimetype==0){//本日
-        start_calendar.add(Calendar.DAY_OF_MONTH, 1);
-        end_calendar.add(Calendar.DAY_OF_MONTH, 1);
-    }else if(choosetimetype==1) {//本月
-        start_calendar.add(Calendar.MONTH,1);
-        end_calendar.add(Calendar.DAY_OF_MONTH,1);
-        end_calendar.add(Calendar.MONTH,1);
-        end_calendar.add(Calendar.DAY_OF_MONTH,-1);
-    }else if(choosetimetype==2){//本季
-        start_calendar.add(Calendar.MONTH,3);
-        end_calendar.add(Calendar.DAY_OF_MONTH,1);
-        end_calendar.add(Calendar.MONTH,3);
-        end_calendar.add(Calendar.DAY_OF_MONTH,-1);
-    }else if(choosetimetype==3){//本年
-        start_calendar.add(Calendar.YEAR,1);
-        end_calendar.add(Calendar.YEAR,1);
-    }
-    end_calendar.set(Calendar.HOUR_OF_DAY, 23);
-    end_calendar.set(Calendar.MINUTE, 59);
-    end_calendar.set(Calendar.SECOND, 59);
-    end_calendar.set(Calendar.MILLISECOND, 999);
-    start_time = start_calendar.getTimeInMillis();
-    end_time = end_calendar.getTimeInMillis();
-    if(choosetimetype==4){//自定义
-        long init_start_time=start_time;
-        long init_end_time=end_time;
-        start_time=init_end_time+1;
-        end_time=start_time+(init_end_time-init_start_time);
-    }
-}
     /*
     对话框弹出
      */
@@ -657,7 +602,7 @@ private void SetNext(){
      */
     private void Activity_Change(String username, String iore, String type_name, long start, long end) {
         intent = new Intent(StatisticalActivity.this, StatisticalEditorActivity.class);
-        intent.putExtra("username", username);
+        intent.putExtra("Username", username);
         intent.putExtra("iore", iore);
         intent.putExtra("type_name", type_name);
         intent.putExtra("start", start);
@@ -677,106 +622,6 @@ private void SetNext(){
         }
     }
 
-    /*
-    获取当天的时间
-     */
-    private void GetDay() {
-        Calendar start_calendar = Calendar.getInstance();
-        start_calendar.set(Calendar.HOUR_OF_DAY, 00);
-        start_calendar.set(Calendar.MINUTE, 00);
-        start_calendar.set(Calendar.SECOND, 00);
-        start_calendar.set(Calendar.MILLISECOND, 00);
-        start_time = start_calendar.getTimeInMillis();
-
-        Calendar end_calendar = Calendar.getInstance();
-        end_calendar.set(Calendar.HOUR_OF_DAY, 23);
-        end_calendar.set(Calendar.MINUTE, 59);
-        end_calendar.set(Calendar.SECOND, 59);
-        end_calendar.set(Calendar.MILLISECOND, 999);
-        end_time = end_calendar.getTimeInMillis();
-        // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
-    }
-
-    /*
-        获取当月的时间
-         */
-    private void GetMonth() {
-        Calendar calendar = Calendar.getInstance();
-        start_time = start_date(calendar.get(Calendar.MONTH));
-        end_time = end_date(calendar.get(Calendar.MONTH));
-        // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
-    }
-
-    /*
-    获取当季节的时间
-     */
-    private void GetSeason() {
-        Calendar calendar = Calendar.getInstance();
-        switch (calendar.get(Calendar.MONTH) + 1) {
-            case 1:
-            case 2:
-            case 3:
-                start_time = start_date(0);
-                end_time = end_date(2);
-                // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
-                break;
-            case 4:
-            case 5:
-            case 6:
-                start_time = start_date(3);
-                end_time = end_date(5);
-                // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
-                break;
-            case 7:
-            case 8:
-            case 9:
-                start_time = start_date(6);
-                end_time = end_date(8);
-                // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
-                break;
-            case 10:
-            case 11:
-            case 12:
-                start_time = start_date(9);
-                end_time = end_date(11);
-                //Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
-                break;
-            default:
-                break;
-        }
-    }
-
-    /*
-    获取当年的时间
-     */
-    private void GetYear() {
-        start_time = start_date(0);
-        end_time=end_date(11);
-    }
-
-    private long start_date(int startmonth) {
-        Calendar start_calendar = Calendar.getInstance();
-        start_calendar.set(Calendar.MONTH, startmonth);
-        start_calendar.set(Calendar.DAY_OF_MONTH, 1);
-        start_calendar.set(Calendar.HOUR_OF_DAY, 00);
-        start_calendar.set(Calendar.MINUTE, 00);
-        start_calendar.set(Calendar.SECOND, 00);
-        start_calendar.set(Calendar.MILLISECOND, 00);
-        return start_calendar.getTimeInMillis();
-    }
-
-    private long end_date(int endmonth) {
-        Calendar end_calendar = Calendar.getInstance();
-        end_calendar.set(Calendar.MONTH, endmonth);
-        end_calendar.set(Calendar.DAY_OF_MONTH, 1);//日期设置为1号
-        end_calendar.add(Calendar.MONTH,1);
-        end_calendar.add(Calendar.DAY_OF_MONTH, -1);//倒回到前一天
-        end_calendar.set(Calendar.HOUR_OF_DAY, 23);
-        end_calendar.set(Calendar.MINUTE, 59);
-        end_calendar.set(Calendar.SECOND, 59);
-        end_calendar.set(Calendar.MILLISECOND, 999);
-        return end_calendar.getTimeInMillis();
-    }
 
     /*
     获取列表的高度

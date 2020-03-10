@@ -8,7 +8,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:background="@color/colorwhite"
         android:layout_height="40dp">
+
+
 
         <TextView
             android:id="@+id/piechart_back"
@@ -47,6 +50,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorwhite"
         android:layout_weight="1">
 
 

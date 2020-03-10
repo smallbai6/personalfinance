@@ -87,15 +87,22 @@ private Cursor cursor;
     /*
      *进行保存操作
      */
-    private String username;
+    private String Username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tally);
+        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
        intent=getIntent();
        huodong=intent.getStringExtra("HuoDong");
-
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        Username=intent.getStringExtra("Username");
+        //获取用户名称
+       /* Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
+        if (cursor.moveToFirst()) {
+            Username = cursor.getString(cursor.getColumnIndex("User_Name"));
+        } else {//没有登录用户时用户名就为请立即登录
+            Username = "请立即登录";
+        }*/
         back = (TextView) findViewById(R.id.tally_back);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 40, 40);
@@ -126,14 +133,8 @@ private Cursor cursor;
         InitPopupWindow();//初始化PopupWindow
         date = new Date();
         time.setText(getTimes(date));
-        currentdate = DateToLong(date);
-        //获取用户名称
-        Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
-        if (cursor.moveToFirst()) {
-            username = cursor.getString(cursor.getColumnIndex("User_Name"));
-        } else {//没有登录用户时用户名就为请立即登录
-            username = "请立即登录";
-        }
+        currentdate =date.getTime();
+
 
         choose.setOnClickListener(this);//支付收入
         money.setOnClickListener(this);//金额
@@ -196,9 +197,11 @@ private Cursor cursor;
     private void Typelist(int position) {
         //获取数据库中的数据
         if (position == 0) {
-            cursor = db.query("expendtype", null, null, null, null, null, null);
+            cursor = db.query("expendtype", null, null,
+                    null, null, null, null);
         } else if (position == 1) {
-            cursor = db.query("incometype", null, null, null, null, null, null);
+            cursor = db.query("incometype", null, null,
+                    null, null, null, null);
         }
         if (cursor.moveToFirst()) {
             String name = "";
@@ -259,7 +262,7 @@ private Cursor cursor;
                 mTimePop.setOnDateTimeSetListener(new TimePop.OnDateTimeSetListener() {
                     @Override
                     public void OnDateTimeSet(long date) {
-                        time.setText(LongToString(date));
+                        time.setText(DetailList.LongToString(date));
                         currentdate = date;
                     }
                 });
@@ -267,24 +270,24 @@ private Cursor cursor;
                 break;
             case R.id.tally_save:
             case R.id.tallycontent_save://进行保存
-                //issave++;
+                issave=1;
                 income_expend(choose.getText().toString());
                 //退出记账活动
                 //判断是由哪一个活动进入的TallyActivity
                 if(huodong.equals("MainActivity.java")){
                     intent = new Intent(TallyActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+
                 }else if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyActivity.this, DetailActivity.class);
                     //startActivity(intent);
-                    setResult(RESULT_OK,intent);
-                    finish();
-                }
 
+                }
+                intent.putExtra("issave", issave);
+                setResult(RESULT_OK,intent);
+                finish();
                 break;
             case R.id.tallycontent_again:
-                issave++;
+                issave=1;
                 //再记一笔先保存再将内容清空
                 income_expend(choose.getText().toString());
                 //清空金额
@@ -295,14 +298,15 @@ private Cursor cursor;
                 //直接退出记账活动
                 if(huodong.equals("MainActivity.java")){
                     intent = new Intent(TallyActivity.this, MainActivity.class);
-                    startActivity(intent);
+                   // startActivity(intent);
                     // finish();
                 }else if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyActivity.this, DetailActivity.class);
                     //startActivity(intent);
-                    intent.putExtra("issave", issave);
-                    setResult(RESULT_CANCELED,intent);
+
                 }
+                intent.putExtra("issave", issave);
+                setResult(RESULT_CANCELED,intent);
                 finish();
                 //Toast.makeText(TallyActivity.this, "tally_back", Toast.LENGTH_SHORT).show();
                 break;
@@ -316,7 +320,7 @@ private Cursor cursor;
      */
     private void income_expend(String typeString){
         ContentValues values = new ContentValues();
-        values.put("User_Name", username);
+        values.put("User_Name", Username);
         values.put("Money", money.getText().toString());
         values.put("Type", type.getText().toString());
         values.put("Time", currentdate);
@@ -342,14 +346,14 @@ private Cursor cursor;
      *获取系统时间
      */
     private String getTimes(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm EE");
         return format.format(date);
     }
 
     /*
      *时间数据类型转换
      */
-    private String LongToString(long date) {
+   /* private String LongToString(long date) {
         Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
         String sDateTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(dateOld);// 把date类型的时间转换为string
         return sDateTime;
@@ -358,5 +362,5 @@ private Cursor cursor;
     // date要转换的date类型的时间
     public static long DateToLong(Date date) {
         return date.getTime();
-    }
+    }*/
 }

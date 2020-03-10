@@ -40,7 +40,7 @@ public class TimeChoose extends FrameLayout {
         select_mMonth = Integer.valueOf(selectTime.substring(5, 7));
         select_mDay = Integer.valueOf(selectTime.substring(8, 10));
         select_mHour = Integer.valueOf(selectTime.substring(12, 14));
-        select_mMinute = Integer.valueOf(selectTime.substring(15));
+        select_mMinute = Integer.valueOf(selectTime.substring(15,17));
        // Log.d("liang", "selectTime=" + selectTime);
        //  Log.d("jinxing",selectTime.substring(0,4)+" "+selectTime.substring(5,7)+" "+selectTime.substring(8,10)+
        //          " "+selectTime.substring(12,14)+" "+selectTime.substring(15));
@@ -80,7 +80,7 @@ public class TimeChoose extends FrameLayout {
        // Log.d("showtime","getMonthvalue   "+mMonthSpinner.getValue());
         mMonthSpinner.setWrapSelectorWheel(true);
         mMonthSpinner.setOnValueChangedListener(mOnMonthChangedListener);
-        mDate.set(select_mYear, select_mMonth, select_mDay, select_mHour, select_mMinute);
+        mDate.set(select_mYear, select_mMonth-1, select_mDay, select_mHour, select_mMinute);
 
         mDaySpinner = (NumberPicker) this.findViewById(R.id.time_day);
         setNumberPickerDividerColor(mDaySpinner);
@@ -112,7 +112,7 @@ public class TimeChoose extends FrameLayout {
         mMinuteSpinner.setWrapSelectorWheel(true);
         mMinuteSpinner.setOnValueChangedListener(mOnMinuteChangedListener);
         // Log.d("liang", "onValueChangedListener  " + mDate.get(Calendar.YEAR));
-        mYear = select_mYear;
+       mYear = select_mYear;
         mMonth = select_mMonth - 1;
         //  Log.d("liang", "主mMonth = " + mMonth);
         if (status == 1) {
@@ -214,7 +214,7 @@ public class TimeChoose extends FrameLayout {
         for (int i = 0; i < 7; ++i) {
             cal.add(Calendar.DAY_OF_MONTH, 1);
             //   mDateDisplayValues[i] = (String) DateFormat.format("dd日", cal);
-            mDateDisplayValues[i] = (String) DateFormat.format("d日 E", cal);
+            mDateDisplayValues[i] = (String) DateFormat.format("dd日 EE", cal);
         }
         mDaySpinner.setDisplayedValues(mDateDisplayValues);
         mDaySpinner.setValue(7 / 2);

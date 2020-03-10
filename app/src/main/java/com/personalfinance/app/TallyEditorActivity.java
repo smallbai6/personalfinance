@@ -28,10 +28,10 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      */
     private SQLiteDatabase db;
     final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
-    /*
-     *活动跳转
-     */
+    private String Username;
     private Intent intent;
+    private String huodong;
+
     /*
      *顶部按钮
      */
@@ -64,7 +64,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     /*
      *进行保存操作
      */
-    private String username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +91,8 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
 
 //获得上一个活动的信息
         intent = getIntent();
-        username=intent.getStringExtra("username");
+        huodong=intent.getStringExtra("HuoDong");
+        Username=intent.getStringExtra("Username");
         if (intent.getStringExtra("type").substring(0, 1).equals("0")) {
             choose.setText(income_expend[0]);
             record = 0;
@@ -105,7 +106,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         type.setText(InitializeType);
         currentdate = intent.getLongExtra("time", 0);
         InitializeTime = currentdate;
-        time.setText(LongToString(currentdate));
+        time.setText(DetailList.LongToString(currentdate));
         InitializeMessage = intent.getStringExtra("message");
         message.setText(InitializeMessage);
 
@@ -155,7 +156,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 mTimePop.setOnDateTimeSetListener(new TimePop.OnDateTimeSetListener() {
                     @Override
                     public void OnDateTimeSet(long date) {
-                        time.setText(LongToString(date));
+                        time.setText(DetailList.LongToString(date));
                         currentdate = date;
                     }
                 });
@@ -164,7 +165,11 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
             case R.id.tallycontent_editor_save://进行更新保存
                 income_expend(choose.getText().toString());
                 //返回到上一个活动中
-                intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
+                if(huodong.equals("DetailActivity.java")){
+                    intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
+                }else if(huodong.equals("StatisticalEditorActivity.java")){
+                    intent = new Intent(TallyEditorActivity.this, StatisticalEditorActivity.class);
+                }
                 setResult(RESULT_OK,intent);
                 finish();
                 break;
@@ -173,8 +178,12 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.tally_editor_back:
                 //返回到上一个活动中
-                intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
-
+                if(huodong.equals("DetailActivity.java")){
+                    intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
+                }else if(huodong.equals("StatisticalEditorActivity.java")){
+                    intent = new Intent(TallyEditorActivity.this, StatisticalEditorActivity.class);
+                }
+               // intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
                 setResult(RESULT_CANCELED, intent);
                 finish();
                 break;
@@ -192,14 +201,19 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
                     db.delete("expendinfo", "User_Name=? AND Money=? " +
                                     "AND Type=? AND Time=? AND Message=?",
-                            new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+                            new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
                 } else if (choose.getText().toString().equals(income_expend[1])) {//收入
                     db.delete("incomeinfo", "User_Name=? AND Money=? " +
                                     "AND Type=? AND Time=? AND Message=?",
-                            new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+                            new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
                 }
                 //返回到上一个活动中
-                intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
+                if(huodong.equals("DetailActivity.java")){
+                    intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
+                }else if(huodong.equals("StatisticalEditorActivity.java")){
+                    intent = new Intent(TallyEditorActivity.this, StatisticalEditorActivity.class);
+                }
+                //intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
                 //startActivity(intent);
                 setResult(RESULT_OK, intent);
                 finish();
@@ -220,7 +234,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      */
     private void income_expend(String typeString) {
         ContentValues values = new ContentValues();
-        values.put("User_Name", username);
+        values.put("User_Name", Username);
         values.put("Money", money.getText().toString());
         values.put("Type", type.getText().toString());
         values.put("Time", currentdate);
@@ -228,11 +242,11 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         if (typeString.equals(income_expend[0])) {
             db.update("expendinfo", values, "User_Name=? AND Money=? " +
                             "AND Type=? AND Time=? AND Message=?",
-                    new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+                    new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
         } else if (typeString.equals(income_expend[1])) {
             db.update("incomeinfo", values, "User_Name=? AND Money=? " +
                             "AND Type=? AND Time=? AND Message=?",
-                    new String[]{username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+                    new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
         }
     }
 
@@ -248,7 +262,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     /*
      *时间数据类型转换
      */
-    private String LongToString(long date) {
+   /* private String LongToString(long date) {
         Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
         String sDateTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(dateOld);// 把date类型的时间转换为string
         return sDateTime;
@@ -257,5 +271,5 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     // date要转换的date类型的时间
     public static long DateToLong(Date date) {
         return date.getTime();
-    }
+    }*/
 }

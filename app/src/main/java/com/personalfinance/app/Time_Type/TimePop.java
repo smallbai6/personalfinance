@@ -28,7 +28,7 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
         select_mMonth = Integer.valueOf(selectTime.substring(5,7));
         select_mDay=Integer.valueOf(selectTime.substring(8,10));
         select_mHour=Integer.valueOf(selectTime.substring(12,14));
-        select_mMinute=Integer.valueOf(selectTime.substring(15));
+        select_mMinute=Integer.valueOf(selectTime.substring(15,17));
         mDate.set(select_mYear,select_mMonth-1,select_mDay,select_mHour,select_mMinute);
 
 

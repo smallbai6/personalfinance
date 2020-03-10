@@ -1,7 +1,6 @@
 package com.personalfinance.app;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,19 +19,15 @@ import com.personalfinance.app.Sqlite.Info;
 import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Sqlite.NodeData;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class DetailEditorActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
     final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
-    private Cursor cursor;
+    //private Cursor cursor;
     private String Username;
-    private String currentyear;
+    private long start_time,end_time;
     private Intent intent;
     /*
     列表
@@ -57,10 +52,11 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.detail_bulkeditor);
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
-        Username = intent.getStringExtra("username");
-        currentyear = String.valueOf(intent.getIntExtra("year",0));
+        Username = intent.getStringExtra("Username");
+        start_time=intent.getLongExtra("start_time",0);
+        end_time=intent.getLongExtra("end_time",0);
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
-        detail_list();
+        Detail_list();
         mAdapter = new DetailBulkAdapter(listView, this, list,
                 1, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
         listView.setAdapter(mAdapter);
@@ -115,7 +111,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 }
             }
             showchoosetotal.setText("已选择了" + total + "条");
-            showtotalmoney.setText("合计: " + formatPrice(totalmoney));
+            showtotalmoney.setText("合计: " + DetailList.formatPrice(totalmoney));
         }
     }
 
@@ -179,55 +175,19 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
 
     }
 
-
-    private void detail_DetailInfo(String currentyear) {
-        //获得消费详情
-        InfoList.clear();
-        //支出信息
-        for(int i=0;i<2;i++){
-            if(i==0){
-                cursor = db.query("expendinfo", null, "User_Name=?",
-                        new String[]{Username}, null, null, null);
-            }else if(i==1){
-                cursor = db.query("incomeinfo", null, "User_Name=?",
-                        new String[]{Username}, null, null, null);
-            }
-            if (cursor.moveToFirst()) {
-                do {
-                    long time = cursor.getLong(cursor.getColumnIndex("Time"));
-                    if (LongToString(time).substring(0, 4).equals(currentyear)) {
-                        String money = cursor.getString(cursor.getColumnIndex("Money"));
-                        String type = i + cursor.getString(cursor.getColumnIndex("Type"));
-                        String text = cursor.getString(cursor.getColumnIndex("Message"));
-                        Info info = new Info(Double.valueOf(money), type, time, text);
-                        InfoList.add(info);
-                    }
-                } while (cursor.moveToNext());
-            }
-        }
-
-        Collections.sort(InfoList);
-
-        for (Info info : InfoList) {
-           // Log.d("DetailActivity.liang", info.getMoney() + "  " + info.getType()
-          //          + "  " + info.getTime() + "   " + info.getText() + "      " + LongToString(info.getTime()));
-        }
-    }
-
-    private void detail_Detailday_day() {
-        //Log.d("DetailActivity.liang", "进入detail_Detailday_day");
+    private void Detailday_day() {
         day_dayList.clear();
         String time;
         boolean createnew = true;
         for (int i = 0; i < InfoList.size(); i++) {
             if (i == 0) {
-                time = LongToString(InfoList.get(0).getTime()).substring(0, 11);
+                time = DetailList.LongToString(InfoList.get(0).getTime()).substring(0, 11);
             } else if (i != 0 && createnew) {
-                time = LongToString(InfoList.get(i).getTime()).substring(0, 11);
+                time = DetailList.LongToString(InfoList.get(i).getTime()).substring(0, 11);
             } else {
-                time = LongToString(InfoList.get(i - 1).getTime()).substring(0, 11);
+                time = DetailList.LongToString(InfoList.get(i - 1).getTime()).substring(0, 11);
             }
-            if (LongToString(InfoList.get(i).getTime()).substring(0, 11).equals(time)) {//如果是同一天
+            if (DetailList.LongToString(InfoList.get(i).getTime()).substring(0, 11).equals(time)) {//如果是同一天
                 createnew = false;
                 if (i == (InfoList.size() - 1)) {
                     day_dayList.add(time);
@@ -238,16 +198,14 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 createnew = true;
             }
         }
-        Log.d("DEAliang", "1级流水");
-        for (String detailSurplus : day_dayList) {
-            Log.d("DEAliang", detailSurplus);
-        }
+
     }
 
-    private void detail_list() {
+    private void Detail_list() {
         list.clear();
-        detail_DetailInfo(currentyear);
-        detail_Detailday_day();
+        DetailList detailList=new DetailList(Username,start_time,end_time);
+        InfoList=detailList.DetailInfo();
+        Detailday_day();
         int a = 0, b = 0;
         int i = 0;//为指针在list中的位置
         int leveldivide01;//等级划分关联
@@ -257,11 +215,10 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
             list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
             i++;
-            // Log.d("aaaaad","InfoList.get(b).getTime() =  "+LongToString(InfoList.get(b).getTime()).substring(0,11));
-            while (day_dayList.get(a).equals(LongToString(InfoList.get(b).getTime()).substring(0, 11))) {
+            while (day_dayList.get(a).equals(DetailList.LongToString(InfoList.get(b).getTime()).substring(0, 11))) {
                 nodeData = new  NodeData(InfoList.get(b).getType(),
-                        LongToString(InfoList.get(b).getTime()).substring(11, 16),
-                        formatPrice(InfoList.get(b).getMoney()),
+                        DetailList.LongToString(InfoList.get(b).getTime()).substring(12, 17),
+                        DetailList.formatPrice(InfoList.get(b).getMoney()),
                         "","","",
                         InfoList.get(b).getTime());
                 list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
@@ -274,16 +231,10 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-
-    private String LongToString(long date) {
+    /*private String LongToString(long date) {
         Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
         String sDateTime = new SimpleDateFormat("yyyy年MM月dd日HH:mmEE").format(dateOld);// 把date类型的时间转换为string
         return sDateTime;
-    }
+    }*/
 
-    public static String formatPrice(double price) {
-        DecimalFormat df = new DecimalFormat("0.00");
-        String format = df.format(price);
-        return format;
-    }
 }

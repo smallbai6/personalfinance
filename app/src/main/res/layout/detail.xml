@@ -14,6 +14,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
+            android:background="@color/colorwhite"
             android:layout_height="40dp">
 
             <TextView
@@ -37,7 +38,7 @@
                 android:layout_centerInParent="true"
                 />
             <ImageView
-                android:id="@+id/detail_year_tianjia"
+                android:id="@+id/detail_tianjia"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentRight="true"
@@ -49,7 +50,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginRight="10dp"
-                android:layout_toLeftOf="@id/detail_year_tianjia"
+                android:layout_toLeftOf="@id/detail_tianjia"
                 android:layout_centerVertical="true"
                 app:srcCompat="@mipmap/shengluetubiao" />
 
@@ -80,75 +81,75 @@
                         android:layout_height="40dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_jieyu"
+                        android:id="@+id/detail_jieyu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/detail_view"
                         android:layout_marginLeft="20dp"
                         android:layout_marginTop="0dp"
                         android:alpha="0.7"
-                        android:text="年结余"
+                        android:text="结余"
                         android:textSize="20dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_money"
+                        android:id="@+id/detail_money"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/detail_year_jieyu"
-                        android:layout_alignLeft="@+id/detail_year_jieyu"
+                        android:layout_below="@+id/detail_jieyu"
+                        android:layout_alignLeft="@+id/detail_jieyu"
                         android:text="-17.20"
                         android:textColor="@color/colorwhite"
                         android:textSize="30dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_shouru"
+                        android:id="@+id/detail_shouru"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/detail_year_money"
-                        android:layout_alignLeft="@+id/detail_year_money"
+                        android:layout_below="@+id/detail_money"
+                        android:layout_alignLeft="@+id/detail_money"
                         android:alpha="0.7"
                         android:text="收入"
                         android:textSize="18dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_incomemoney"
+                        android:id="@+id/detail_incomemoney"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/detail_year_money"
+                        android:layout_below="@id/detail_money"
                         android:layout_marginLeft="7dp"
-                        android:layout_toRightOf="@id/detail_year_shouru"
+                        android:layout_toRightOf="@id/detail_shouru"
                         android:text="1.00"
                         android:textColor="@color/colorwhite"
                         android:textSize="18dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_fengefu"
+                        android:id="@+id/detail_fengefu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/detail_year_money"
+                        android:layout_below="@id/detail_money"
                         android:layout_marginLeft="10dp"
-                        android:layout_toRightOf="@id/detail_year_incomemoney"
+                        android:layout_toRightOf="@id/detail_incomemoney"
                         android:text="|"
                         android:textSize="16dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_zhichu"
+                        android:id="@+id/detail_zhichu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/detail_year_money"
+                        android:layout_below="@id/detail_money"
                         android:layout_marginLeft="10dp"
-                        android:layout_toRightOf="@id/detail_year_fengefu"
+                        android:layout_toRightOf="@id/detail_fengefu"
                         android:alpha="0.7"
                         android:text="支出"
                         android:textSize="18dp" />
 
                     <TextView
-                        android:id="@+id/detail_year_expendmoney"
+                        android:id="@+id/detail_expendmoney"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/detail_year_money"
+                        android:layout_below="@id/detail_money"
                         android:layout_marginLeft="7dp"
-                        android:layout_toRightOf="@id/detail_year_zhichu"
+                        android:layout_toRightOf="@id/detail_zhichu"
                         android:text="18.20"
                         android:textColor="@color/colorwhite"
                         android:textSize="18dp" />

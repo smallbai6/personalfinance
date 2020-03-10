@@ -8,15 +8,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.personalfinance.app.Sqlite.Node;
-import com.personalfinance.app.Sqlite.NodeData;
 import com.personalfinance.app.Detail.OnInnerItemClickListener;
 import com.personalfinance.app.Detail.OnInnerItemLongClickListener;
 import com.personalfinance.app.Detail.TreeListViewAdapter;
 import com.personalfinance.app.R;
+import com.personalfinance.app.Sqlite.Node;
+import com.personalfinance.app.Sqlite.NodeData;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class StatisticalAdapter extends TreeListViewAdapter {
@@ -128,10 +126,5 @@ public class StatisticalAdapter extends TreeListViewAdapter {
             tvc = (TextView) convertView.findViewById(R.id.b_statistical_text);
             tvd=(TextView)convertView.findViewById(R.id.b_statistical_money);
         }
-    }
-    private String LongToString(long date) {
-        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间HH:mm:ss SSS
-        String sDateTime = new SimpleDateFormat("yyyy.MM.dd HH:mm EE").format(dateOld);// 把date类型的时间转换为string
-        return sDateTime;
     }
 }

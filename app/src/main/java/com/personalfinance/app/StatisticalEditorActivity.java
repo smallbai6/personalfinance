@@ -55,7 +55,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         setContentView(R.layout.statistical_peditor);
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
-        Username = intent.getStringExtra("username");
+        Username = intent.getStringExtra("Username");
         iore = intent.getStringExtra("iore");
         type = intent.getStringExtra("type_name");
         start_time = intent.getLongExtra("start", -1);
@@ -165,7 +165,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
                     break;
                 }
             }
-        }
+    }
         list_adapter();
     }
 
@@ -179,11 +179,12 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
                 NodeData nodeData = (NodeData) node.getData();
                 Toast.makeText(StatisticalEditorActivity.this, "短点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(StatisticalEditorActivity.this, TallyEditorActivity.class);
-                intent.putExtra("username", Username);
+                intent.putExtra("Username", Username);
                 intent.putExtra("money", nodeData.getD());
                 intent.putExtra("type", nodeData.getA());
                 intent.putExtra("time", nodeData.getTime());
-                intent.putExtra("message", nodeData.getF());
+                intent.putExtra("message", nodeData.getC());
+                intent.putExtra("HuoDong","StatisticcalEditorActivity.java");
                 startActivityForResult(intent, 1);
             }
         });
@@ -192,7 +193,9 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case 1://重新刷新一遍
-               Get_List();
+                if(resultCode==RESULT_OK){
+                    Get_List();
+                }
                 break;
             default:
                 break;

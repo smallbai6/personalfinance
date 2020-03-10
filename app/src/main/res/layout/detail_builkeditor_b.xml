@@ -59,13 +59,7 @@
         android:textSize="20dp"
         />
 
-   <!-- <ImageView
-        android:id="@+id/b_builkeditor_jiantou"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_alignParentRight="true"
-        app:srcCompat="@mipmap/bianxiebutiao" />
--->
+
 
     <View
         android:layout_width="match_parent"

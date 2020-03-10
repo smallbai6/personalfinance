@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TreeListViewAdapter extends BaseAdapter {
-
+    private static final int VIEW_TYPE_THREE = 3;
     protected Context mContext;
 
     /**
