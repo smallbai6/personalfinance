@@ -4,14 +4,21 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
+
+import com.personalfinance.app.R;
+import com.personalfinance.app.Util.PictureFormatUtil;
 
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String create_userinfo = "CREATE TABLE userinfo ("
             + " User_Name varchar(45)  NOT NULL,"
-            + " User_Password varchar(45) DEFAULT NULL,"
-            + "User_Login int(11) NOT NULL,"
+           // + " User_Password varchar(45) DEFAULT NULL,"
+            + "Head_Portrait blob ,"
+            + " User_Login int(11) DEFAULT NULL,"
             + " PRIMARY KEY (User_Name))";
 
     public static final String create_incometype = "CREATE TABLE incometype("
@@ -76,6 +83,11 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(create_expendinfo);
         db.execSQL(create_incomebudget);
         db.execSQL(create_expendbudget);
+        InitDataBase(db, mContext);
+
+    }
+
+    private void InitDataBase(SQLiteDatabase db, Context context) {
         String[] incometype = {"职业收入", "其他收入"};
         String[] expendtype = {"食品酒水", "居家物业", "衣服饰品", "行车交通", "交流通讯"
                 , "休闲娱乐", "学习进修", "人情往来", "医疗保健", "金融保险", "其他支出"};
@@ -90,11 +102,31 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             db.insert("expendtype", null, values);
             values.clear();
         }
+
+       /*
         values.put("User_Name","请立即登录");
-        values.put("User_Login",0);
+        //values.put("User_Login",0);
+        // values.put("Head_Portrait", model.getPic());
         db.insert("userinfo",null,values);
-        Log.d("SQLiteDatabasemy", "a");
+        Log.d("SQLiteDatabasemy", "a");*/
+       //插入用户信息
+        InsertUserInfo(db, context, "请立即登录", "", 0, R.mipmap.defaultheadportrait);
     }
+
+    //将转换后的图片存入到数据库中
+    private void InsertUserInfo(SQLiteDatabase db, Context context, String Username, String Password,
+                                int loginstatus, int drawablepicture) {
+        ContentValues values = new ContentValues();
+        values.put("User_Name", Username);
+        //values.put("User_Password", Password);
+        values.put("User_Login", loginstatus);
+        Drawable drawable = ContextCompat.getDrawable(context,drawablepicture);//context.getResources().getDrawable(drawablepicture);
+        values.put("Head_Portrait", PictureFormatUtil.Drawable2Bytes(drawable));
+        db.insert("userinfo", null, values);
+    }
+
+
+
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("drop table if exists userinfo");

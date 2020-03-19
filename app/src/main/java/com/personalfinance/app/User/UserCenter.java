@@ -1,4 +1,4 @@
-package com.personalfinance.app;
+package com.personalfinance.app.User;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -10,7 +10,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class UserCenter extends AppCompatActivity implements View.OnClickListener{
+import com.personalfinance.app.MainActivity;
+import com.personalfinance.app.R;
+
+public class UserCenter extends AppCompatActivity  implements View.OnClickListener{
     private TextView userCenter_back,logout,close_account,userCenter_name;
     SQLiteDatabase db;
     final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";

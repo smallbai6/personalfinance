@@ -25,24 +25,28 @@
                     android:background="@color/colorwhite"
                     android:layout_height="60dp">
 
-                    <ImageView
-                        android:id="@+id/main_opendrawera"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="-20dp"
-                        android:src="@mipmap/sanhengxian" />
+                    <RelativeLayout
+                        android:id="@+id/main_opendrawer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/main_opendrawerb"
+                        <ImageView
+                            android:id="@+id/main_opendrawera"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="-20dp"
+                            android:src="@mipmap/sanhengxian" />
+
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/main_opendraweriv"
                         android:layout_width="45dp"
                         android:layout_height="45dp"
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/main_opendrawera"
                         android:src="@mipmap/backgroundpicture" />
-
-
-
+                    </RelativeLayout>
                     <TextView
                         android:id="@+id/mainbudget_button"
                         android:layout_width="wrap_content"

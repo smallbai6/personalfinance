@@ -23,20 +23,27 @@ import com.google.android.material.navigation.NavigationView;
 import com.personalfinance.app.Main.MainListAdapter;
 import com.personalfinance.app.Main.MainListClass;
 import com.personalfinance.app.Sqlite.SQLiteDatabaseHelper;
+import com.personalfinance.app.User.RegisterLogin;
+import com.personalfinance.app.User.UserCenter;
+import com.personalfinance.app.Util.PictureFormatUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     /*
      *数据库建立
      */
     private SQLiteDatabaseHelper dbHelper;
-    SQLiteDatabase db;
+    private SQLiteDatabase db;
+    private Cursor cursor;
     /*
-     *用户信息；
+     *用户名和用户头像
      */
     private String Username = "";
+    private Drawable Userheadportrait;
     /*
      *drawerlayout
      */
@@ -44,10 +51,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View userheaderView;
     private RelativeLayout userheaderlayout;
     private TextView draweruserrname;
+    private CircleImageView drawerheadportrait;
+
     /*
     按键
      */
-    private ImageView drawerbuttona, drawerbuttonb;
+    private RelativeLayout main_opendrawer;
+    private ImageView main_opendraweriv;
 
     //  private Button tallybutton,detailbutton,budgetbutton,statisticalbutton;
     private TextView tallybutton, detailbutton, budgetbutton, statisticalbutton;
@@ -68,11 +78,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dbHelper = new SQLiteDatabaseHelper(this, "personal.db", null, 1);
         db = dbHelper.getWritableDatabase();
         //用户名和头像获取
-        Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
+        cursor = db.query("userinfo", null, "User_Login=?",
+                new String[]{"1"}, null, null, null);
         if (cursor.moveToFirst()) {
             Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-        } else {//没有登录用户时用户名就为请立即登录
-            Username = "请立即登录";
+            // iv.setImageDrawable(getDrawable().get(0));
+            byte[] blob=cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
+            Userheadportrait= PictureFormatUtil.Bytes2Drawable(getResources(),blob);
+        } else {
+            //获取默认用户名和用户头像
+            cursor = db.query("userinfo", null, "User_Login=?",
+                    new String[]{"0"}, null, null, null);
+            if(cursor.moveToFirst()){
+                Username = cursor.getString(cursor.getColumnIndex("User_Name"));
+                // iv.setImageDrawable(getDrawable().get(0));
+                byte[] blob=cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
+                Userheadportrait= PictureFormatUtil.Bytes2Drawable(getResources(),blob);
+            }
         }
         Init_Drawerlayout();
         Init_MainButton();
@@ -90,8 +112,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         userheaderlayout = (RelativeLayout) userheaderView.findViewById(R.id.userlayout_header);//用户
         userheaderlayout.setOnClickListener(this);
         draweruserrname = (TextView) userheaderView.findViewById(R.id.drawer_username);//用户名
+        drawerheadportrait=(CircleImageView)userheaderView.findViewById(R.id.drawer_headportrait);//用户头像
         //用户名已获得
         draweruserrname.setText(Username);
+        drawerheadportrait.setImageDrawable(Userheadportrait);
         Toast.makeText(MainActivity.this, "用户名为" + Username, Toast.LENGTH_SHORT).show();
     }
 
@@ -99,11 +123,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     初始化主界面中的按键
      */
     private void Init_MainButton() {
-        drawerbuttona = (ImageView) findViewById(R.id.main_opendrawera);
-        drawerbuttonb = (ImageView) findViewById(R.id.main_opendrawerb);
-        drawerbuttona.setOnClickListener(this);
-        drawerbuttonb.setOnClickListener(this);
-
+        main_opendrawer = (RelativeLayout) findViewById(R.id.main_opendrawer);
+        main_opendraweriv=(ImageView)findViewById(R.id.main_opendraweriv);
+        main_opendraweriv.setImageDrawable(Userheadportrait);
+        main_opendrawer.setOnClickListener(this);
 
         tallybutton = (Button) findViewById(R.id.maintally_button);//记账
         tallybutton.setOnClickListener(this);
@@ -167,9 +190,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         long start_time = 0, end_time = 0;
         long[] time;
         String time_String = "";
-        DetailList detailList;
-        MainListClass mainListClass;
-        String[] expend_incomemoney;
         for (int i = 0; i < ysmd_name.length; i++) {
             switch (i) {
                 case 0:
@@ -201,17 +221,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 default:
                     break;
             }
-            detailList = new DetailList(Username, start_time, end_time);
-            expend_incomemoney = detailList.Get_IandE();
-            mainListClass = new MainListClass(ysmd_name[i], time_String, expend_incomemoney[0], expend_incomemoney[1]);
+            DetailList detailList = new DetailList(Username, start_time, end_time);
+            String[] expend_incomemoney = detailList.Get_IandE();
+            MainListClass mainListClass = new MainListClass(ysmd_name[i], time_String, expend_incomemoney[0], expend_incomemoney[1]);
             ysmd_list.add(mainListClass);
         }
         ysmd_adapter.notifyDataSetChanged();
     }
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.main_opendrawera://drawerlayout侧滑菜单显示
-            case R.id.main_opendrawerb:
+            case R.id.main_opendrawer://drawerlayout侧滑菜单显示
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.userlayout_header://用户头
