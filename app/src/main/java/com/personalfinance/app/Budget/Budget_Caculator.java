@@ -51,9 +51,16 @@ public class Budget_Caculator extends FrameLayout implements View.OnClickListene
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         moneyPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         moneyPop.setOutsideTouchable(true);
-        moneyPop.setTouchable(true);
-        moneyPop.setFocusable(true);
+        //  moneyPop.setTouchable(true);
+         moneyPop.setFocusable(true);
+
         moneyPop.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
+
+
+
+
+
+
         //结果显示
         result_tv=(TextView)contentView.findViewById(R.id.budget_caculator_result);
         // 获取运算符

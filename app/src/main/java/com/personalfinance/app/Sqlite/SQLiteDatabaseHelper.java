@@ -17,8 +17,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     public static final String create_userinfo = "CREATE TABLE userinfo ("
             + " User_Name varchar(45)  NOT NULL,"
            // + " User_Password varchar(45) DEFAULT NULL,"
-            + "Head_Portrait blob ,"
-            + " User_Login int(11) DEFAULT NULL,"
+            + "Head_Portrait blob DEFAULT NULL,"
+            + " Time interger DEFAULT NULL,"
+            + " User_Login int DEFAULT NULL,"
             + " PRIMARY KEY (User_Name))";
 
     public static final String create_incometype = "CREATE TABLE incometype("
@@ -33,7 +34,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + "User_Name varchar(45)  NOT NULL,"
             + "Money varchar(45) NOT NULL,"
             + "Type varchar(45)  NOT NULL,"
-            + "Time int(11) NOT NULL,"
+            + "Time interger NOT NULL,"
             + "Message text ,"
             + "CONSTRAINT incomeinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + "CONSTRAINT incomeinfo_ibfk_2 FOREIGN KEY (Type) REFERENCES incometype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
@@ -42,7 +43,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " User_Name varchar(45)  NOT NULL,"
             + " Money varchar(45) NOT NULL,"
             + " Type varchar(45)  NOT NULL,"
-            + " Time int(11) NOT NULL,"
+            + " Time interger NOT NULL,"
             + " Message text ,"
             + " CONSTRAINT expendinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT expendinfo_ibfk_2 FOREIGN KEY (Type) REFERENCES expendtype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
@@ -53,7 +54,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " Type varchar(45)  NOT NULL,"
             + " Money varchar(45) DEFAULT NULL,"
             + " DMSY varchar(45) NOT NULL,"
-            + " Time int(11) NOT NULL,"
+            + " Time interger NOT NULL,"
             + " CONSTRAINT incomebudget_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT incomebudget_ibfk_2 FOREIGN KEY (Type) REFERENCES incometype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";
@@ -63,7 +64,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " Type varchar(45)  NOT NULL,"
             + " Money varchar(45) DEFAULT NULL,"
             + " DMSY varchar(45) NOT NULL,"
-            + " Time int(11) NOT NULL,"
+            + " Time interger NOT NULL,"
             + " CONSTRAINT expendbudget_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
             + " CONSTRAINT expendbudget_ibfk_2 FOREIGN KEY (Type) REFERENCES expendtype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";

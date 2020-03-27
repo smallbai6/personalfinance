@@ -7,7 +7,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -69,26 +69,41 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private List<Node> list = new ArrayList<>();
     private DetailAdapter adapter;
 
+
+    private final static int BackbuttonText = 1;
+    private final static int list_adapter = 2;
+    private final static int Total_show=3;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case BackbuttonText:
+                    backbutton.setText((String) msg.obj);
+                    break;
+                case list_adapter:
+                    list_adapter();
+                    break;
+                case Total_show:
+                   // Log.d("TAG","Total_show");
+                    detail_money.setText(msg.getData().getString("totalmoney"));
+                    detail_expendmoney.setText(msg.getData().getString("totalexpendmoney"));
+                    detail_incomemoney.setText(msg.getData().getString("totalincomemoney"));
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail);
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
-        /*cursor = db.query("userinfo", null,
-                "User_Login=?", new String[]{"1"}, null, null, null);
-        if (cursor.moveToFirst()) {
-            Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-        } else {.//没有登录用户时用户名就为请立即登录
-            Username = "请立即登录";
-        }
-*/
+
         intent=getIntent();
         Username=intent.getStringExtra("Username");
         start_time=intent.getLongExtra("start_time",0);
         end_time=intent.getLongExtra("end_time",0);
         timetype=intent.getIntExtra("timetype",-1);
-
-
 
 
         listView = (MyListView) findViewById(R.id.detail_listview);//流水列表
@@ -164,34 +179,41 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         chooseysmd.setOnClickListener(this);
         chooseln.setOnClickListener(this);
         addtally.setOnClickListener(this);
-        //Refresh_List();列表刷新
-        /*DetailList detailList=new DetailList(Username,start_time,end_time);
-        list=detailList.Detailyear_list();
-        list_adapter();*/
+
         Refresh_List();
     }
     private void BackbuttonText(){
-        String string="";
-        if(timetype==0){
-            //2020.03.06
-            string=DetailList.LongToString(start_time).substring(0,4)+"."+
-                    DetailList.LongToString(start_time).substring(5,7)+"."+
-                    DetailList.LongToString(start_time).substring(8,10);
-        }else if(timetype==1){
-            //2020年03月
-            string=DetailList.LongToString(start_time).substring(0,8);
-        }else if(timetype==2){
-            //2020.01.16-03.16
-            string=DetailList.LongToString(start_time).substring(0,4)+"."+
-                    DetailList.LongToString(start_time).substring(5,7)+"."+
-                    DetailList.LongToString(start_time).substring(8,10)+"-"+
-                    DetailList.LongToString(end_time).substring(5,7)+"."+
-                    DetailList.LongToString(start_time).substring(8,10);
-        }else if(timetype==3){
-            //2020年
-            string=DetailList.LongToString(start_time).substring(0,5);
-        }
-        backbutton.setText(string);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String string = "";
+                if (timetype == 0) {
+                    //2020.03.06
+                    string = DetailList.LongToString(start_time).substring(0, 4) + "." +
+                            DetailList.LongToString(start_time).substring(5, 7) + "." +
+                            DetailList.LongToString(start_time).substring(8, 10);
+                } else if (timetype == 1) {
+                    //2020年03月
+                    string = DetailList.LongToString(start_time).substring(0, 8);
+                } else if (timetype == 2) {
+                    //2020.01.16-03.16
+                    string = DetailList.LongToString(start_time).substring(0, 4) + "." +
+                            DetailList.LongToString(start_time).substring(5, 7) + "." +
+                            DetailList.LongToString(start_time).substring(8, 10) + "-" +
+                            DetailList.LongToString(end_time).substring(5, 7) + "." +
+                            DetailList.LongToString(start_time).substring(8, 10);
+                } else if (timetype == 3) {
+                    //2020年
+                    string = DetailList.LongToString(start_time).substring(0, 5);
+                }
+                Message message = new Message();
+                message.what = BackbuttonText;
+                message.obj = string;
+                handler.sendMessage(message);
+
+            }
+        }).start();
+
     }
     private void drawable2tubiao() {
         drawable.setBounds(0, 0, 30, 30);
@@ -268,9 +290,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         adapter.setOnInnerItemClickListener(new OnInnerItemClickListener() {
             @Override
             public void onClick(Node node, int position) {
-                Log.d("onClick"," position    "+position);
+                //   Log.d("onClick"," position    "+position);
                 NodeData nodeData = (NodeData) node.getData();
-                Toast.makeText(DetailActivity.this, "短点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(DetailActivity.this, "短点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(DetailActivity.this, TallyEditorActivity.class);
                 intent.putExtra("Username", Username);
                 intent.putExtra("money", nodeData.getE());
@@ -285,7 +307,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(Node node, int position) {
                 NodeData nodeData = (NodeData) node.getData();
-                Toast.makeText(DetailActivity.this, "长点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(DetailActivity.this, "长点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(DetailActivity.this, DetailEditorActivity.class);
                 intent.putExtra("Username", Username);
                 intent.putExtra("start_time",start_time);
@@ -296,29 +318,43 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
     private void Total_show(){
-        double totalmoney = 0;
-        double totalexpendmoney = 0;
-        double totalincomemoney = 0;
-        for(Node node:list){
-            if(node.isRootNode()){
-                //为根节点
-                NodeData nodeData =(NodeData)node.getData();
-                totalmoney+=Double.valueOf(nodeData.getC());
-                totalincomemoney+=Double.valueOf(nodeData.getD());
-                totalexpendmoney+=Double.valueOf(nodeData.getE());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+               // Log.d("TAG","return");
+                double totalmoney = 0;
+                double totalexpendmoney = 0;
+                double totalincomemoney = 0;
+                for(Node node:list){
+                    if(node.isRootNode()){
+                        //为根节点
+                        NodeData nodeData =(NodeData)node.getData();
+                        totalmoney+=Double.valueOf(nodeData.getC());
+                        totalincomemoney+=Double.valueOf(nodeData.getD());
+                        totalexpendmoney+=Double.valueOf(nodeData.getE());
+                    }
+                }
+                Message message=new Message();
+                message.what=3;
+                Bundle bundle=new Bundle();
+                bundle.putString("totalmoney",DetailList.formatPrice(totalmoney));
+                bundle.putString("totalexpendmoney",DetailList.formatPrice(totalexpendmoney));
+                bundle.putString("totalincomemoney",DetailList.formatPrice(totalincomemoney));
+                message.setData(bundle);
+                handler.sendMessage(message);
             }
-        }
-        detail_money.setText(DetailList.formatPrice(totalmoney));
+        }).start();
+
+     /*  detail_money.setText(DetailList.formatPrice(totalmoney));
         detail_expendmoney.setText(DetailList.formatPrice(totalexpendmoney));
-        detail_incomemoney.setText(DetailList.formatPrice(totalincomemoney));
+        detail_incomemoney.setText(DetailList.formatPrice(totalincomemoney));*/
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //DetailList detailList=new DetailList(Username,start_time,end_time);
         switch (requestCode) {
             case 1://添加数据
                 int issave = data.getIntExtra("issave", -1);
-              //  Log.d("liangjialinga",issave+"  "+chooseysmd.getText().toString());
                 if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Refresh_List();
                 }
@@ -329,9 +365,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 break;
             case 3://批量编辑
-                int isdelete = intent.getIntExtra("isdelete", 0);
+             //   Log.d("TAG","返回到DetailActivity");
+                int isdelete = data.getIntExtra("isdelete", 0);
+
                 if (resultCode == RESULT_OK) {//返回了
                     if (isdelete != 0) {
+                      //  Log.d("TAG","Refresh_List列表重建");
                         Refresh_List();
                     }
                 }
@@ -341,28 +380,24 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
     private void Refresh_List(){
-        DetailList detailList=new DetailList(Username,start_time,end_time);
-        if (chooseysmd.getText().equals(ysmdString[0])) {
-            list=detailList.Detailday_list();
-        } else if (chooseysmd.getText().equals(ysmdString[1])) {
-            list=detailList.Detailmonth_list();
-        } else if (chooseysmd.getText().equals(ysmdString[2])) {
-            list=detailList.Detailseason_list();
-        }else if (chooseysmd.getText().equals(ysmdString[3])) {
-            list=detailList.Detailyear_list();
-        }
-        list_adapter();
-    }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DetailList detailList = new DetailList(Username, start_time, end_time);
+                if (chooseysmd.getText().equals(ysmdString[0])) {
+                    list = detailList.Detailday_list();
+                } else if (chooseysmd.getText().equals(ysmdString[1])) {
+                    list = detailList.Detailmonth_list();
+                } else if (chooseysmd.getText().equals(ysmdString[2])) {
+                    list = detailList.Detailseason_list();
+                } else if (chooseysmd.getText().equals(ysmdString[3])) {
+                    list = detailList.Detailyear_list();
+                }
+                handler.sendEmptyMessage(list_adapter);
 
-    /*public int dip2px(float dpValue) {
-        final float scale = getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
+            }
+        }).start();
 
-    public String LongToString(long date) {
-        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
-        String sDateTime = new SimpleDateFormat("yyyy.MM月dd日HH:mmEE").format(dateOld);// 把date类型的时间转换为string
-        return sDateTime;
-    }*/
+    }
 
 }

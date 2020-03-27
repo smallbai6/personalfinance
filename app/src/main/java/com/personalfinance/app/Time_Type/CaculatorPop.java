@@ -54,8 +54,25 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         moneyPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         moneyPop.setOutsideTouchable(true);
-        moneyPop.setTouchable(true);
+        //moneyPop.setTouchable(true);
+       // moneyPop.setFocusable(true);
+     //   contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         moneyPop.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
+
+
+       /* moneyPop.setTouchInterceptor(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction()==MotionEvent.ACTION_OUTSIDE){
+                    moneyPop.dismiss();
+                    return true;
+                }
+                return false;
+            }
+        });*/
+
+
+
 
         // 获取运算符
         btnCommand[0] = (Button) contentView.findViewById(R.id.add);

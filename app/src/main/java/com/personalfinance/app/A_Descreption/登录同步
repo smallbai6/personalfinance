@@ -1,0 +1,71 @@
+同步说明：所说的时间戳为该用户每次同步时候的时间
+1.点击同步按钮，联网进行同步（首先判断同步是否成功再更改本地时间戳）
+             client->server
+             客户端：用户名、密码、本地数据库储存的时间+数据打包-->服务端：进行客户端数据和服务端数据判断
+             服务端进行同步，更改用户时间,返回response更改客户端时间 response=时间
+2.当处在登录状态时，后台运行进行同步；未登录状态时，不用进行同步。（定时后台运行）
+客户端发送数据：
+                  JSONArray->JSONArray(userinfo)
+                           ->JSONArray(incomeinfo)
+                           ->JSONArray(expendinfo)
+                           ->JSONArray(incomebudget)
+                           ->JSONArray(expendbudget)
+服务端返回数据：
+                  JSONObject->resultCode  Time
+
+
+
+
+
+
+
+
+
+
+
+登录同步说明：有两种情况
+              首先判断本地数据库是否有该用户
+1.初次在本机登录：server->client
+                 （客户端：用户名、密码-->服务端：服务端接收，进行用户判断）
+                 （服务端判断成功，更改服务端的用户时间并将数据打包返回至客户端  response=数据包）
+2.重复在本机上登录：a.client>=server时，client->server
+                    b.client<server时，server->client
+      客户端：用户名、密码、本地数据库储存的时间+数据打包-->服务端：进行客户端数据和服务端数据判断
+
+      判断本地数据库存储时间>=服务端时间   ，      服务端进行同步，更改用户时间,返回response更改客户端时间 response=时间
+                             <             ,       服务器更改时间，数据打包返回至客户端 response=数据包
+
+退出登录说明：
+1.退出登录时更改登录用户的登录状态和时间戳
+2.进行client->server时的同步，不管成功与否本地时间戳都进行更改
+
+
+
+*登录同步时加标志位
+                   客户端： DataSync_Status 1:进行数据打包 2：只验证用户信息   （方便服务端进行分辨）
+                   服务端： 1：返回的是数据包  2：返回的是时间戳
+
+
+客户端发送数据打包：
+                  JSONArray->JSONArray(userinfo)->包含DataSync_Status
+                           ->JSONArray(incomeinfo)
+                           ->JSONArray(expendinfo)
+                           ->JSONArray(incomebudget)
+                           ->JSONArray(expendbudget)
+客户端发送用户信息：
+                  JSONArray->JSONArray->(包括DataSync_Status User_Name User_Password)
+服务端发送数据打包：
+                  JSONArray->JSONArray(resultCode,status)
+                           ->JSONArray(所有数据)->JSONArray(userinfo)
+                                                ->JSONArray(incomeinfo)
+                                                ->JSONArray(expendinfo)
+                                                ->JSONArray(incomebudget)
+                                                ->JSONArray(expendbudget)
+服务端发送时间：
+                  JSONArray->JSONArray->(resultCode,status,time)
+
+
+
+
+
+

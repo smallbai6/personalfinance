@@ -213,8 +213,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 }else if(huodong.equals("StatisticalEditorActivity.java")){
                     intent = new Intent(TallyEditorActivity.this, StatisticalEditorActivity.class);
                 }
-                //intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
-                //startActivity(intent);
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -233,21 +231,28 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      *保存更改后的支付和收入信息
      */
     private void income_expend(String typeString) {
-        ContentValues values = new ContentValues();
-        values.put("User_Name", Username);
-        values.put("Money", money.getText().toString());
-        values.put("Type", type.getText().toString());
-        values.put("Time", currentdate);
-        values.put("Message", message.getText().toString());
-        if (typeString.equals(income_expend[0])) {
-            db.update("expendinfo", values, "User_Name=? AND Money=? " +
-                            "AND Type=? AND Time=? AND Message=?",
-                    new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
-        } else if (typeString.equals(income_expend[1])) {
-            db.update("incomeinfo", values, "User_Name=? AND Money=? " +
-                            "AND Type=? AND Time=? AND Message=?",
-                    new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
-        }
+        final String string=typeString;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ContentValues values = new ContentValues();
+                values.put("User_Name", Username);
+                values.put("Money", money.getText().toString());
+                values.put("Type", type.getText().toString());
+                values.put("Time", currentdate);
+                values.put("Message", message.getText().toString());
+                if (string.equals(income_expend[0])) {
+                    db.update("expendinfo", values, "User_Name=? AND Money=? " +
+                                    "AND Type=? AND Time=? AND Message=?",
+                            new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+                } else if (string.equals(income_expend[1])) {
+                    db.update("incomeinfo", values, "User_Name=? AND Money=? " +
+                                    "AND Type=? AND Time=? AND Message=?",
+                            new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
+                }
+            }
+        }).start();
+
     }
 
 

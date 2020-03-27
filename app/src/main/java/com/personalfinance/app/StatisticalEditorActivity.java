@@ -5,7 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,6 +50,18 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     private List<Info> InfoList = new ArrayList<>();
     private List<String> TimeList = new ArrayList<>();
 
+    private final static int list_adapter=1;
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case list_adapter:
+                    list_adapter();
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,31 +95,33 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     private void Get_InfoList() {
         InfoList.clear();
         int i = 0;
-        if (iore.equals(ioreString[0])) {
-            i = 0;
-            cursor = db.query("expendinfo", null, "User_Name=? AND Type=? ",
-                    new String[]{Username, type}, null, null, null);
-        } else if (iore.equals(ioreString[1])) {
-            i = 1;
-            cursor = db.query("incomeinfo", null,
-                    "User_Name=? AND Type=?",
-                    new String[]{Username, type}, null, null, null);
-        }
-        if (cursor.moveToFirst()) {
-            do {
-                long time = cursor.getLong(cursor.getColumnIndex("Time"));
-                if ((time >= start_time) && (time <= end_time)) {
-                    String money = cursor.getString(cursor.getColumnIndex("Money"));
-                    String text = cursor.getString(cursor.getColumnIndex("Message"));
-                    Info info = new Info(Double.valueOf(money), i + type, time, text);
-                    InfoList.add(info);
-                }
-            } while (cursor.moveToNext());
+        try {
+            if (iore.equals(ioreString[0])) {
+                i = 0;
+                cursor = db.query("expendinfo", null, "User_Name=? AND Type=? ",
+                        new String[]{Username, type}, null, null, null);
+            } else if (iore.equals(ioreString[1])) {
+                i = 1;
+                cursor = db.query("incomeinfo", null,
+                        "User_Name=? AND Type=?",
+                        new String[]{Username, type}, null, null, null);
+            }
+            if (cursor.moveToFirst()) {
+                do {
+                    long time = cursor.getLong(cursor.getColumnIndex("Time"));
+                    if ((time >= start_time) && (time <= end_time)) {
+                        String money = cursor.getString(cursor.getColumnIndex("Money"));
+                        String text = cursor.getString(cursor.getColumnIndex("Message"));
+                        Info info = new Info(Double.valueOf(money), i + type, time, text);
+                        InfoList.add(info);
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+        } finally {
+            cursor.close();
         }
         Collections.sort(InfoList);//对列表进行排序，通过时间进行倒叙排序
-        for (Info info : InfoList) {
-            Log.d("liangjialing", info.getType() + "  " + LongToString(info.getTime()) + "  " + info.getMoney());
-        }
     }
 
     private void Get_TimeList() {
@@ -134,39 +149,44 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
             }
 
         }
-        for (String string : TimeList) {
+      /*  for (String string : TimeList) {
             Log.d("liangjialing", string);
-        }
+        }*/
     }
 
     private void Get_List() {
-        int a, b = 0;
-        int i = 0;//为指针在list中的位置
-        int leveldivide01;//等级划分关联
-        list.clear();
-        Get_InfoList();
-        Get_TimeList();
-        NodeData nodeData;
-
-        for (a = 0; a < TimeList.size(); a++) {
-            nodeData = new NodeData(TimeList.get(a), "", "", "", "", "", 0);
-            list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
-            leveldivide01 = i;
-            i++;
-            while (TimeList.get(a).substring(0, 10).equals(LongToString(InfoList.get(b).getTime()).substring(0, 10))) {
-                nodeData = new NodeData(InfoList.get(b).getType(),
-                        LongToString(InfoList.get(b).getTime()).substring(11, 16),
-                        InfoList.get(b).getText(),
-                        formatPrice(InfoList.get(b).getMoney()), "", "", InfoList.get(b).getTime());
-                list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
-                i++;
-                b++;
-                if (b >= InfoList.size()) {
-                    break;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int a, b = 0;
+                int i = 0;//为指针在list中的位置
+                int leveldivide01;//等级划分关联
+                list.clear();
+                Get_InfoList();
+                Get_TimeList();
+                NodeData nodeData;
+                for (a = 0; a < TimeList.size(); a++) {
+                    nodeData = new NodeData(TimeList.get(a), "", "", "", "", "", 0);
+                    list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
+                    leveldivide01 = i;
+                    i++;
+                    while (TimeList.get(a).substring(0, 10).equals(LongToString(InfoList.get(b).getTime()).substring(0, 10))) {
+                        nodeData = new NodeData(InfoList.get(b).getType(),
+                                LongToString(InfoList.get(b).getTime()).substring(11, 16),
+                                InfoList.get(b).getText(),
+                                formatPrice(InfoList.get(b).getMoney()), "", "", InfoList.get(b).getTime());
+                        list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
+                        i++;
+                        b++;
+                        if (b >= InfoList.size()) {
+                            break;
+                        }
+                    }
                 }
+                handler.sendEmptyMessage(list_adapter);
+                //list_adapter();
             }
-    }
-        list_adapter();
+        }).start();
     }
 
     private void list_adapter() {

@@ -44,6 +44,7 @@ public class DetailList {
     public List<Info> DetailInfo() {//获取该时间段内所有的流水
         InfoList.clear();
         //支出收入信息
+        try {
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
                 cursor = db.query("expendinfo", null, "User_Name=?",
@@ -64,6 +65,11 @@ public class DetailList {
                     }
                 } while (cursor.moveToNext());
             }
+        }
+        } catch (Exception e) {
+
+        } finally {
+            cursor.close();
         }
         Collections.sort(InfoList);
         return InfoList;

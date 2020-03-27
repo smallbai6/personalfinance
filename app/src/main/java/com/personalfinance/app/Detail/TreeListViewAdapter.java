@@ -1,7 +1,6 @@
 package com.personalfinance.app.Detail;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +104,7 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
      */
     public void expandOrCollapse(int position) {
         Node n = mNodes.get(position);//获得该节点
-        Log.d("setcheck", "expandOrCollapse");
+        //Log.d("setcheck", "expandOrCollapse");
         if (n != null) {// 排除传入参数错误异常
             if (!n.isLeaf()) {
                 //Log.d("setcheck", "!n.isLeaf");
@@ -119,7 +118,7 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
                 if (onTreeNodeClickListener != null) {
                     onTreeNodeClickListener.onClick(mNodes.get(position), position);
                 }
-                Log.d("setcheck", "n.isLeaf  "+n.isChecked());
+              //  Log.d("setcheck", "n.isLeaf  "+n.isChecked());
                 // n.setChecked(!n.isChecked());
             }
         }

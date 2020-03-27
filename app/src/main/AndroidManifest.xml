@@ -12,7 +12,8 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".User.UserCenter"></activity>
-        <activity android:name=".User.RegisterLogin"></activity>
+        <activity android:name=".User.RegisterActivity"></activity>
+        <activity android:name=".User.LoginActivity"></activity>
         <activity
             android:name=".TallyActivity"
             android:windowSoftInputMode="adjustPan|stateHidden"></activity>

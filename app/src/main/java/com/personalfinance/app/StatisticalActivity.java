@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -91,19 +93,26 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
             R.color.colorgreen, R.color.colorblue, R.color.colorindigo, R.color.colorpurple};
     private TextView[] piechart_legend = new TextView[7];
 
+    private final static int GetAllConsume = 1;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case GetAllConsume:
+                    Create_Legend(msg.getData().getDoubleArray("consumemoney"), consumetype);
+                    create_PieChart(msg.getData().getFloatArray("consumepercent"),
+                            msg.getData().getDouble("totalmoney"));
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statistical_piechart);
-
         db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
-       /* cursor = db.query("userinfo", null, "User_Login=?",
-                new String[]{"1"}, null, null, null);
-        if (cursor.moveToFirst()) {
-            Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-        } else {//没有登录用户时用户名就为请立即登录
-            Username = "请立即登录";
-        }*/
+
         intent=getIntent();
         Username=intent.getStringExtra("Username");
         pieChart = (PieChart) findViewById(R.id.PieChart);
@@ -245,7 +254,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                     end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                   // Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_month://本月
@@ -255,7 +263,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                     end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                   // Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_season://本季
@@ -266,24 +273,19 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                     end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                   // Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_year://本年
-
                     choosetimetype=3;
                     SE_time=StartEndTime.GetYear();
                     start_time=SE_time[0];
                     end_time=SE_time[1];
                     choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timedialog.cancel();
-                  //  Log.d("liangjialing",start_time+"    "+end_time);
                     GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                     break;
                 case R.id.statistical_time_zidingyi://自定义
                     timedialog.cancel();//关闭该对话框
-                    //打开popupwindow时间设置
-                    //choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
                     timeZDYPop = new TimeZDYPop(StatisticalActivity.this, choosetime, start_time, end_time);
                     timeZDYPop.setOnDateTimeSetListener(new TimeZDYPop.OnDateTimeSetListener() {
                         @Override
@@ -372,62 +374,77 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     进行获得收入支出类别+时间范围的所有消费
      */
     private void GetAllConsume(String iore, long start, long end) {//收入或支出  开始时间  结束时间
-        GetConsumetype(iore);
-        if (iore.equals(chooseString[0])) {
-            cursor = db.query("expendinfo", null, "User_Name=?"
-                    , new String[]{Username}, null, null, null);
-        } else if (iore.equals(chooseString[1])) {
-            cursor = db.query("incomeinfo", null, "User_Name=?"
-                    , new String[]{Username}, null, null, null);
-        }
-        double[] consumemoney = new double[11];
-        for (int i = 0; i < consumetype.size(); i++) {
-            consumemoney[i] = 0;
-        }
-        if (cursor.moveToFirst()) {
-            do {
-                long time = cursor.getLong(cursor.getColumnIndex("Time"));
-                if ((time >= start) && (time <= end)) {
+        final String ie = iore;
+        final long st = start;
+        final long ed = end;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    GetConsumetype(ie);
+                    if (ie.equals(chooseString[0])) {
+                        cursor = db.query("expendinfo", null, "User_Name=?"
+                                , new String[]{Username}, null, null, null);
+                    } else if (ie.equals(chooseString[1])) {
+                        cursor = db.query("incomeinfo", null, "User_Name=?"
+                                , new String[]{Username}, null, null, null);
+                    }
+                    double[] consumemoney = new double[11];
                     for (int i = 0; i < consumetype.size(); i++) {
-                        if (consumetype.get(i).equals(cursor.getString(cursor.getColumnIndex("Type")))) {
-                            consumemoney[i] += Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                            break;
+                        consumemoney[i] = 0;
+                    }
+                    if (cursor.moveToFirst()) {
+                        do {
+                            long time = cursor.getLong(cursor.getColumnIndex("Time"));
+                            if ((time >= st) && (time <= ed)) {
+                                for (int i = 0; i < consumetype.size(); i++) {
+                                    if (consumetype.get(i).equals(cursor.getString(cursor.getColumnIndex("Type")))) {
+                                        consumemoney[i] += Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
+                                        break;
+                                    }
+                                }
+                            }
+                        } while (cursor.moveToNext());
+                    }
+                    //金额占比计算
+                    double totalmoney = 0;
+                    for (int i = 0; i < consumetype.size(); i++) {
+                        totalmoney += consumemoney[i];
+                    }
+                    float[] consumepercent = new float[11];
+                    for (int i = 0; i < consumetype.size(); i++) {
+                        if (consumemoney[i] == 0) {
+                            consumepercent[i] = -1;
+                        } else {
+                            consumepercent[i] = (float) (consumemoney[i] / totalmoney);
                         }
                     }
+//               以上执行完毕，回到主线程执行UI
+                    Message message = new Message();
+                    message.what = GetAllConsume;
+                    Bundle bundle = new Bundle();
+                    bundle.putDoubleArray("consumemoney", consumemoney);
+                    bundle.putFloatArray("consumepercent", consumepercent);
+                    bundle.putDouble("totalmoney", totalmoney);
+                    message.setData(bundle);
+                    handler.sendMessage(message);
+                    // Create_Legend(consumemoney, consumetype);
+                    //  create_PieChart(consumepercent, totalmoney);
+                } catch (Exception e) {
+                } finally {
+                    cursor.close();
                 }
-            } while (cursor.moveToNext());
-        }
-        //  Log.d("liangjialing", "GetAllConsume");
-        for (double list : consumemoney) {
-            //    Log.d("liangjialing", "GetAllConsume_consumemoney:    " + list);
-        }
-
-        //金额占比计算
-        double totalmoney = 0;
-        for (int i = 0; i < consumetype.size(); i++) {
-            totalmoney += consumemoney[i];
-        }
-        float[] consumepercent = new float[11];
-        for (int i = 0; i < consumetype.size(); i++) {
-            if (consumemoney[i] == 0) {
-                consumepercent[i] = -1;
-            } else {
-                consumepercent[i] = (float) (consumemoney[i] / totalmoney);
             }
-        }
 
-        //  Log.d("liangjialing", "moneypercent");
-        for (float list : consumepercent) {
-            // Log.d("liangjialing", "GetAllConsume_moneypercent:    " + list);
-        }
-        Create_Legend(consumemoney, consumetype);
-        create_PieChart(consumepercent, totalmoney);
+        }).start();/**/
+
     }
 
     /*
         得到消费类型
          */
     private void GetConsumetype(String iore) {
+
         consumetype.clear();
         if (iore.equals(chooseString[0])) {
             cursor = db.query("expendtype", null, null
@@ -441,11 +458,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 consumetype.add(cursor.getString(cursor.getColumnIndex("Type_Name")));
             } while (cursor.moveToNext());
         }
-        // Log.d("liangjialing", "GetConsumtype");
-        for (String list : consumetype) {
-            //    Log.d("liangjialing", "GetConsumtype:    " + list);
-        }
-
     }
 
     /*
@@ -465,7 +477,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
             setPieChart(pieChart, "合计:\n" + total);
         }
         setPieChartData(pieChart, entries);
-
 
     }
 
@@ -513,7 +524,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);//图例显示的方向
         legend.setDrawInside(false);
         legend.setDirection(Legend.LegendDirection.LEFT_TO_RIGHT);
-
     }
 
     private void setPieChartData(PieChart pieChart, List<PieEntry> list) {
@@ -590,8 +600,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         @Override
         public void onClick(View view) {
             TextView tv = (TextView) view;
-            //tv.getText().toString()
-            Toast.makeText(StatisticalActivity.this, tv.getText().toString(), Toast.LENGTH_SHORT).show();
             Activity_Change(Username, choosebutton.getText().toString(), tv.getText().toString(), start_time, end_time);
         }
     }

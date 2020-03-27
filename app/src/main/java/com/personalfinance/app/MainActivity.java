@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,7 +26,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.personalfinance.app.Main.MainListAdapter;
 import com.personalfinance.app.Main.MainListClass;
 import com.personalfinance.app.Sqlite.SQLiteDatabaseHelper;
-import com.personalfinance.app.User.RegisterLogin;
+import com.personalfinance.app.User.LoginActivity;
 import com.personalfinance.app.User.UserCenter;
 import com.personalfinance.app.Util.PictureFormatUtil;
 
@@ -70,7 +73,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListView ysmd_listview;
     private List<MainListClass> ysmd_list = new ArrayList<>();
     private ArrayAdapter<MainListClass> ysmd_adapter;
-
+    /*
+    操作UI返回主线程
+     */
+    private final static int Set_YSMD = 1;
+    private final static int ysmd_listview_click = 2;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case Set_YSMD:
+                    ysmd_adapter.notifyDataSetChanged();
+                    break;
+                case ysmd_listview_click:
+                    int position = msg.getData().getInt("position");
+                    long[] time = msg.getData().getLongArray("time");
+                    intent = new Intent(MainActivity.this, DetailActivity.class);
+                    intent.putExtra("Username", Username);
+                    intent.putExtra("start_time", time[0]);
+                    intent.putExtra("end_time", time[1]);
+                    intent.putExtra("timetype", position);
+                    startActivityForResult(intent, 1);//返回之后进行列表的更新
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,30 +106,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dbHelper = new SQLiteDatabaseHelper(this, "personal.db", null, 1);
         db = dbHelper.getWritableDatabase();
         //用户名和头像获取
-        cursor = db.query("userinfo", null, "User_Login=?",
-                new String[]{"1"}, null, null, null);
-        if (cursor.moveToFirst()) {
-            Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-            // iv.setImageDrawable(getDrawable().get(0));
-            byte[] blob=cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
-            Userheadportrait= PictureFormatUtil.Bytes2Drawable(getResources(),blob);
-        } else {
-            //获取默认用户名和用户头像
-            cursor = db.query("userinfo", null, "User_Login=?",
-                    new String[]{"0"}, null, null, null);
-            if(cursor.moveToFirst()){
-                Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-                // iv.setImageDrawable(getDrawable().get(0));
-                byte[] blob=cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
-                Userheadportrait= PictureFormatUtil.Bytes2Drawable(getResources(),blob);
-            }
-        }
+        Get_User();
         Init_Drawerlayout();
         Init_MainButton();
         Init_YSMD();
         Set_YSMD();
     }
 
+    private void Get_User() {
+        try {
+            cursor = db.query("userinfo", null, "User_Login=?",
+                    new String[]{"1"}, null, null, null);
+            if (cursor.moveToFirst()) {
+                Username = cursor.getString(cursor.getColumnIndex("User_Name"));
+                // iv.setImageDrawable(getDrawable().get(0));
+                byte[] blob = cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
+                Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), blob);
+            } else {
+                //获取默认用户名和用户头像
+                cursor = db.query("userinfo", null, "User_Login=?",
+                        new String[]{"0"}, null, null, null);
+                if (cursor.moveToFirst()) {
+                    Username = cursor.getString(cursor.getColumnIndex("User_Name"));
+                    // iv.setImageDrawable(getDrawable().get(0));
+                    byte[] blob = cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
+                    Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), blob);
+                }
+            }
+            Log.d("TAG", "GetUsername= " + Username);
+        } catch (Exception e) {
+        } finally {
+            cursor.close();
+        }
+
+    }
     /*
     初始化DrawerLayout相关的控件
      */
@@ -116,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //用户名已获得
         draweruserrname.setText(Username);
         drawerheadportrait.setImageDrawable(Userheadportrait);
+        Log.d("TAG", "Init_Drawerla");
         Toast.makeText(MainActivity.this, "用户名为" + Username, Toast.LENGTH_SHORT).show();
+
     }
 
     /*
@@ -159,25 +199,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ysmd_listview.setAdapter(ysmd_adapter);
         ysmd_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, ysmd_list.get(position).getName(), Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                //  Toast.makeText(MainActivity.this, ysmd_list.get(position).getName(), Toast.LENGTH_SHORT).show();
                 //0本日 1本月 2本季 3本年
-                long[] time = new long[2];
-                if (position == 0) {
-                    time = StartEndTime.GetDay();//按日算
-                } else if (position == 1) {
-                    time = StartEndTime.GetMonth();//按月算
-                } else if (position == 2) {
-                    time = StartEndTime.GetSeason();//按季算
-                } else if (position == 3) {
-                    time = StartEndTime.GetYear();//按年算
-                }
-                intent = new Intent(MainActivity.this, DetailActivity.class);
-                intent.putExtra("Username", Username);
-                intent.putExtra("start_time", time[0]);
-                intent.putExtra("end_time", time[1]);
-                intent.putExtra("timetype", position);
-                startActivityForResult(intent, 1);//返回之后进行列表的更新
+                final int pt = position;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Log.d("TAG","ysmd_ListView");
+                        long[] time = new long[2];
+                        if (pt == 0) {
+                            time = StartEndTime.GetDay();//按日算
+                        } else if (pt == 1) {
+                            time = StartEndTime.GetMonth();//按月算
+                        } else if (pt == 2) {
+                            time = StartEndTime.GetSeason();//按季算
+                        } else if (pt == 3) {
+                            time = StartEndTime.GetYear();//按年算
+                        }
+                        Message message = new Message();
+                        message.what = ysmd_listview_click;
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("position", pt);
+                        bundle.putLongArray("time", time);
+                        message.setData(bundle);
+                        handler.sendMessage(message);
+                    }
+                }).start();
             }
         });
     }
@@ -186,47 +234,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     设置ysmd列表的内容并进行更新适配器
      */
     private void Set_YSMD() {
-        ysmd_list.clear();
-        long start_time = 0, end_time = 0;
-        long[] time;
-        String time_String = "";
-        for (int i = 0; i < ysmd_name.length; i++) {
-            switch (i) {
-                case 0:
-                    time = StartEndTime.GetDay();
-                    start_time = time[0];
-                    end_time = time[1];
-                    time_String = DetailList.LongToString(start_time).substring(5, 11);
-                    break;
-                case 1:
-                    time = StartEndTime.GetMonth();
-                    start_time = time[0];
-                    end_time = time[1];
-                    time_String = DetailList.LongToString(start_time).substring(5, 11) +
-                            " - " + DetailList.LongToString(end_time).substring(5, 11);
-                    break;
-                case 2:
-                    time = StartEndTime.GetSeason();
-                    start_time = time[0];
-                    end_time = time[1];
-                    time_String = DetailList.LongToString(start_time).substring(5, 11) +
-                            " - " + DetailList.LongToString(end_time).substring(5, 11);
-                    break;
-                case 3:
-                    time = StartEndTime.GetYear();
-                    start_time = time[0];
-                    end_time = time[1];
-                    time_String = DetailList.LongToString(start_time).substring(0, 5);
-                    break;
-                default:
-                    break;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("TAG", "set_ysmd");
+                ysmd_list.clear();
+                long start_time = 0, end_time = 0;
+                long[] time;
+                String time_String = "";
+                for (int i = 0; i < ysmd_name.length; i++) {
+                    switch (i) {
+                        case 0:
+                            time = StartEndTime.GetDay();
+                            start_time = time[0];
+                            end_time = time[1];
+                            time_String = DetailList.LongToString(start_time).substring(5, 11);
+                            break;
+                        case 1:
+                            time = StartEndTime.GetMonth();
+                            start_time = time[0];
+                            end_time = time[1];
+                            time_String = DetailList.LongToString(start_time).substring(5, 11) +
+                                    " - " + DetailList.LongToString(end_time).substring(5, 11);
+                            break;
+                        case 2:
+                            time = StartEndTime.GetSeason();
+                            start_time = time[0];
+                            end_time = time[1];
+                            time_String = DetailList.LongToString(start_time).substring(5, 11) +
+                                    " - " + DetailList.LongToString(end_time).substring(5, 11);
+                            break;
+                        case 3:
+                            time = StartEndTime.GetYear();
+                            start_time = time[0];
+                            end_time = time[1];
+                            time_String = DetailList.LongToString(start_time).substring(0, 5);
+                            break;
+                        default:
+                            break;
+                    }
+                    DetailList detailList = new DetailList(Username, start_time, end_time);
+                    String[] expend_incomemoney = detailList.Get_IandE();
+                    MainListClass mainListClass = new MainListClass(ysmd_name[i], time_String, expend_incomemoney[0], expend_incomemoney[1]);
+                    ysmd_list.add(mainListClass);
+                }
+                handler.sendEmptyMessage(Set_YSMD);
             }
-            DetailList detailList = new DetailList(Username, start_time, end_time);
-            String[] expend_incomemoney = detailList.Get_IandE();
-            MainListClass mainListClass = new MainListClass(ysmd_name[i], time_String, expend_incomemoney[0], expend_incomemoney[1]);
-            ysmd_list.add(mainListClass);
-        }
-        ysmd_adapter.notifyDataSetChanged();
+        }).start();
+
+
     }
     public void onClick(View v) {
         switch (v.getId()) {
@@ -234,21 +290,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.userlayout_header://用户头
-                Toast.makeText(MainActivity.this, "点击用户头像部分", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MainActivity.this, "点击用户头像部分", Toast.LENGTH_SHORT).show();
                 //进入用户中心
                 mDrawerLayout.closeDrawers();
                 if (draweruserrname.getText().toString().equals("请立即登录")) {//没有登录跳转到登录界面
-                    intent = new Intent(MainActivity.this, RegisterLogin.class);
+                    intent = new Intent(MainActivity.this, LoginActivity.class);
                     //startActivityForResult(intent, 1);
                     startActivity(intent);
-                } else {//跳转到用户中心中
+                    finish();
+                } else {//跳转到用户中心
                    intent = new Intent(MainActivity.this, UserCenter.class);
+                    intent.putExtra("Username", Username);
+                    intent.putExtra("Headportrait", PictureFormatUtil.Drawable2Bytes(Userheadportrait));
                     startActivity(intent);
+                    finish();
                 }
                 // finish();
                 break;
             case R.id.maintally_button://进入记账
-                Toast.makeText(MainActivity.this, "进入记账中", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "进入记账中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, TallyActivity.class);
                 intent.putExtra("Username", Username);
                 intent.putExtra("HuoDong","MainActivity.java");
@@ -256,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
             case R.id.maindetail_button://进入流水 输入进去start_time end_time
-                Toast.makeText(MainActivity.this, "进入流水中", Toast.LENGTH_SHORT).show();
+                //   Toast.makeText(MainActivity.this, "进入流水中", Toast.LENGTH_SHORT).show();
                 long[] time = StartEndTime.GetYear();//按年算
                 intent = new Intent(MainActivity.this, DetailActivity.class);
                 intent.putExtra("Username", Username);
@@ -268,14 +328,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //finish();
                 break;
             case R.id.mainbudget_button://进入预算
-                Toast.makeText(MainActivity.this, "进入预算中", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "进入预算中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, BudgetActivity.class);
                 intent.putExtra("Username", Username);
                 startActivity(intent);//不需要进行列表刷新，在预算中只能更改预算
                 // finish();
                 break;
             case R.id.mainstatistical_button://进入统计
-                Toast.makeText(MainActivity.this, "进入统计中", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "进入统计中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, StatisticalActivity.class);
                 intent.putExtra("Username", Username);
                 startActivityForResult(intent, 1);//返回之后进行列表的更新
@@ -284,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -291,7 +352,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Set_YSMD();
                 break;
             case 2://编辑数据
+
                 int issave = data.getIntExtra("issave", -1);
+                Log.d("TAG", "返回到MainActivity issave=" + issave);
                 if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Set_YSMD();
                 }

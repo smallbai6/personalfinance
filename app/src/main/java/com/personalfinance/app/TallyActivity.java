@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -88,6 +91,22 @@ private Cursor cursor;
      *进行保存操作
      */
     private String Username;
+
+    private final static int Typelist = 1;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case Typelist:
+                    type.setText((String) msg.obj);
+                    break;
+            }
+        }
+    };
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,13 +115,7 @@ private Cursor cursor;
        intent=getIntent();
        huodong=intent.getStringExtra("HuoDong");
         Username=intent.getStringExtra("Username");
-        //获取用户名称
-       /* Cursor cursor = db.query("userinfo", null, "User_Login=?", new String[]{"1"}, null, null, null);
-        if (cursor.moveToFirst()) {
-            Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-        } else {//没有登录用户时用户名就为请立即登录
-            Username = "请立即登录";
-        }*/
+
         back = (TextView) findViewById(R.id.tally_back);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 40, 40);
@@ -195,23 +208,37 @@ private Cursor cursor;
      *初始化分类的列表
      */
     private void Typelist(int position) {
+        final int pos = position;
         //获取数据库中的数据
-        if (position == 0) {
-            cursor = db.query("expendtype", null, null,
-                    null, null, null, null);
-        } else if (position == 1) {
-            cursor = db.query("incometype", null, null,
-                    null, null, null, null);
-        }
-        if (cursor.moveToFirst()) {
-            String name = "";
-            if (position == 0) {
-                name = cursor.getString(cursor.getColumnIndex("Type_Name"));
-            } else if (position == 1) {
-                name = cursor.getString(cursor.getColumnIndex("Type_Name"));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try{
+                    if (pos == 0) {
+                        cursor = db.query("expendtype", null, null,
+                                null, null, null, null);
+                    } else if (pos == 1) {
+                        cursor = db.query("incometype", null, null,
+                                null, null, null, null);
+                    }
+                    if (cursor.moveToFirst()) {
+                        String name = "";
+                        name = cursor.getString(cursor.getColumnIndex("Type_Name"));
+                        Message message = new Message();
+                        message.what = Typelist;
+                        message.obj = name;
+                        handler.sendMessage(message);
+                    }
+                }catch(Exception e){
+                }finally {
+                   // if(null!=cursor){
+                        cursor.close();
+                   // }
+                }
             }
-            type.setText(name);
-        }
+        }).start();
+
     }
 
     private void drawablel2tubiao() {
@@ -264,23 +291,23 @@ private Cursor cursor;
                     public void OnDateTimeSet(long date) {
                         time.setText(DetailList.LongToString(date));
                         currentdate = date;
+                        Log.d("liangjialing", currentdate + "");
                     }
                 });
                 // Log.d("liang", "完毕");
                 break;
             case R.id.tally_save:
             case R.id.tallycontent_save://进行保存
+                //  Log.d("TAG","点击保存  "+choose.getText().toString());
                 issave=1;
                 income_expend(choose.getText().toString());
                 //退出记账活动
                 //判断是由哪一个活动进入的TallyActivity
                 if(huodong.equals("MainActivity.java")){
                     intent = new Intent(TallyActivity.this, MainActivity.class);
-
+                    //   Log.d("TAG","返回到MainActivity");
                 }else if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyActivity.this, DetailActivity.class);
-                    //startActivity(intent);
-
                 }
                 intent.putExtra("issave", issave);
                 setResult(RESULT_OK,intent);
@@ -292,7 +319,6 @@ private Cursor cursor;
                 income_expend(choose.getText().toString());
                 //清空金额
                 money.setText("0.00");
-                //Toast.makeText(TallyActivity.this, "tallycontent_again", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.tally_back:
                 //直接退出记账活动
@@ -319,18 +345,29 @@ private Cursor cursor;
      *保存支付信息
      */
     private void income_expend(String typeString){
-        ContentValues values = new ContentValues();
-        values.put("User_Name", Username);
-        values.put("Money", money.getText().toString());
-        values.put("Type", type.getText().toString());
-        values.put("Time", currentdate);
-        values.put("Message", message.getText().toString());
-        if(typeString.equals(income_expend[0])){
-            db.insert("expendinfo", null, values);
-        }else if(typeString.equals(income_expend[1])){
-            db.insert("incomeinfo", null, values);
-        }
-        values.clear();
+        final String string = typeString;
+        /* */
+       Thread t1= new Thread(new Runnable() {
+            @Override
+            public void run() {
+                  //  Log.d("TAG", "income_expend");
+                    ContentValues values = new ContentValues();
+                    values.put("User_Name", Username);
+                    values.put("Money", money.getText().toString());
+                    values.put("Type", type.getText().toString());
+                    values.put("Time", currentdate);
+                    values.put("Message", message.getText().toString());
+                    if (string.equals(income_expend[0])) {
+                        db.insert("expendinfo", null, values);
+                    } else if (string.equals(income_expend[1])) {
+                        db.insert("incomeinfo", null, values);
+                    }
+                    values.clear();
+                //Log.d("liangjialing","a");
+            }
+        });
+       t1.start();
+       while(t1.isAlive()){}
     }
 
     /*
@@ -349,18 +386,4 @@ private Cursor cursor;
         SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm EE");
         return format.format(date);
     }
-
-    /*
-     *时间数据类型转换
-     */
-   /* private String LongToString(long date) {
-        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
-        String sDateTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(dateOld);// 把date类型的时间转换为string
-        return sDateTime;
-    }
-
-    // date要转换的date类型的时间
-    public static long DateToLong(Date date) {
-        return date.getTime();
-    }*/
 }

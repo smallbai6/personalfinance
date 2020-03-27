@@ -3,6 +3,8 @@ package com.personalfinance.app;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +27,6 @@ import java.util.List;
 public class DetailEditorActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
     final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
-    //private Cursor cursor;
     private String Username;
     private long start_time,end_time;
     private Intent intent;
@@ -46,6 +47,40 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     private Button allchoosebutton, allnochoosebutton, deletebutton;
     private int isdelete = 0;
 
+    private final static int Detail_list = 1;
+    private final static int Delete = 2;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case Detail_list:
+                    mAdapter = new DetailBulkAdapter(listView, DetailEditorActivity.this, list,
+                            1, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
+                    listView.setAdapter(mAdapter);
+                    Log.d("TAG","handler");
+                    //选中状态监听
+                    mAdapter.setCheckedChangeListener(new OnTreeNodeCheckedChangeListener() {
+                        @Override
+                        public void onCheckChange(Node node, int position, boolean isChecked) {
+                            showchoosetotal_totalmoney();
+                        }
+                    });
+                    mAdapter.setOnTreeNodeClickListener(new OnTreeNodeClickListener() {
+                        @Override
+                        public void onClick(Node node, int position) {
+                            showchoosetotal_totalmoney();
+                        }
+                    });
+                    break;
+                case Delete:
+                    mAdapter.getVisibleNodes();
+                    showchoosetotal.setText("未进行选择");
+                    showtotalmoney.setText("");
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,10 +91,9 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         start_time=intent.getLongExtra("start_time",0);
         end_time=intent.getLongExtra("end_time",0);
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
+        Log.d("TAG","onCreate");
         Detail_list();
-        mAdapter = new DetailBulkAdapter(listView, this, list,
-                1, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
-        listView.setAdapter(mAdapter);
+        Log.d("TAG","onCreate->Detail_list->over");
         allchoose = (TextView) findViewById(R.id.detail_bulkeditor_allchoose);
         allchoose.setOnClickListener(this);
         showchoosetotal = (TextView) findViewById(R.id.detail_bulkeditor_showchoosetotal);
@@ -74,19 +108,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
         allnochoosebutton.setOnClickListener(this);
         deletebutton = (Button) findViewById(R.id.detail_bulkeditor_deletebutton);
         deletebutton.setOnClickListener(this);
-        //选中状态监听
-        mAdapter.setCheckedChangeListener(new OnTreeNodeCheckedChangeListener() {
-            @Override
-            public void onCheckChange(Node node, int position, boolean isChecked) {
-                showchoosetotal_totalmoney();
-            }
-        });
-        mAdapter.setOnTreeNodeClickListener(new OnTreeNodeClickListener() {
-            @Override
-            public void onClick(Node node, int position) {
-                showchoosetotal_totalmoney();
-            }
-        });
+
     }
 
     private void showchoosetotal_totalmoney() {
@@ -118,6 +140,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.detail_bulkeditor_back:
+                Log.d("TAG","点击返回");
                 intent = new Intent(DetailEditorActivity.this, DetailActivity.class);
                 intent.putExtra("isdelete", isdelete);
                 setResult(RESULT_OK, intent);
@@ -142,36 +165,47 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.detail_bulkeditor_deletebutton://删除
                 isdelete++;
+                Log.d("TAG","isdelete="+isdelete);
                 delete();
                 break;
         }
     }
 
     private void delete() {
-        List<Node> selectedNode = mAdapter.getSelectedNode();
-        for (Node node : selectedNode) {
-            NodeData nodeData = (NodeData) node.getData();
-            if (node.isLeaf()) {
-                //如果是叶子节点,进行删除
-                String type = nodeData.getA();
-                String money = nodeData.getC();
-                String time = String.valueOf(nodeData.getTime());
-                if (type.substring(0, 1).equals("0")) {
-                    //支出
-                    db.delete("expendinfo", "User_Name=? AND Money=? " +
-                                    "AND Type=? AND Time=?",
-                            new String[]{Username, money, type.substring(1), time});
-                } else if (type.substring(0, 1).equals("1")) {
-                    db.delete("incomeinfo", "User_Name=? AND Money=? " +
-                                    "AND Type=? AND Time=? ",
-                            new String[]{Username, money, type.substring(1), time});
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("TAG","delete->run");
+                List<Node> selectedNode = mAdapter.getSelectedNode();
+                for (Node node : selectedNode) {
+                    NodeData nodeData = (NodeData) node.getData();
+                    if (node.isLeaf()) {
+                        //如果是叶子节点,进行删除
+                        String type = nodeData.getA();
+                        String money = nodeData.getC();
+                        String time = String.valueOf(nodeData.getTime());
+
+                        if (type.substring(0, 1).equals("0")) {
+                            //支出
+                            db.delete("expendinfo", "User_Name=? AND Money=? " +
+                                            "AND Type=? AND Time=?",
+                                    new String[]{Username, money, type.substring(1), time});
+                        } else if (type.substring(0, 1).equals("1")) {
+                            db.delete("incomeinfo", "User_Name=? AND Money=? " +
+                                            "AND Type=? AND Time=? ",
+                                    new String[]{Username, money, type.substring(1), time});
+                        }
+                    }
                 }
+                //使用getVisibleNodes()删除allNode中的节点，更新显示的节点
+                handler.sendEmptyMessage(Delete);
+              /*  mAdapter.getVisibleNodes();
+                showchoosetotal.setText("未进行选择");
+                showtotalmoney.setText("");*/
             }
-        }
-        //使用getVisibleNodes()删除allNode中的节点，更新显示的节点
-        mAdapter.getVisibleNodes();
-        showchoosetotal.setText("未进行选择");
-        showtotalmoney.setText("");
+        }).start();
+
+
 
     }
 
@@ -202,39 +236,43 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void Detail_list() {
-        list.clear();
-        DetailList detailList=new DetailList(Username,start_time,end_time);
-        InfoList=detailList.DetailInfo();
-        Detailday_day();
-        int a = 0, b = 0;
-        int i = 0;//为指针在list中的位置
-        int leveldivide01;//等级划分关联
-        NodeData nodeData;
-        for (a = 0; a < day_dayList.size(); a++) {
-            nodeData = new NodeData(day_dayList.get(a),"","", "", "", "",0);
-            list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
-            leveldivide01 = i;
-            i++;
-            while (day_dayList.get(a).equals(DetailList.LongToString(InfoList.get(b).getTime()).substring(0, 11))) {
-                nodeData = new  NodeData(InfoList.get(b).getType(),
-                        DetailList.LongToString(InfoList.get(b).getTime()).substring(12, 17),
-                        DetailList.formatPrice(InfoList.get(b).getMoney()),
-                        "","","",
-                        InfoList.get(b).getTime());
-                list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
-                i++;
-                b++;
-                if (b >= InfoList.size()) {
-                    break;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                list.clear();
+                Log.d("TAG","Detail_list->a");
+                DetailList detailList = new DetailList(Username, start_time, end_time);
+                InfoList = detailList.DetailInfo();
+                Detailday_day();
+                int a = 0, b = 0;
+                int i = 0;//为指针在list中的位置
+                int leveldivide01;//等级划分关联
+                NodeData nodeData;
+                Log.d("TAG","Detail_list->b");
+                for (a = 0; a < day_dayList.size(); a++) {
+                    nodeData = new NodeData(day_dayList.get(a), "", "", "", "", "", 0);
+                    list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
+                    leveldivide01 = i;
+                    i++;
+                    while (day_dayList.get(a).equals(DetailList.LongToString(InfoList.get(b).getTime()).substring(0, 11))) {
+                        nodeData = new NodeData(InfoList.get(b).getType(),
+                                DetailList.LongToString(InfoList.get(b).getTime()).substring(12, 17),
+                                DetailList.formatPrice(InfoList.get(b).getMoney()),
+                                "", "", "",
+                                InfoList.get(b).getTime());
+                        list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
+                        i++;
+                        b++;
+                        if (b >= InfoList.size()) {
+                            break;
+                        }
+                    }
                 }
+                Log.d("TAG","Detail_list->c");
+                handler.sendEmptyMessage(Detail_list);
             }
-        }
-    }
+        }).start();
 
-    /*private String LongToString(long date) {
-        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
-        String sDateTime = new SimpleDateFormat("yyyy年MM月dd日HH:mmEE").format(dateOld);// 把date类型的时间转换为string
-        return sDateTime;
-    }*/
+    }
 
 }

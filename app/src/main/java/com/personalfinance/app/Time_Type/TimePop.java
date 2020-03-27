@@ -36,13 +36,19 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
 
         mTimeChoose=new TimeChoose(context,selectTime,0);
         buttoncancel=(Button)mTimeChoose.findViewById(R.id.time_cancel);
+
         timepop = new PopupWindow(mTimeChoose,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         timepop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        timepop.setOutsideTouchable(true);
-        timepop.setTouchable(true);
-        timepop.showAtLocation(parent, Gravity.BOTTOM,0,0);
+        //timepop.setOutsideTouchable(true);
+        //timepop.setTouchable(true);
+       timepop.setFocusable(true);
+
         buttoncancel.setOnClickListener(this);
+
+        timepop.showAtLocation(parent, Gravity.BOTTOM,0,0);
+
+
         timepop.setOnDismissListener(new OnDismissListener() {
             @Override
             public void onDismiss() {
