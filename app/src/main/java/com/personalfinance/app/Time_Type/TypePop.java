@@ -8,14 +8,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.personalfinance.app.R;
 
 public class TypePop extends PopupWindow implements View.OnClickListener {
     private Cursor cursor;
-    private Button btncancel;
+    private TextView btncancel;
     private PopupWindow timepop;
     private TypeChoose mTypeChoose;
     private OnTypeSetListener mOnTypeSetListener;//接口
@@ -42,15 +42,18 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
             int truth_long = 0;
             if (cursor.moveToFirst()) {
                 do {
-                    String name = "";
-                    if (typecategory == 0) {
-                        name = cursor.getString(cursor.getColumnIndex("Type_Name"));
-                    } else if (typecategory == 1) {
-                        name = cursor.getString(cursor.getColumnIndex("Type_Name"));
-                    }
-                    chooseList[truth_long] = name;
-                    truth_long++;
+                    if(!cursor.getString(cursor.getColumnIndex("Type_Name")).equals("总预算")) {
 
+                        String name = "";
+                        if (typecategory == 0) {
+                            name = cursor.getString(cursor.getColumnIndex("Type_Name"));
+                        } else if (typecategory == 1) {
+                            name = cursor.getString(cursor.getColumnIndex("Type_Name"));
+                        }
+
+                        chooseList[truth_long] = name;
+                        truth_long++;
+                    }
                 } while (cursor.moveToNext());
             }
 
@@ -70,14 +73,17 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
 
         } finally {
             cursor.close();
+            db.close();
         }
-        btncancel = (Button) mTypeChoose.findViewById(R.id.type_cancel);
+        btncancel = (TextView) mTypeChoose.findViewById(R.id.type_cancel);
+        btncancel.setOnClickListener(this);
         timepop = new PopupWindow(mTypeChoose,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         timepop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         timepop.setOutsideTouchable(true);
         // timepop.setTouchable(true);
         //timepop.setFocusable(true);
+
         timepop.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
 
 

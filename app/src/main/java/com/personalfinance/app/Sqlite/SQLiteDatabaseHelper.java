@@ -37,7 +37,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + "Time interger NOT NULL,"
             + "Message text ,"
             + "CONSTRAINT incomeinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
-            + "CONSTRAINT incomeinfo_ibfk_2 FOREIGN KEY (Type) REFERENCES incometype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
+             + "CONSTRAINT incomeinfo_ibfk_2 FOREIGN KEY (Type) REFERENCES incometype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";
     public static final String create_expendinfo = "CREATE TABLE expendinfo("
             + " User_Name varchar(45)  NOT NULL,"
@@ -85,13 +85,12 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(create_incomebudget);
         db.execSQL(create_expendbudget);
         InitDataBase(db, mContext);
-
     }
 
     private void InitDataBase(SQLiteDatabase db, Context context) {
-        String[] incometype = {"职业收入", "其他收入"};
+        String[] incometype = {"职业收入","礼金收入","经营所得", "其他收入","总预算"};
         String[] expendtype = {"食品酒水", "居家物业", "衣服饰品", "行车交通", "交流通讯"
-                , "休闲娱乐", "学习进修", "人情往来", "医疗保健", "金融保险", "其他支出"};
+                , "休闲娱乐", "学习进修", "人情往来", "医疗保健", "金融保险", "其他支出","总预算"};
         ContentValues values = new ContentValues();
         for (int i = 0; i < incometype.length; i++) {
             values.put("Type_Name", incometype[i]);
@@ -103,13 +102,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             db.insert("expendtype", null, values);
             values.clear();
         }
-
-       /*
-        values.put("User_Name","请立即登录");
-        //values.put("User_Login",0);
-        // values.put("Head_Portrait", model.getPic());
-        db.insert("userinfo",null,values);
-        Log.d("SQLiteDatabasemy", "a");*/
        //插入用户信息
         InsertUserInfo(db, context, "请立即登录", "", 0, R.mipmap.defaultheadportrait);
     }

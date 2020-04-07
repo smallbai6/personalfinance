@@ -111,7 +111,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statistical_piechart);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
 
         intent=getIntent();
         Username=intent.getStringExtra("Username");
@@ -382,6 +382,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
             public void run() {
                 try {
                     GetConsumetype(ie);
+                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     if (ie.equals(chooseString[0])) {
                         cursor = db.query("expendinfo", null, "User_Name=?"
                                 , new String[]{Username}, null, null, null);
@@ -433,6 +434,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 } catch (Exception e) {
                 } finally {
                     cursor.close();
+                    db.close();
                 }
             }
 
@@ -444,8 +446,9 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         得到消费类型
          */
     private void GetConsumetype(String iore) {
-
+        try{
         consumetype.clear();
+        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         if (iore.equals(chooseString[0])) {
             cursor = db.query("expendtype", null, null
                     , null, null, null, null);
@@ -455,9 +458,17 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         }
         if (cursor.moveToFirst()) {
             do {
-                consumetype.add(cursor.getString(cursor.getColumnIndex("Type_Name")));
+                if(!cursor.getString(cursor.getColumnIndex("Type_Name")).equals("总预算")){
+                    consumetype.add(cursor.getString(cursor.getColumnIndex("Type_Name")));
+                }
             } while (cursor.moveToNext());
         }
+        }catch (Exception e){}
+        finally {
+            db.close();
+            cursor.close();
+        }
+
     }
 
     /*

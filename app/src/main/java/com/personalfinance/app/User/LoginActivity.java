@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.login_back);
         register = (TextView) findViewById(R.id.login_toregister);
         login_username = (EditText) findViewById(R.id.login_username);
@@ -128,6 +128,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         new Thread(new Runnable() {
             @Override
             public void run() {
+                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 cursor = db.query("userinfo", null, "User_Name=?",
                         new String[]{login_username.getText().toString()}, null, null, null);
                 JSONArray jsonArray = new JSONArray();
@@ -154,6 +155,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
                 cursor.close();
+                db.close();
                 Message message = new Message();
                 message.what = NetWork;
                 message.obj = jsonArray;
@@ -182,6 +184,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 int isRegister = -1;
                 String resultCode = "500";
                 String responseText = response.body().string();
+                Log.d("TAG1", "responseText= "+responseText);
+               // Log.d("TAG1", "responseText= "+responseText.substring(responseText.length()/2));
+
                 if (!TextUtils.isEmpty(responseText)) {
                     //  Log.d("TAG1","回调有值");
                     try {//接收到服务器返回的json格式数据，进行解析
@@ -193,6 +198,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         if (resultCode.equals("200")) {//成功
                             //判断状态码
                             int status = jsonObject.getInt("status");
+                            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                             if (status == 1) {//返回数据包
                                 Data_ZIP.Login_GetData(db, login_username.getText().toString(), jsonArray.getJSONArray(1));
                             } else if (status == 2) {//返回时时间戳  userinfo中时间更改
@@ -202,6 +208,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 db.update("userinfo", values, "User_Name=?",
                                         new String[]{login_username.getText().toString()});
                             }
+                            db.close();
                         }/*else  if(resultCode.equals("201")){//错误
 
                         }else  if(resultCode.equals("500")){//失败

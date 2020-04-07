@@ -95,7 +95,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                             msg.getData().getDouble("totalbudgetmoney"));
                     break;
                 case show_budgetlist:
-                    Log.d("TAG", "handler->show_budgetlist");
+                    Log.d("TAG", "handler->show_budgetlist进行列表适配");
                     budgetAdapter = new BudgetAdapter(BudgetActivity.this,
                             R.layout.budget_type, budgetList);
                     budgetListView.setAdapter(budgetAdapter);
@@ -107,6 +107,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                             mCaculatorPop.setOnCaculatorSetListener(new Budget_Caculator.OnCaculatorSetListener() {
                                 @Override
                                 public void OnCaculatorSet(String date) {
+                                    Log.d("TAG", "OnCaculatorSet");
                                     //budgetList列表的显示更新
                                     if (Double.valueOf(date) >= 0) {
                                         budgetlist_change(date, position);
@@ -130,11 +131,11 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.budget);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent=getIntent();
         Username=intent.getStringExtra("Username");
         date = new Date();
-        budget_update();
+        /*budget_update();*/
         back = (TextView) findViewById(R.id.budget_back_button);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 40, 40);
@@ -179,6 +180,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         totala.setText("0.00");
         totaltvb.setText(totaltvb_String[0]);
         totalb.setText("0.00");
+        budget_update();
         show_budgetlist(choose_ysmd.getText().toString(), choose_type.getText().toString());
         total_budget(choose_ysmd.getText().toString(), choose_type.getText().toString());
         chooselistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -210,8 +212,6 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
 
 
     }
-
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -316,83 +316,90 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /*
-       检查数据库中budget将不符合的数据进行删除
+     *budget_update()和delete_sqlite(Cursor cursor,int iore) 检查更新数据库，将不符合的数据进行删除
         */
     private void budget_update() {
-        try {
-            int currentseason = season_judge(Integer.valueOf(getTimes(date).substring(5, 7)));
-            for (int i = 0; i < choose_typeString.length; i++) {
-                if (i == 0) {
-                    cursor = db.query("expendbudget", null, "User_Name=?"
-                            , new String[]{Username}, null, null, null);
-                } else if (i == 1) {
-                    cursor = db.query("incomebudget", null, "User_Name=?"
-                            , new String[]{Username}, null, null, null);
-                }
-                if (cursor.moveToFirst()) {
-                    do {
-                        if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[0])) {
-                            //本日
-                            if (!LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 11).
-                                    equals(getTimes(date).substring(0, 11))) {
-                                delete_sqlite(cursor, i);
-                            }
-
-                        } else if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[1])) {
-                            //本月
-                            if (!LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 8).
-                                    equals(getTimes(date).substring(0, 8))) {
-                                delete_sqlite(cursor, i);
-                            }
-                        } else if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[2])) {
-                            //本季
-                            if (LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 5).
-                                    equals(getTimes(date).substring(0, 5))) {
-                                if (!(Integer.valueOf(getTimes(date).substring(5, 7)) <= (currentseason * 3)) &&
-                                        !(Integer.valueOf(getTimes(date).substring(5, 7)) >= (currentseason * 3 - 2))) {
-                                    delete_sqlite(cursor, i);
-                                }
-                            }
-                        } else if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[3])) {
-                            //本年
-                            if (!LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 5).
-                                    equals(getTimes(date).substring(0, 5))) {
-                                delete_sqlite(cursor, i);
-                            }
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    int currentseason = season_judge(Integer.valueOf(getTimes(date).substring(5, 7)));
+                    for (int i = 0; i < choose_typeString.length; i++) {
+                        if (i == 0) {
+                            cursor = db.query("expendbudget", null, "User_Name=?"
+                                    , new String[]{Username}, null, null, null);
+                        } else if (i == 1) {
+                            cursor = db.query("incomebudget", null, "User_Name=?"
+                                    , new String[]{Username}, null, null, null);
                         }
-                    } while (cursor.moveToNext());
+                        if (cursor.moveToFirst()) {
+                            do {
+                                if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[0])) {
+                                    //本日
+                                    if (!LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 11).
+                                            equals(getTimes(date).substring(0, 11))) {
+                                        delete_sqlite(cursor, i);
+                                    }
+
+                                } else if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[1])) {
+                                    //本月
+                                    if (!LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 8).
+                                            equals(getTimes(date).substring(0, 8))) {
+                                        delete_sqlite(cursor, i);
+                                    }
+                                } else if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[2])) {
+                                    //本季
+                                    if (LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 5).
+                                            equals(getTimes(date).substring(0, 5))) {
+                                        if (!(Integer.valueOf(getTimes(date).substring(5, 7)) <= (currentseason * 3)) &&
+                                                !(Integer.valueOf(getTimes(date).substring(5, 7)) >= (currentseason * 3 - 2))) {
+                                            delete_sqlite(cursor, i);
+                                        }
+                                    }
+                                } else if (cursor.getString(cursor.getColumnIndex("DMSY")).equals(choose_ysmdString[3])) {
+                                    //本年
+                                    if (!LongToString(cursor.getLong(cursor.getColumnIndex("Time"))).substring(0, 5).
+                                            equals(getTimes(date).substring(0, 5))) {
+                                        delete_sqlite(cursor, i);
+                                    }
+                                }
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                } catch (Exception e) {
+
+                } finally {
+                    db.close();
+                    cursor.close();
                 }
             }
-        } catch (Exception e) {
-
-        } finally {
-            cursor.close();
+        });
+        t1.start();
+        while (t1.isAlive()) {
         }
+    }
+    private void delete_sqlite(Cursor cursor, int iore) {
+        String Table = "";
+        if (iore == 0) {
+            Table = "expendbudget";
+        } else if (iore == 1) {
+            Table = "incomebudget";
+        }
+        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        db.delete(Table, "User_Name=? AND Type=? AND Money=?" +
+                        "AND DMSY=? AND Time=?"
+                , new String[]{Username,
+                        cursor.getString(cursor.getColumnIndex("Type")),
+                        cursor.getString(cursor.getColumnIndex("Money")),
+                        cursor.getString(cursor.getColumnIndex("DMSY")),
+                        String.valueOf(cursor.getLong(cursor.getColumnIndex("Time")))});
+        db.close();
     }
 
     /*
-    数据库中删除的内容budget_update
+     * budgetlist_change(String date,int position) 当预算列表中预算设置改动，更新budgetlist的显示
      */
-    private void delete_sqlite(Cursor cursor, int iore) {
-        if (iore == 0) {
-            db.delete("expendbudget", "User_Name=? AND Type=? AND Money=?" +
-                            "AND DMSY=? AND Time=?"
-                    , new String[]{Username,
-                            cursor.getString(cursor.getColumnIndex("Type")),
-                            cursor.getString(cursor.getColumnIndex("Money")),
-                            cursor.getString(cursor.getColumnIndex("DMSY")),
-                            String.valueOf(cursor.getLong(cursor.getColumnIndex("Time")))});
-        } else if (iore == 1) {
-            db.delete("incomebudget", "User_Name=? AND Type=? AND Money=?" +
-                            "AND DMSY=? AND Time=?"
-                    , new String[]{Username,
-                            cursor.getString(cursor.getColumnIndex("Type")),
-                            cursor.getString(cursor.getColumnIndex("Money")),
-                            cursor.getString(cursor.getColumnIndex("DMSY")),
-                            String.valueOf(cursor.getLong(cursor.getColumnIndex("Time")))});
-        }
-    }
-
     private void budgetlist_change(String date, int position) {
         final String stringdate = date;
         final int pos = position;
@@ -427,7 +434,6 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                     budgetList.set(pos, budgetClass);
                 }
                 handler.sendEmptyMessage(budgetlist_change);
-                /*budgetAdapter.notifyDataSetChanged();*/
             }
         }).start();
     }
@@ -441,10 +447,11 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         final String stringiore = iore;
         final String stringtype = type;
         final String stringmoney = money;
-        new Thread(new Runnable() {
+        Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     String Table = null;
                     if (stringiore.equals(choose_typeString[0])) {
                         Table = "expendbudget";
@@ -474,53 +481,14 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                 } catch (Exception e) {
                 } finally {
                     cursor.close();
+                    db .close();
                 }
             }
-        }).start();
-
-        /*if (iore.equals(choose_typeString[0])) {
-            cursor = db.query("expendbudget",
-                    null, "User_Name=? AND Type=?AND DMSY=?"
-                    , new String[]{Username, type, ysmd}, null, null, null);
-            ContentValues values = new ContentValues();
-            if (cursor.moveToFirst()) {
-                //进行数据的更改
-                values.put("Money", money);
-                values.put("Time", date.getTime());
-                db.update("expendbudget", values,
-                        "User_Name=? AND Type=? AND DMSY=?"
-                        , new String[]{Username, type, ysmd});
-            } else {
-                //进行数据的添加
-                values.put("User_Name", Username);
-                values.put("Type", type);
-                values.put("Money", money);
-                values.put("DMSY", ysmd);
-                values.put("Time", date.getTime());
-                db.insert("expendbudget", null, values);
-            }
-        } else if (iore.equals(choose_typeString[1])) {
-            cursor = db.query("incomebudget",
-                    null, "User_Name=? AND Type=?AND DMSY=?"
-                    , new String[]{Username, type, ysmd}, null, null, null);
-            ContentValues values = new ContentValues();
-            if (cursor.moveToFirst()) {
-                //进行数据的更改
-                values.put("Money", money);
-                values.put("Time", date.getTime());
-                db.update("incomebudget", values,
-                        "User_Name=? AND Type=? AND DMSY=?"
-                        , new String[]{Username, type, ysmd});
-            } else {
-                //进行数据的添加
-                values.put("User_Name", Username);
-                values.put("Type", type);
-                values.put("Money", money);
-                values.put("DMSY", ysmd);
-                values.put("Time", date.getTime());
-                db.insert("incomebudget", null, values);
-            }
-        }*/
+        });
+        t1.start();
+        while (t1.isAlive()) {
+        }
+        Log.d("TAG", "budget_change完毕");
     }
 
     /*
@@ -532,15 +500,16 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
+                try {db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     double totaltypemoney = 0;//各个类型支出总预算
+                    String Table = "";
                     if (stringiore.equals(choose_typeString[0])) {
-                        cursor = db.query("expendbudget", null, "User_Name=? AND DMSY=?"
-                                , new String[]{Username, stringysmd}, null, null, null);
+                        Table = "expendbudget";
                     } else if (stringiore.equals(choose_typeString[1])) {
-                        cursor = db.query("incomebudget", null, "User_Name=? AND DMSY=?"
-                                , new String[]{Username, stringysmd}, null, null, null);
+                        Table = "incomebudget";
                     }
+                    cursor = db.query(Table, null, "User_Name=? AND DMSY=?"
+                            , new String[]{Username, stringysmd}, null, null, null);
                     if (cursor.moveToFirst()) {
                         do {
                             if (!cursor.getString(cursor.getColumnIndex("Type")).equals("总预算")) {
@@ -548,6 +517,11 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                             }
                         } while (cursor.moveToNext());
                     }
+                    ContentValues values = new ContentValues();
+                    values.put("Money", formatPrice(totaltypemoney));
+                    values.put("Time", date.getTime());
+                    db.update(Table, values, "User_Name=? AND Type=? AND DMSY=?"
+                            , new String[]{Username, "总预算", stringysmd});
                     Message message = new Message();
                     message.what = totalbudget_show;
                     Bundle bundle = new Bundle();
@@ -555,10 +529,10 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                     bundle.putDouble("totalbudgetmoney", totaltypemoney);
                     message.setData(bundle);
                     handler.sendMessage(message);
-                    //totalbudget_show(stringiore, totaltypemoney);
                 } catch (Exception e) {
                 } finally {
                     cursor.close();
+                    db.close();
                 }
             }
         }).start();
@@ -574,7 +548,8 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
+                try {db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    Log.d("TAG", "开始进行total_budget");
                     double totaltypemoney = 0;//各个类型的总预算金额
                     double totalbudgetmoney = 0;//总预算金额
                     String Table = null;
@@ -621,7 +596,6 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                             }
                         }
                     } else {//各个类型的预算中都没有设置过或者设置的值为0.00
-
                         if (!cursor.moveToFirst()) {
                             // ContentValues values = new ContentValues();
                             values.put("User_Name", Username);
@@ -632,105 +606,6 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                             db.insert(Table, null, values);
                         }
                     }
-                /*if (stringiore.equals(choose_typeString[0])) {
-                    cursor = db.query("expendbudget", null, "User_Name=? AND DMSY=?"
-                            , new String[]{Username, stringysmd}, null, null, null);
-                    if (cursor.moveToFirst()) {
-                        do {
-                            if (cursor.getString(cursor.getColumnIndex("Type")).equals("总预算")) {
-                                totalbudgetmoney = Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                            } else {
-                                totaltypemoney = totaltypemoney + Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                            }
-                        } while (cursor.moveToNext());
-                    }
-                    //获得本日 支出中各个类型总预算的值  如果总预算金额设过则得到数据库中的总预算金额，反之仍为0
-                    cursor = db.query("expendbudget", null,
-                            "User_Name=? AND Type=? AND DMSY=?"
-                            , new String[]{Username, "总预算", stringysmd}, null, null, null);
-                    if (totaltypemoney != 0) {//各个类型的预算中有已经设置的
-                        if (totaltypemoney >= totalbudgetmoney) {
-                            //a>=b => b=a  数据库中内容更改    反之b不变
-                            totalbudgetmoney = totaltypemoney;
-                            if (cursor.moveToFirst()) {
-                                // ContentValues values=new ContentValues();
-                                values.put("Money", formatPrice(totalbudgetmoney));
-                                values.put("Time", date.getTime());
-                                db.update("expendbudget", values,
-                                        "User_Name=? AND Type=? AND DMSY=?"
-                                        , new String[]{Username, "总预算", stringysmd});
-                            } else {
-                                // ContentValues values = new ContentValues();
-                                values.put("User_Name", Username);
-                                values.put("Type", "总预算");
-                                values.put("Money", formatPrice(totalbudgetmoney));
-                                values.put("DMSY", stringysmd);
-                                values.put("Time", date.getTime());
-                                db.insert("expendbudget", null, values);
-                            }
-                        }
-                    } else {//各个类型的预算中都没有设置过或者设置的值为0.00
-
-                        if (!cursor.moveToFirst()) {
-                            // ContentValues values = new ContentValues();
-                            values.put("User_Name", Username);
-                            values.put("Type", "总预算");
-                            values.put("Money", "0.00");
-                            values.put("DMSY", stringysmd);
-                            values.put("Time", date.getTime());
-                            db.insert("expendbudget", null, values);
-                        }
-                    }
-                }
-                else if (stringiore.equals(choose_typeString[1])) {
-                    cursor = db.query("incomebudget", null, "User_Name=? AND DMSY=?"
-                            , new String[]{Username, stringysmd}, null, null, null);
-                    if (cursor.moveToFirst()) {
-                        do {
-                            if (cursor.getString(cursor.getColumnIndex("Type")).equals("总预算")) {
-                                totalbudgetmoney = Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                            } else {
-                                totaltypemoney = totaltypemoney + Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                            }
-                        } while (cursor.moveToNext());
-                    }
-                    //获得本日 支出中各个类型总预算的值  如果总预算金额设过则得到数据库中的总预算金额，反之仍为0
-                    cursor = db.query("incomebudget", null,
-                            "User_Name=? AND Type=? AND DMSY=?"
-                            , new String[]{Username, "总预算", stringysmd}, null, null, null);
-                    if (totaltypemoney != 0) {//各个类型的预算中有已经设置的
-                        if (totaltypemoney >= totalbudgetmoney) {
-                            //a>=b => b=a  数据库中内容更改    反之b不变
-                            totalbudgetmoney = totaltypemoney;
-                            if (cursor.moveToFirst()) {
-                                //ContentValues values=new ContentValues();
-                                values.put("Money", formatPrice(totalbudgetmoney));
-                                values.put("Time", date.getTime());
-                                db.update("incomebudget", values,
-                                        "User_Name=? AND Type=? AND DMSY=?"
-                                        , new String[]{Username, "总预算",stringysmd});
-                            } else {
-                                //ContentValues values = new ContentValues();
-                                values.put("User_Name", Username);
-                                values.put("Type", "总预算");
-                                values.put("Money", formatPrice(totalbudgetmoney));
-                                values.put("DMSY", stringysmd);
-                                values.put("Time", date.getTime());
-                                db.insert("incomebudget", null, values);
-                            }
-                        }
-                    } else {//各个类型的预算中都没有设置过或者设置的值为0.00
-                        if (!cursor.moveToFirst()) {
-                            //ContentValues values = new ContentValues();
-                            values.put("User_Name", Username);
-                            values.put("Type", "总预算");
-                            values.put("Money", "0.00");
-                            values.put("DMSY", stringysmd);
-                            values.put("Time", date.getTime());
-                            db.insert("incomebudget", null, values);
-                        }
-                    }
-                }*/
                     Message message = new Message();
                     message.what = totalbudget_show;
                     Bundle bundle = new Bundle();
@@ -738,11 +613,10 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                     bundle.putDouble("totalbudgetmoney", totalbudgetmoney);
                     message.setData(bundle);
                     handler.sendMessage(message);
-//                totalbudget_show(stringiore, totalbudgetmoney);
-
                 } catch (Exception e) {
                 } finally {
                     cursor.close();
+                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 }
             }
         }).start();
@@ -754,58 +628,37 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     private void totalbudget_change(String ysmd, String iore, String money) {
         try {
             double totaltypemoney = 0;
+            String Table = "";
             if (iore.equals(choose_typeString[0])) {
-                cursor = db.query("expendbudget", null, "User_Name=? AND DMSY=?"
-                        , new String[]{Username, ysmd}, null, null, null);
-                if (cursor.moveToFirst()) {
-                    do {
-                        if (!cursor.getString(cursor.getColumnIndex("Type")).equals("总预算")) {
-                            totaltypemoney = totaltypemoney + Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                        }
-                    } while (cursor.moveToNext());
-                }
-                if (Double.valueOf(money) >= totaltypemoney) {
-                    ContentValues values = new ContentValues();
-                    cursor = db.query("expendbudget", null,
-                            "User_Name=? AND Type=? AND DMSY=?"
-                            , new String[]{Username, "总预算", ysmd}, null, null, null);
-                    values.put("Money", money);
-                    values.put("Time", date.getTime());
-                    db.update("expendbudget", values,
-                            "User_Name=? AND Type=? AND DMSY=?"
-                            , new String[]{Username, "总预算", ysmd});
-                    totalbudget_show(iore, Double.valueOf(money));
-                } else {
-                    Toast.makeText(BudgetActivity.this, "总预算不能小于各个类型预算之和！", Toast.LENGTH_SHORT).show();
-                }
+                Table = "expendbudget";
             } else if (iore.equals(choose_typeString[1])) {
-                cursor = db.query("incomebudget", null, "User_Name=? AND DMSY=?"
-                        , new String[]{Username, ysmd}, null, null, null);
-                if (cursor.moveToFirst()) {
-                    do {
-                        if (!cursor.getString(cursor.getColumnIndex("Type")).equals("总预算")) {
-                            totaltypemoney = totaltypemoney + Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
-                        }
-                    } while (cursor.moveToNext());
-                }
-                if (Double.valueOf(money) >= totaltypemoney) {
-                    ContentValues values = new ContentValues();
-                    cursor = db.query("incomebudget", null,
-                            "User_Name=? AND Type=? AND DMSY=?"
-                            , new String[]{Username, "总预算", ysmd}, null, null, null);
-                    values.put("Money", money);
-                    values.put("Time", date.getTime());
-                    db.update("incomebudget", values,
-                            "User_Name=? AND Type=? AND DMSY=?"
-                            , new String[]{Username, "总预算", ysmd});
-                    totalbudget_show(iore, Double.valueOf(money));
-                } else {
-                    Toast.makeText(BudgetActivity.this, "总预算不能小于各个类型预算之和！", Toast.LENGTH_SHORT).show();
-                }
+                Table = "incomebudget";
+            }db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.query(Table, null, "User_Name=? AND DMSY=?"
+                    , new String[]{Username, ysmd}, null, null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    if (!cursor.getString(cursor.getColumnIndex("Type")).equals("总预算")) {
+                        totaltypemoney = totaltypemoney + Double.valueOf(cursor.getString(cursor.getColumnIndex("Money")));
+                    }
+                } while (cursor.moveToNext());
+            }
+            if (Double.valueOf(money) >= totaltypemoney) {
+                ContentValues values = new ContentValues();
+
+                values.put("Money", money);
+                values.put("Time", date.getTime());
+                db.update(Table, values,
+                        "User_Name=? AND Type=? AND DMSY=?"
+                        , new String[]{Username, "总预算", ysmd});
+                totalbudget_show(iore, Double.valueOf(money));
+            } else {
+                Toast.makeText(BudgetActivity.this, "总预算不能小于各个类型预算之和！", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
         } finally {
             cursor.close();
+            db.close();
         }
     }
 
@@ -844,55 +697,40 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-
+    /*
+     *show_budgetlist(String ysmd,String iore) 显示预算列表，并设置监听事件
+     */
     private void show_budgetlist(String ysmd, String iore) {
         final String stringysmd = ysmd;
         final String stringiore = iore;
-        Log.d("TAG", "show_budgetlist");
-        get_type(stringiore);
-        Log.d("TAG", "show_budgetlist->get_type");
-        Result_typemoney(stringysmd, stringiore);
-        Log.d("TAG", "show_budgetlist->Result_typemoney");
-        new Thread(new Runnable() {
+        /*get_type(stringiore);
+        Result_typemoney(stringysmd, stringiore);*/
+        Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-
+                get_type(stringiore);
+                Result_typemoney(stringysmd, stringiore);
                 Result_budgetlist(stringysmd, stringiore);
-                Log.d("TAG", "show_budgetlist->Result_budgetlist");
+                Log.d("TAG", "show_budgetlist->Result_budgetlist得到列表结果");
                 handler.sendEmptyMessage(show_budgetlist);
             }
-        }).start();
-
-       /* budgetAdapter = new BudgetAdapter(BudgetActivity.this,
-                R.layout.budget_type, budgetList);
-        budgetListView.setAdapter(budgetAdapter);
-        budgetListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                mCaculatorPop = new Budget_Caculator(BudgetActivity.this, chooselistView);
-                mCaculatorPop.setOnCaculatorSetListener(new Budget_Caculator.OnCaculatorSetListener() {
-                    @Override
-                    public void OnCaculatorSet(String date) {
-                        //budgetList列表的显示更新
-                        if (Double.valueOf(date) >= 0) {
-                            budgetlist_change(date, position);
-                            budget_change(choose_ysmd.getText().toString(), choose_type.getText().toString(), consumetype[position], date);
-                            total_budget(choose_ysmd.getText().toString(), choose_type.getText().toString());
-                        } else {
-                            Toast.makeText(BudgetActivity.this, "设置金额不能为负数", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });*/
+        });
+        t1.start();
+        while (t1.isAlive()) {
+        }
+        Log.d("TAG", "show_budgetlist 执行完毕");
     }
 
     /*
-    获得消费类型;
+     * get_type(String iore) 获得消费类型
+     * Result_typemoney(String ysmd,String iore) 计算各个消费类型的总金额
+     * Init_budgetList(String iore) 初始化显示budgetList列表
+     * Result_budgetlist(String ysmd,String iore) 的到预算列表budgetlist
      */
     private void get_type(String iore) {//得到消费类型支出 收入
         try {
             typenumber = 0;
+            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(choose_typeString[0])) {//支出
                 cursor = db.query("expendtype", null, null,
                         null, null, null, null);
@@ -902,29 +740,28 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
             }
             if (cursor.moveToFirst()) {
                 do {
+                    if(!cursor.getString(cursor.getColumnIndex("Type_Name")).equals("总预算")){
                     consumetype[typenumber] = cursor.getString(cursor.getColumnIndex("Type_Name"));
-                    typenumber++;
+                    typenumber++; }
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
         } finally {
             cursor.close();
+            db.close();
         }
     }
-
-    /*
-    计算各个消费类型的总金额
-     */
     private void Result_typemoney(String ysmd, String iore) {
         //首先初始化各个消费类型的总金额
         for (int i = 0; i < typenumber; i++) {
             consumetype_money[i] = 0.00;
         }
-        Log.d("TAG", "show_budgetlist->a");
+        //  Log.d("TAG", "show_budgetlist->a");
         int currentseason = season_judge(Integer.valueOf(getTimes(date).substring(5, 7)));
         //确定支出或者收入中各消费类型的消费金额
-        Log.d("TAG", "show_budgetlist->b");
+        // Log.d("TAG", "show_budgetlist->b");
         try {
+            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(choose_typeString[0])) {//支出
                 cursor = db.query("expendinfo", null, "User_Name=?"
                         , new String[]{Username}, null, null, null);
@@ -932,7 +769,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                 cursor = db.query("incomeinfo", null, "User_Name=?"
                         , new String[]{Username}, null, null, null);
             }
-            Log.d("TAG", "show_budgetlist->c");
+            // Log.d("TAG", "show_budgetlist->c");
             if (cursor.moveToFirst()) {
                 do {
                     long time = cursor.getLong(cursor.getColumnIndex("Time"));
@@ -985,13 +822,9 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         } catch (Exception e) {
         } finally {
             cursor.close();
+            db.close();
         }
-        Log.d("TAG", "show_budgetlist->d");
     }
-
-    /*
-    初始化显示的budgetList列表
-     */
     private void Init_budgetList(String iore) {//初始化显示的budgetList列表 为支出
         budgetList.clear();
         BudgetClass budgetClass;
@@ -1016,12 +849,9 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         }
 
     }
-    /*
-           根据数据库对budgetlist进行更改
-            */
     private void Result_budgetlist(String ysmd, String iore) {
         Init_budgetList(iore);
-        try {
+        try {db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(choose_typeString[0])) {//支出
                 cursor = db.query("expendbudget", null, "User_Name=? AND DMSY=?"
                         , new String[]{Username, ysmd}, null, null, null);
@@ -1062,7 +892,6 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                                 }
                                 budgetList.set(i, budgetClass);
                             }
-
                             break;
                         }
                     }
@@ -1071,68 +900,8 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         } catch (Exception e) {
         } finally {
             cursor.close();
+            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         }
-        /*if (iore.equals(choose_typeString[0])) {//支出
-            cursor = db.query("expendbudget", null, "User_Name=? AND DMSY=?"
-                    , new String[]{Username, ysmd}, null, null, null);
-            if (cursor.moveToFirst()) {//数据库中含有数据
-                do {
-                    //找寻对应的数据
-                    for (int i = 0; i < budgetList.size(); i++) {
-                        if (cursor.getString(cursor.getColumnIndex("Type")).
-                                equals(budgetList.get(i).getType())) {
-                            //更新数据
-                            double resultmoney = Double.valueOf(cursor.getString(
-                                    cursor.getColumnIndex("Money"))) - consumetype_money[i];
-                            BudgetClass budgetClass;
-                            if (resultmoney >= 0) {//余额
-                                budgetClass = new BudgetClass(consumetype[i],
-                                        cursor.getString(cursor.getColumnIndex("Money")),
-                                        zyc_String[1], formatPrice(resultmoney));
-                            } else {//超支
-                                budgetClass = new BudgetClass(consumetype[i],
-                                        cursor.getString(cursor.getColumnIndex("Money")),
-                                        zyc_String[2], formatPrice(resultmoney * (-1.0)));
-                            }
-                            budgetList.set(i, budgetClass);
-                            break;
-                        }
-                    }
-                } while (cursor.moveToNext());
-            }
-        }
-        else if (iore.equals(choose_typeString[1])) {
-            cursor = db.query("incomebudget", null, "User_Name=? AND DMSY=?"
-                    , new String[]{Username, ysmd}, null, null, null);
-            if (cursor.moveToFirst()) {//数据库中含有数据
-                do {
-                    //找寻对应的数据
-                    for (int i = 0; i < budgetList.size(); i++) {
-                        if (cursor.getString(cursor.getColumnIndex("Type")).
-                                equals(budgetList.get(i).getType())) {
-                            //更新数据
-                            double resultmoney = Double.valueOf(cursor.getString(
-                                    cursor.getColumnIndex("Money"))) - consumetype_money[i];
-                            BudgetClass budgetClass;
-                            if (resultmoney >= 0) {//待收
-                                budgetClass = new BudgetClass(consumetype[i],
-                                        cursor.getString(cursor.getColumnIndex("Money")),
-                                        zyc_String[4], formatPrice(resultmoney));
-                            } else {//超收
-                                budgetClass = new BudgetClass(consumetype[i],
-                                        cursor.getString(cursor.getColumnIndex("Money")),
-                                        zyc_String[5], formatPrice(resultmoney * (-1.0)));
-                            }
-                            budgetList.set(i, budgetClass);
-                            break;
-                        }
-                    }
-                } while (cursor.moveToNext());
-            }
-        }*/
-       /* budgetAdapter = new BudgetAdapter(BudgetActivity.this,
-                R.layout.budget_type, budgetList);
-        budgetListView.setAdapter(budgetAdapter);*/
     }
 
 

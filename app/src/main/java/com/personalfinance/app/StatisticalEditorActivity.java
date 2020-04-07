@@ -66,7 +66,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statistical_peditor);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+       // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         iore = intent.getStringExtra("iore");
@@ -96,6 +96,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         InfoList.clear();
         int i = 0;
         try {
+            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(ioreString[0])) {
                 i = 0;
                 cursor = db.query("expendinfo", null, "User_Name=? AND Type=? ",
@@ -120,6 +121,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         } catch (Exception e) {
         } finally {
             cursor.close();
+            db.close();
         }
         Collections.sort(InfoList);//对列表进行排序，通过时间进行倒叙排序
     }

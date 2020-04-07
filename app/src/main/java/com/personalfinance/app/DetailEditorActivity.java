@@ -85,7 +85,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_bulkeditor);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+       // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         start_time=intent.getLongExtra("start_time",0);
@@ -184,7 +184,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                         String type = nodeData.getA();
                         String money = nodeData.getC();
                         String time = String.valueOf(nodeData.getTime());
-
+                        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                         if (type.substring(0, 1).equals("0")) {
                             //支出
                             db.delete("expendinfo", "User_Name=? AND Money=? " +
@@ -195,6 +195,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                                             "AND Type=? AND Time=? ",
                                     new String[]{Username, money, type.substring(1), time});
                         }
+                        db.close();
                     }
                 }
                 //使用getVisibleNodes()删除allNode中的节点，更新显示的节点

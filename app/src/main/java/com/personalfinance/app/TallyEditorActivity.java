@@ -69,7 +69,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tally_editor);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.tally_editor_back);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 40, 40);
@@ -198,6 +198,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
                     db.delete("expendinfo", "User_Name=? AND Money=? " +
                                     "AND Type=? AND Time=? AND Message=?",
@@ -207,6 +208,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                                     "AND Type=? AND Time=? AND Message=?",
                             new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
                 }
+                db.close();
                 //返回到上一个活动中
                 if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
@@ -235,6 +237,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         new Thread(new Runnable() {
             @Override
             public void run() {
+                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 ContentValues values = new ContentValues();
                 values.put("User_Name", Username);
                 values.put("Money", money.getText().toString());
@@ -250,6 +253,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                                     "AND Type=? AND Time=? AND Message=?",
                             new String[]{Username, InitializeMoney, InitializeType, String.valueOf(InitializeTime), InitializeMessage});
                 }
+                db.close();
             }
         }).start();
 

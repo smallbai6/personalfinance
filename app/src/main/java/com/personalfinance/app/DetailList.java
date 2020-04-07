@@ -35,7 +35,7 @@ public class DetailList {
         this.Username = Username;
         this.start_time = start_time;
         this.end_time = end_time;
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
     /*
@@ -45,7 +45,9 @@ public class DetailList {
         InfoList.clear();
         //支出收入信息
         try {
+            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         for (int i = 0; i < 2; i++) {
+
             if (i == 0) {
                 cursor = db.query("expendinfo", null, "User_Name=?",
                         new String[]{Username}, null, null, null);
@@ -70,6 +72,7 @@ public class DetailList {
 
         } finally {
             cursor.close();
+            db.close();
         }
         Collections.sort(InfoList);
         return InfoList;

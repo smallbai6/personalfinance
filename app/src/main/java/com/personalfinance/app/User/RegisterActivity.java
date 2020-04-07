@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -49,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private byte[] Picturebytes;
 
     private Dialog mDialog;
-    private String NetWork_Code;
+    private String NetWork_Code="500";
 
     private final static int Register_success = 1;
     private final static int Register_alreadyhave = 2;
@@ -83,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.register_back);
         login = (TextView) findViewById(R.id.register_tologin);
         register_username = (EditText) findViewById(R.id.register_username);
@@ -143,15 +144,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Log.d("liangjialing","数据打包好了");
             MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
             RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
             String address = AppNetConfig.Register;
+            Log.d("liangjialing","准备请求");
             HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     e.printStackTrace();
                     //Toast.makeText(RegisterActivity.this, "注册失败,请重试", Toast.LENGTH_SHORT).show();
-                    //Log.d("TAG1", "注册失败,请重试连接网络");
+                    Log.d("liangjialing", "注册失败,请重试连接网络");
                     NetWork_Code = "500";
                 }
 
@@ -159,35 +162,28 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
                     //成功响应，接收数据
                     int isRegister = -1;
+                    //response.body().contentType();
                     String responseText = response.body().string();
                     String resultCode = "500";
                     //byte[] bytesq = null;
                     // Log.d("TAG1", "response     :" + responseText);
                     if (!TextUtils.isEmpty(responseText)) {
                         try {
-                            //接收到服务器返回的json格式数据，进行解析
-                            // JSONArray jsonArray1 = new JSONArray(responseText);
                             JSONObject jsonObject = new JSONObject(responseText);
-                            // JSONObject jsonObject = jsonArray1.getJSONObject(0);
                             resultCode = jsonObject.getString("resultCode");
-                            //  Log.d("liangjialing",   resultCode);
+                            Log.d("liangjialing",resultCode);
                             if (resultCode.equals("200")) {//成功
                                 //插入数据库
-                                //    Log.d("liangjialing", "200     :" + resultCode);
+                                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                                 ContentValues values = new ContentValues();
                                 values.put("User_Name", register_username.getText().toString());
                                 values.put("User_Login", 1);
                                 values.put("Head_Portrait", Picturebytes);
                                 values.put("Time",jsonObject.getLong("Time"));
                                 db.insert("userinfo", null, values);
-                                // Log.d("liangjialing", "数据库插入完成  ");
-                                //handler.sendEmptyMessage(Register_success);
-                            } else if (resultCode.equals("201"))//存在相同用户名
-                            {
-                                //handler.sendEmptyMessage(Register_alreadyhave);
-                                //线程表示存在相同用户名或注册失败
+                                db.close();
+                            } else if (resultCode.equals("201")){//存在相同用户名
                             } else if (resultCode.equals("500")) {//注册失败，服务器繁忙
-                                // handler.sendEmptyMessage(Register_fail);
                             }
                             NetWork_Code = resultCode;
                         } catch (JSONException e) {
@@ -209,7 +205,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void run() {
                 //开启等待界面
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

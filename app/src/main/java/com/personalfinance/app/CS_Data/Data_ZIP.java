@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -133,6 +134,7 @@ public class Data_ZIP {
     public static void Login_GetData(SQLiteDatabase db,String Username,JSONArray jsonArray) throws JSONException {
         //信息打包，进行同步
         //首先判断有无该用户
+
         Cursor cursor;
         //---------------userinfo--------------------------------
         cursor = db.query("userinfo", null, "User_Name=?",
@@ -152,41 +154,51 @@ public class Data_ZIP {
         values.put("Time", jsonObject.getLong("Time"));
         values.put("User_Login", 1);
         db.insert("userinfo", null, values);
-
+        Log.d("TAG",jsonObject.getString("User_Name")+"   "
+                        +Base64.decode(jsonObject.getString("Head_Portrait"),Base64.NO_WRAP)+"    "
+                +jsonObject.getLong("Time"));
         //---------------incomeinfo-------------------------------------------------
         jsonArray1=jsonArray.getJSONArray(1);
         for(int i=0;i<jsonArray1.length();i++){
             JSONObject jsonObject1=jsonArray1.getJSONObject(i);
             ContentValues values1=new ContentValues();
-            values.put("User_Name", jsonObject1.getString("User_Name"));
-            values.put("Money", jsonObject1.getString("Money"));
-            values.put("Type", jsonObject1.getString("Type"));
-            values.put("Time", jsonObject1.getLong("Time"));
-            values.put("Message", jsonObject1.getString("Message"));
+            values1.put("User_Name", jsonObject1.getString("User_Name"));
+            values1.put("Money", jsonObject1.getString("Money"));
+            values1.put("Type", jsonObject1.getString("Type"));
+            values1.put("Time", jsonObject1.getLong("Time"));
+            values1.put("Message", jsonObject1.getString("Message"));
             db.insert("incomeinfo", null, values1);
+            Log.d("TAG",jsonObject.getString("User_Name")+"   "
+                    +jsonObject1.getString("Money")+"    "
+                    +jsonObject1.getString("Type")+"     "
+            +jsonObject1.getLong("Time"));
         }
        //---------------expendinfo-------------------------------------------------
         jsonArray1=jsonArray.getJSONArray(2);
         for(int i=0;i<jsonArray1.length();i++){
             JSONObject jsonObject1=jsonArray1.getJSONObject(i);
             ContentValues values1=new ContentValues();
-            values.put("User_Name", jsonObject1.getString("User_Name"));
-            values.put("Money", jsonObject1.getString("Money"));
-            values.put("Type", jsonObject1.getString("Type"));
-            values.put("Time", jsonObject1.getLong("Time"));
-            values.put("Message", jsonObject1.getString("Message"));
+            values1.put("User_Name", jsonObject1.getString("User_Name"));
+            values1.put("Money", jsonObject1.getString("Money"));
+            values1.put("Type", jsonObject1.getString("Type"));
+            values1.put("Time", jsonObject1.getLong("Time"));
+            values1.put("Message", jsonObject1.getString("Message"));
             db.insert("expendinfo", null, values1);
+            Log.d("TAG",jsonObject.getString("User_Name")+"   "
+                    +jsonObject1.getString("Money")+"    "
+                    +jsonObject1.getString("Type")+"     "
+                    +jsonObject1.getLong("Time"));
         }
         //---------------incomebudget-------------------------------------------------
         jsonArray1=jsonArray.getJSONArray(3);
         for(int i=0;i<jsonArray1.length();i++){
             JSONObject jsonObject1=jsonArray1.getJSONObject(i);
             ContentValues values1=new ContentValues();
-            values.put("User_Name", jsonObject1.getString("User_Name"));
-            values.put("Type", jsonObject1.getString("Type"));
-            values.put("Money", jsonObject1.getString("Money"));
-            values.put("DMSY", jsonObject1.getString("DMSY"));
-            values.put("Time", jsonObject1.getLong("Time"));
+            values1.put("User_Name", jsonObject1.getString("User_Name"));
+            values1.put("Type", jsonObject1.getString("Type"));
+            values1.put("Money", jsonObject1.getString("Money"));
+            values1.put("DMSY", jsonObject1.getString("DMSY"));
+            values1.put("Time", jsonObject1.getLong("Time"));
             db.insert("incomebudget", null, values1);
         }
        //---------------expendbudget-------------------------------------------------
@@ -194,190 +206,13 @@ public class Data_ZIP {
         for(int i=0;i<jsonArray1.length();i++){
             JSONObject jsonObject1=jsonArray1.getJSONObject(i);
             ContentValues values1=new ContentValues();
-            values.put("User_Name", jsonObject1.getString("User_Name"));
-            values.put("Type", jsonObject1.getString("Type"));
-            values.put("Money", jsonObject1.getString("Money"));
-            values.put("DMSY", jsonObject1.getString("DMSY"));
-            values.put("Time", jsonObject1.getLong("Time"));
+            values1.put("User_Name", jsonObject1.getString("User_Name"));
+            values1.put("Type", jsonObject1.getString("Type"));
+            values1.put("Money", jsonObject1.getString("Money"));
+            values1.put("DMSY", jsonObject1.getString("DMSY"));
+            values1.put("Time", jsonObject1.getLong("Time"));
             db.insert("expendbudget", null, values1);
         }
         cursor.close();
     }
 }
-/*
-//---------------incomeinfo-------------------------------------------------
-//每个jsonarry开头进行有无数据判断
-        cursor = db.query("incomeinfo", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray incomeinfo = new JSONArray();
-                if (cursor.moveToFirst()) {
-                //incomeinfo.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                jsonObject.put("Message", cursor.getString(cursor.getColumnIndex("Message")));
-                incomeinfo.put(jsonObject);
-                } while (cursor.moveToNext());
-                }*/
-/* else {
-            incomeinfo.put("无数据");
-        }*//*
-
-                jsonArray.put(incomeinfo);
-                //-----------------expendinfo-----------------------------------------------------
-                cursor = db.query("expendinfo", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray expendinfo = new JSONArray();
-                if (cursor.moveToFirst()) {
-                // expendinfo.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                jsonObject.put("Message", cursor.getString(cursor.getColumnIndex("Message")));
-                expendinfo.put(jsonObject);
-                } while (cursor.moveToNext());
-                } */
-/*else {
-            expendinfo.put("无数据");
-        }*//*
-
-                jsonArray.put(expendinfo);
-                //----------------------incomebudget------------------------------------------------
-                cursor = db.query("incomebudget", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray incomebudget = new JSONArray();
-                if (cursor.moveToFirst()) {
-                // incomebudget.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("DMSY", cursor.getString(cursor.getColumnIndex("DMSY")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                incomebudget.put(jsonObject);
-                } while (cursor.moveToNext());
-                } */
-/*else {
-            incomebudget.put("无数据");
-        }*//*
-
-                jsonArray.put(incomebudget);
-                //-----------------------expendbudget-----------------------------------------------
-                cursor = db.query("expendbudget", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray expendbudget = new JSONArray();
-                if (cursor.moveToFirst()) {
-                // expendbudget.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("DMSY", cursor.getString(cursor.getColumnIndex("DMSY")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                expendbudget.put(jsonObject);
-                } while (cursor.moveToNext());
-                } */
-/*else {
-            expendbudget.put("无数据");
-        }*//*
-
-                jsonArray.put(expendbudget);*/
-
-
-
-
-/*
-
-//---------------incomeinfo-------------------------------------------------
-//每个jsonarry开头进行有无数据判断
-        cursor = db.query("incomeinfo", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray incomeinfo = new JSONArray();
-                if (cursor.moveToFirst()) {
-                //incomeinfo.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                jsonObject.put("Message", cursor.getString(cursor.getColumnIndex("Message")));
-                incomeinfo.put(jsonObject);
-                } while (cursor.moveToNext());
-                }*/
-/* else {
-            incomeinfo.put("无数据");
-        }*//*
-
-                jsonArray.put(incomeinfo);
-                //-----------------expendinfo-----------------------------------------------------
-                cursor = db.query("expendinfo", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray expendinfo = new JSONArray();
-                if (cursor.moveToFirst()) {
-                // expendinfo.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                jsonObject.put("Message", cursor.getString(cursor.getColumnIndex("Message")));
-                expendinfo.put(jsonObject);
-                } while (cursor.moveToNext());
-                } */
-/*else {
-            expendinfo.put("无数据");
-        }*//*
-
-                jsonArray.put(expendinfo);
-                //----------------------incomebudget------------------------------------------------
-                cursor = db.query("incomebudget", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray incomebudget = new JSONArray();
-                if (cursor.moveToFirst()) {
-                // incomebudget.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("DMSY", cursor.getString(cursor.getColumnIndex("DMSY")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                incomebudget.put(jsonObject);
-                } while (cursor.moveToNext());
-                } */
-/*else {
-            incomebudget.put("无数据");
-        }*//*
-
-                jsonArray.put(incomebudget);
-                //-----------------------expendbudget-----------------------------------------------
-                cursor = db.query("expendbudget", null, "User_Name=?",
-                new String[]{Username}, null, null, null);
-                JSONArray expendbudget = new JSONArray();
-                if (cursor.moveToFirst()) {
-                // expendbudget.put("有数据");
-                do {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("User_Name", Username);
-                jsonObject.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-                jsonObject.put("Money", cursor.getString(cursor.getColumnIndex("Money")));
-                jsonObject.put("DMSY", cursor.getString(cursor.getColumnIndex("DMSY")));
-                jsonObject.put("Time", cursor.getLong(cursor.getColumnIndex("Time")));
-                expendbudget.put(jsonObject);
-                } while (cursor.moveToNext());
-                } */
-/*else {
-            expendbudget.put("无数据");
-        }*//*
-
-                jsonArray.put(expendbudget);*/

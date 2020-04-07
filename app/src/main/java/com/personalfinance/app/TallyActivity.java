@@ -111,7 +111,7 @@ private Cursor cursor;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tally);
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+       // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
        intent=getIntent();
        huodong=intent.getStringExtra("HuoDong");
         Username=intent.getStringExtra("Username");
@@ -215,6 +215,7 @@ private Cursor cursor;
             public void run() {
 
                 try{
+                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     if (pos == 0) {
                         cursor = db.query("expendtype", null, null,
                                 null, null, null, null);
@@ -223,17 +224,23 @@ private Cursor cursor;
                                 null, null, null, null);
                     }
                     if (cursor.moveToFirst()) {
-                        String name = "";
-                        name = cursor.getString(cursor.getColumnIndex("Type_Name"));
-                        Message message = new Message();
-                        message.what = Typelist;
-                        message.obj = name;
-                        handler.sendMessage(message);
+                        do{
+                            if(!cursor.getString(cursor.getColumnIndex("Type_Name")).equals("总预算")){
+                                String name = "";
+                                name = cursor.getString(cursor.getColumnIndex("Type_Name"));
+                                Message message = new Message();
+                                message.what = Typelist;
+                                message.obj = name;
+                                handler.sendMessage(message);
+                                return;
+                            }
+                        }while(cursor.moveToNext());
                     }
                 }catch(Exception e){
                 }finally {
                    // if(null!=cursor){
                         cursor.close();
+                        db.close();
                    // }
                 }
             }
@@ -351,6 +358,7 @@ private Cursor cursor;
             @Override
             public void run() {
                   //  Log.d("TAG", "income_expend");
+                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     ContentValues values = new ContentValues();
                     values.put("User_Name", Username);
                     values.put("Money", money.getText().toString());
@@ -363,6 +371,7 @@ private Cursor cursor;
                         db.insert("incomeinfo", null, values);
                     }
                     values.clear();
+                    db.close();
                 //Log.d("liangjialing","a");
             }
         });

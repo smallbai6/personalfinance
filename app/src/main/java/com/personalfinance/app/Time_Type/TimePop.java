@@ -6,15 +6,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.personalfinance.app.R;
 
 import java.util.Calendar;
 
 public class TimePop extends PopupWindow implements View.OnClickListener{
-    private Button buttoncancel;
+    private TextView buttoncancel;
     private PopupWindow timepop;
     private Calendar mDate=Calendar.getInstance();
     private int select_mYear,select_mMonth,select_mDay,select_mHour,select_mMinute;
@@ -35,7 +35,7 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
 
 
         mTimeChoose=new TimeChoose(context,selectTime,0);
-        buttoncancel=(Button)mTimeChoose.findViewById(R.id.time_cancel);
+        buttoncancel=(TextView)mTimeChoose.findViewById(R.id.time_cancel);
 
         timepop = new PopupWindow(mTimeChoose,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *数据库建立
      */
     private SQLiteDatabaseHelper dbHelper;
+    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private SQLiteDatabase db;
     private Cursor cursor;
     /*
@@ -115,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void Get_User() {
         try {
+            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             cursor = db.query("userinfo", null, "User_Login=?",
                     new String[]{"1"}, null, null, null);
             if (cursor.moveToFirst()) {
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
         } finally {
             cursor.close();
+            db.close();
         }
 
     }
@@ -230,60 +233,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    /*
-    设置ysmd列表的内容并进行更新适配器
-     */
     private void Set_YSMD() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("TAG", "set_ysmd");
-                ysmd_list.clear();
-                long start_time = 0, end_time = 0;
-                long[] time;
-                String time_String = "";
-                for (int i = 0; i < ysmd_name.length; i++) {
-                    switch (i) {
-                        case 0:
-                            time = StartEndTime.GetDay();
-                            start_time = time[0];
-                            end_time = time[1];
-                            time_String = DetailList.LongToString(start_time).substring(5, 11);
-                            break;
-                        case 1:
-                            time = StartEndTime.GetMonth();
-                            start_time = time[0];
-                            end_time = time[1];
-                            time_String = DetailList.LongToString(start_time).substring(5, 11) +
-                                    " - " + DetailList.LongToString(end_time).substring(5, 11);
-                            break;
-                        case 2:
-                            time = StartEndTime.GetSeason();
-                            start_time = time[0];
-                            end_time = time[1];
-                            time_String = DetailList.LongToString(start_time).substring(5, 11) +
-                                    " - " + DetailList.LongToString(end_time).substring(5, 11);
-                            break;
-                        case 3:
-                            time = StartEndTime.GetYear();
-                            start_time = time[0];
-                            end_time = time[1];
-                            time_String = DetailList.LongToString(start_time).substring(0, 5);
-                            break;
-                        default:
-                            break;
-                    }
-                    DetailList detailList = new DetailList(Username, start_time, end_time);
-                    String[] expend_incomemoney = detailList.Get_IandE();
-                    MainListClass mainListClass = new MainListClass(ysmd_name[i], time_String, expend_incomemoney[0], expend_incomemoney[1]);
-                    ysmd_list.add(mainListClass);
-                }
-                handler.sendEmptyMessage(Set_YSMD);
+
+        Log.d("TAG", "set_ysmd");
+        ysmd_list.clear();
+        long start_time = 0, end_time = 0;
+        long[] time;
+        String time_String = "";
+        for (int i = 0; i < ysmd_name.length; i++) {
+            switch (i) {
+                case 0:
+                    time = StartEndTime.GetDay();
+                    start_time = time[0];
+                    end_time = time[1];
+                    time_String = DetailList.LongToString(start_time).substring(5, 11);
+                    break;
+                case 1:
+                    time = StartEndTime.GetMonth();
+                    start_time = time[0];
+                    end_time = time[1];
+                    time_String = DetailList.LongToString(start_time).substring(5, 11) +
+                            " - " + DetailList.LongToString(end_time).substring(5, 11);
+                    break;
+                case 2:
+                    time = StartEndTime.GetSeason();
+                    start_time = time[0];
+                    end_time = time[1];
+                    time_String = DetailList.LongToString(start_time).substring(5, 11) +
+                            " - " + DetailList.LongToString(end_time).substring(5, 11);
+                    break;
+                case 3:
+                    time = StartEndTime.GetYear();
+                    start_time = time[0];
+                    end_time = time[1];
+                    time_String = DetailList.LongToString(start_time).substring(0, 5);
+                    break;
+                default:
+                    break;
             }
-        }).start();
-
-
+            DetailList detailList = new DetailList(Username, start_time, end_time);
+            String[] expend_incomemoney = detailList.Get_IandE();
+            MainListClass mainListClass = new MainListClass(ysmd_name[i], time_String, expend_incomemoney[0], expend_incomemoney[1]);
+            ysmd_list.add(mainListClass);
+        }
+        handler.sendEmptyMessage(Set_YSMD);
     }
+
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.main_opendrawer://drawerlayout侧滑菜单显示
