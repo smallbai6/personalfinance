@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Detail.OnInnerItemClickListener;
 import com.personalfinance.app.Sqlite.Info;
 import com.personalfinance.app.Sqlite.Node;
@@ -29,7 +30,7 @@ import java.util.List;
 
 public class StatisticalEditorActivity extends AppCompatActivity implements View.OnClickListener{
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+  //  final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private Intent intent;
     private Drawable drawable;
@@ -66,7 +67,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statistical_peditor);
-       // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+       // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         iore = intent.getStringExtra("iore");
@@ -96,7 +97,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         InfoList.clear();
         int i = 0;
         try {
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(ioreString[0])) {
                 i = 0;
                 cursor = db.query("expendinfo", null, "User_Name=? AND Type=? ",

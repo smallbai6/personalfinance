@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Detail.DetailBulkAdapter;
 import com.personalfinance.app.Detail.OnTreeNodeCheckedChangeListener;
 import com.personalfinance.app.Detail.OnTreeNodeClickListener;
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class DetailEditorActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private String Username;
     private long start_time,end_time;
     private Intent intent;
@@ -85,7 +86,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_bulkeditor);
-       // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+       // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         start_time=intent.getLongExtra("start_time",0);
@@ -184,7 +185,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                         String type = nodeData.getA();
                         String money = nodeData.getC();
                         String time = String.valueOf(nodeData.getTime());
-                        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                        db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                         if (type.substring(0, 1).equals("0")) {
                             //支出
                             db.delete("expendinfo", "User_Name=? AND Money=? " +

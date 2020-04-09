@@ -39,6 +39,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Statistical.TimeZDYPop;
 
 import java.text.SimpleDateFormat;
@@ -48,7 +49,7 @@ import java.util.List;
 
 public class StatisticalActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private String Username;
     private Intent intent;
@@ -111,7 +112,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statistical_piechart);
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
 
         intent=getIntent();
         Username=intent.getStringExtra("Username");
@@ -382,7 +383,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
             public void run() {
                 try {
                     GetConsumetype(ie);
-                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     if (ie.equals(chooseString[0])) {
                         cursor = db.query("expendinfo", null, "User_Name=?"
                                 , new String[]{Username}, null, null, null);
@@ -448,7 +449,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     private void GetConsumetype(String iore) {
         try{
         consumetype.clear();
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         if (iore.equals(chooseString[0])) {
             cursor = db.query("expendtype", null, null
                     , null, null, null, null);

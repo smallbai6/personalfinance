@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.personalfinance.app.Budget.BudgetAdapter;
 import com.personalfinance.app.Budget.BudgetClass;
 import com.personalfinance.app.Budget.Budget_Caculator;
+import com.personalfinance.app.Config.DatabaseConfig;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ import java.util.List;
 
 public class BudgetActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+   // final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private String Username;
     private Date date;
@@ -323,7 +324,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void run() {
                 try {
-                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     int currentseason = season_judge(Integer.valueOf(getTimes(date).substring(5, 7)));
                     for (int i = 0; i < choose_typeString.length; i++) {
                         if (i == 0) {
@@ -386,7 +387,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         } else if (iore == 1) {
             Table = "incomebudget";
         }
-        db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         db.delete(Table, "User_Name=? AND Type=? AND Money=?" +
                         "AND DMSY=? AND Time=?"
                 , new String[]{Username,
@@ -451,7 +452,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void run() {
                 try {
-                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     String Table = null;
                     if (stringiore.equals(choose_typeString[0])) {
                         Table = "expendbudget";
@@ -500,7 +501,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                try {db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     double totaltypemoney = 0;//各个类型支出总预算
                     String Table = "";
                     if (stringiore.equals(choose_typeString[0])) {
@@ -548,7 +549,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                try {db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     Log.d("TAG", "开始进行total_budget");
                     double totaltypemoney = 0;//各个类型的总预算金额
                     double totalbudgetmoney = 0;//总预算金额
@@ -616,7 +617,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                 } catch (Exception e) {
                 } finally {
                     cursor.close();
-                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 }
             }
         }).start();
@@ -633,7 +634,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                 Table = "expendbudget";
             } else if (iore.equals(choose_typeString[1])) {
                 Table = "incomebudget";
-            }db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            }db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             cursor = db.query(Table, null, "User_Name=? AND DMSY=?"
                     , new String[]{Username, ysmd}, null, null, null);
             if (cursor.moveToFirst()) {
@@ -730,7 +731,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     private void get_type(String iore) {//得到消费类型支出 收入
         try {
             typenumber = 0;
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(choose_typeString[0])) {//支出
                 cursor = db.query("expendtype", null, null,
                         null, null, null, null);
@@ -761,7 +762,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         //确定支出或者收入中各消费类型的消费金额
         // Log.d("TAG", "show_budgetlist->b");
         try {
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(choose_typeString[0])) {//支出
                 cursor = db.query("expendinfo", null, "User_Name=?"
                         , new String[]{Username}, null, null, null);
@@ -851,7 +852,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     }
     private void Result_budgetlist(String ysmd, String iore) {
         Init_budgetList(iore);
-        try {db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        try {db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             if (iore.equals(choose_typeString[0])) {//支出
                 cursor = db.query("expendbudget", null, "User_Name=? AND DMSY=?"
                         , new String[]{Username, ysmd}, null, null, null);
@@ -900,7 +901,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         } catch (Exception e) {
         } finally {
             cursor.close();
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         }
     }
 

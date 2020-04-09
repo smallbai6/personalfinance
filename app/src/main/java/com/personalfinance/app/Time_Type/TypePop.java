@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.R;
 
 public class TypePop extends PopupWindow implements View.OnClickListener {
@@ -25,14 +26,14 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
     private int position = 0;
     private Activity context;
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
 
     public TypePop(final Activity context, View parent, int typecategory, String typeposition) {
         super(context);
         this.context = context;
         //  Log.d("liang","数据库");
         try {
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             //cursor = db.query("expendtype", null, null, null, null, null, null);
             if (typecategory == 0) {
                 cursor = db.query("expendtype", null, null, null, null, null, null);

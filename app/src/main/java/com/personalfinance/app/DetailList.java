@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Sqlite.DetailSurplus;
 import com.personalfinance.app.Sqlite.Info;
 import com.personalfinance.app.Sqlite.Node;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class DetailList {
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private String Username;
     private long start_time;
@@ -45,7 +46,7 @@ public class DetailList {
         InfoList.clear();
         //支出收入信息
         try {
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         for (int i = 0; i < 2; i++) {
 
             if (i == 0) {

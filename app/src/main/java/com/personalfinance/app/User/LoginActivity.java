@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.personalfinance.app.CS_Data.Data_ZIP;
 import com.personalfinance.app.Config.AppNetConfig;
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.MainActivity;
 import com.personalfinance.app.R;
 import com.personalfinance.app.Util.HttpUtil;
@@ -41,17 +43,19 @@ import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+   // final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Intent intent;
     private Cursor cursor;
 
     private TextView back, register;
+    private Drawable drawable;
     private EditText login_username, login_password;
     private RelativeLayout login_sure;
 
     private Dialog mDialog;
     private String NetWork_Code;
 
+    private boolean flag=true;
     private final static int Login_success = 1;
     private final static int Login_haveerror = 2;
     private final static int Login_fail = 3;
@@ -89,6 +93,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.login);
         //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.login_back);
+        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+        drawable.setBounds(0, 0, 50, 50);
+        back.setCompoundDrawables(drawable, null, null, null);
+        back.setCompoundDrawablePadding(10);
         register = (TextView) findViewById(R.id.login_toregister);
         login_username = (EditText) findViewById(R.id.login_username);
         login_password = (EditText) findViewById(R.id.login_password);
@@ -128,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         new Thread(new Runnable() {
             @Override
             public void run() {
-                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 cursor = db.query("userinfo", null, "User_Name=?",
                         new String[]{login_username.getText().toString()}, null, null, null);
                 JSONArray jsonArray = new JSONArray();
@@ -156,6 +164,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 cursor.close();
                 db.close();
+                Log.d("TAG1","jsonArray打包数据显示：  "+jsonArray);
                 Message message = new Message();
                 message.what = NetWork;
                 message.obj = jsonArray;
@@ -166,6 +175,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void Network_Login(JSONArray jsonArray) {
         //进行登录请求
+        Log.d("TAG1","Network_Login中jsonArray打包数据显示：  "+jsonArray);
         MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(jsonArray.toString(), mediaType);
         String address = AppNetConfig.Login;
@@ -175,6 +185,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 e.printStackTrace();
                 Log.d("TAG1", "登录失败,请重试连接网络");
                 NetWork_Code = "500";
+                flag=false;
             }
 
             @Override
@@ -198,8 +209,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         if (resultCode.equals("200")) {//成功
                             //判断状态码
                             int status = jsonObject.getInt("status");
-                            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                             if (status == 1) {//返回数据包
+                                Log.d("TAG1","返回数据包显示数据：  "+jsonArray.getJSONArray(1));
                                 Data_ZIP.Login_GetData(db, login_username.getText().toString(), jsonArray.getJSONArray(1));
                             } else if (status == 2) {//返回时时间戳  userinfo中时间更改
                                 ContentValues values = new ContentValues();
@@ -215,8 +227,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                         }*/
                         NetWork_Code = resultCode;
+                        flag=false;
                     } catch (JSONException e) {
-                        Log.d("liangjialing", "解析出错  ");
+                        //Log.d("liangjialing", "解析出错  ");
                         e.printStackTrace();
                     }
                 }
@@ -232,11 +245,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void run() {
                 //开启等待界面
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+               while(flag){}//等待界面开始时间
+                flag=true;
                 if (NetWork_Code.equals("200")) {
                     handler.sendEmptyMessage(Login_success);
                 } else if (NetWork_Code.equals("201")) {

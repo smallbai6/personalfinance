@@ -25,11 +25,11 @@
         <TextView
             android:id="@+id/tally_editor_choose"
             android:layout_width="wrap_content"
-            android:layout_height="53dp"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:gravity="center"
             android:text="支付"
             android:textColor="@color/colorblack"
             android:textSize="20sp" />
@@ -39,10 +39,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:text="保存"
             android:textColor="@color/coloryellow"
-            android:layout_centerVertical="true"
             android:textSize="20sp" />
 
     </RelativeLayout>
@@ -52,61 +52,52 @@
         android:layout_height="3dp"
         android:background="@color/colorblack" />
 
-    <LinearLayout
-        android:id="@+id/son_tallyeditor"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="620dp">
 
-        <ScrollView
+        <include layout="@layout/tally_content" />
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="620dp">
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/tallycontent_editor_save"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/mainjizhang"
+                android:text="保存"
+                android:textColor="@color/colorwhite"
+                android:textSize="25sp" />
 
-                <include layout="@layout/tally_content" />
-            </LinearLayout>
-        </ScrollView>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/tallycontent_editor_delete"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:orientation="horizontal">
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/mainjizhang"
+                android:text="删除"
+                android:textColor="@color/colorwhite"
+                android:textSize="25sp" />
+        </LinearLayout>
 
-                <Button
-                    android:id="@+id/tallycontent_editor_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60dp"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@color/coloryellow"
-                    android:text="保存"
-                    android:textColor="@color/colorwhite"
-                    android:textSize="20sp" />
-
-                <Button
-                    android:id="@+id/tallycontent_editor_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60dp"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@color/coloryellow"
-                    android:text="删除"
-                    android:textColor="@color/colorwhite"
-                    android:textSize="20sp" />
-            </LinearLayout>
-
-        </RelativeLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

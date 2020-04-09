@@ -1,6 +1,7 @@
 package com.personalfinance.app.User;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -10,6 +11,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -18,13 +21,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +45,7 @@ import androidx.core.content.FileProvider;
 
 import com.personalfinance.app.CS_Data.Data_ZIP;
 import com.personalfinance.app.Config.AppNetConfig;
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.MainActivity;
 import com.personalfinance.app.R;
 import com.personalfinance.app.Util.HttpUtil;
@@ -52,6 +61,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.zip.Inflater;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -59,36 +69,39 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class UserCenter extends AppCompatActivity  implements View.OnClickListener{
+public class UserCenter extends AppCompatActivity implements View.OnClickListener {
 
     SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private String Username;
     private Drawable Userheadportrait;
     private Intent intent;
-    private Cursor cursor;
+    private Drawable drawable;
 
+    private LinearLayout userCenter_linearLayout;
     private TextView userCenter_back, close_account, userCenter_name;
     private RelativeLayout logout, userCenter_headportraitR;
     private ImageView userCenter_headportrait;
 
 
-    private Dialog Camera_Ablumdialog;
+
+    private PopupWindow popupWindow;
     private Button[] Camera_Ablumbutton = new Button[3];
     private Uri imageUri, cropImageUri;
-    private Thread database;
 
     private final static int TAKE_PHOTO = 6;
     private final static int CHOOSE_PHOTO = 7;
-    private final static int CROP_RESULT_CODE =8;
+    private final static int CROP_RESULT_CODE = 8;
 
     private Dialog LoadingDialog;
     private String NetWork_Code;
+    private boolean flag=true;
+
     private final static int Close_success = 1;
     private final static int Close_fail = 2;
     private final static int Close_havent = 3;
     private final static int Logout_Datasync = 4;
-    private final static int Exit_Activity =5;
+    private final static int Exit_Activity = 5;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -96,6 +109,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
             switch (msg.what) {
                 case Close_success:
                     loadDialogUtils.closeDialog(LoadingDialog);
+                    db.close();
                     Toast.makeText(UserCenter.this, "注销成功", Toast.LENGTH_SHORT).show();
                     intent = new Intent(UserCenter.this, MainActivity.class);
                     startActivity(intent);
@@ -111,11 +125,12 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                     break;
                 case Logout_Datasync://数据进行同步
                     JSONArray jsonArray = (JSONArray) msg.obj;
-                   // Log.d("TAG1", "handler进行数据同步");
+                    Log.d("TAG1", "handler进行数据同步:  "+jsonArray.toString());
                     Data_sync(jsonArray);
                     break;
                 case Exit_Activity://退出该活动
-                   // Log.d("TAG1", "本地更改登录状态完毕");
+                    // Log.d("TAG1", "本地更改登录状态完毕");
+                    db.close();
                     intent = new Intent(UserCenter.this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -123,37 +138,41 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
             }
         }
     };
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.usercenter);
-      // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), intent.getByteArrayExtra("Headportrait"));
 
-        userCenter_back=(TextView)findViewById(R.id.userCenter_back);
+        userCenter_linearLayout = (LinearLayout) findViewById(R.id.userCenter_LinearLayout);//整体布局的id
+        userCenter_back = (TextView) findViewById(R.id.userCenter_back);
+        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+        drawable.setBounds(0, 0, 50, 50);
+        userCenter_back.setCompoundDrawables(drawable, null, null, null);
+        userCenter_back.setCompoundDrawablePadding(10);
+
         userCenter_name = (TextView) findViewById(R.id.usercenter_username);
         userCenter_headportrait = (ImageView) findViewById(R.id.userCenter_headportrait);
         userCenter_headportraitR = (RelativeLayout) findViewById(R.id.userCenter_headportraitR);
         logout = (RelativeLayout) findViewById(R.id.logout);
         close_account = (TextView) findViewById(R.id.close_account);
-
         userCenter_name.setText(Username);
         userCenter_headportrait.setImageDrawable(Userheadportrait);
         userCenter_back.setOnClickListener(this);
         userCenter_headportraitR.setOnClickListener(this);
         logout.setOnClickListener(this);
         close_account.setOnClickListener(this);
+
+
+        InitPop();
     }
-    public void onClick(View v){
-        Log.d("TAGa","判断");
-        if(database!=null){
-            Log.d("TAGa","判断为空");
-        }else{
-            Log.d("TAGa","判断不为空");
-        }
-        //while(database.isAlive()){}
-        switch (v.getId()){
+
+    public void onClick(View v) {
+
+        switch (v.getId()) {
             case R.id.userCenter_back://返回主页面
                 intent = new Intent(UserCenter.this, MainActivity.class);
                 startActivity(intent);
@@ -185,8 +204,10 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                 break;
             case R.id.userCenter_headportraitR://进行用户头像更改
                 //用户头像更改，如果联网则进行同步，反之等备份时同步
-                InitDialog();
-                Camera_Ablumdialog.show();
+                //InitPop();
+                popupWindow.showAtLocation(userCenter_linearLayout, Gravity.BOTTOM, 0, 0);
+                //userCenter_linearLayout.setBackgroundColor(Color.GRAY);
+                backgroundAlpha((float)0.4);
                 break;
         }
     }
@@ -196,30 +217,33 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
      */
     private void setLogout() {
         //退出登录
+        //Log.d("TAG1", "进入setLogout");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 ContentValues values = new ContentValues();
                 values.put("User_Login", 0);
                 db.update("userinfo", values, "User_Name=?", new String[]{Username});
-                db.close();
-                // Log.d("TAG1", "本地更改登录状态");
+                // db.close();
+                // Log.d("TAG1", "本地更改登录状态完成");
             }
         }).start();
-
+        //Log.d("TAG1", "本地更改登录状态线程启动");
         new Thread(new Runnable() {//进行同步操作
             @Override
             public void run() {
+
                 Message message = new Message();
                 message.what = Logout_Datasync;
                 try {
-                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     message.obj = Data_ZIP.Data_Sync(db, Username);
-                    db.close();
+                    // db.close();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Log.d("TAG1", "同步线程启动");
                 handler.sendMessage(message);
             }
         }).start();
@@ -234,7 +258,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
         MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(jsonArray.toString(), mediaType);
         String address = AppNetConfig.Data_syncCS;
-
+        // Log.d("TAG1", "进入Data_sync");
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -250,7 +274,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                 String responseText = response.body().string();
                 String resultCode = "500";
                 //byte[] bytesq = null;
-                // Log.d("TAG1", "response     :" + responseText);
+                //Log.d("TAG1", "返回response     :" + responseText);
                 if (!TextUtils.isEmpty(responseText)) {
                     try {
                         //Log.d("TAG1", "resultCode=a     " + resultCode);
@@ -258,20 +282,20 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                         resultCode = jsonObject.getString("resultCode");
                         // Log.d("TAG1", "resultCode=b    " + resultCode);
                         if (resultCode.equals("200")) {//退出时备份成功
-                            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                             ContentValues values = new ContentValues();
                             values.put("Time", jsonObject.getLong("Time"));
                             db.update("userinfo", values, "User_Name=?",
                                     new String[]{Username});
-                            db.close();
+                            // db.close();
                             Log.d("TAG1", "备份成功");
                         }
                     } catch (JSONException e) {
-                        Log.d("TAG1", "出现错误");
+                          Log.d("TAG1", "出现错误");
                         e.printStackTrace();
                     }
                 } else {
-                    Log.d("TAG1", "weikong  " + resultCode);
+                    Log.d("TAG1", "返回responseText为空  " + resultCode);
                 }
                 handler.sendEmptyMessage(Exit_Activity);
             }
@@ -299,6 +323,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                 // Toast.makeText(UserCenter.this, "请连接网络", Toast.LENGTH_SHORT).show();\
                 Log.d("TAG", "注销失败，请连接网络");
                 NetWork_Code = "500";
+                flag=false;
             }
 
             @Override
@@ -313,48 +338,58 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                         resultCode = jsonObject.getString("resultCode");
                         //  Log.d("liangjialing",   resultCode);
                         if (resultCode.equals("200")) {//成功,本地也注销
-                            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                             db.delete("userinfo", "User_Name=?", new String[]{Username});
-                            db.close();
+                            //db.close();
                         }
                         NetWork_Code = resultCode;
+
                     } catch (JSONException e) {
                         Log.d("liangjialing", "解析出错  ");
                         e.printStackTrace();
                     }
-                }
+                }flag=false;
             }
         });
-
-
     }
 
     /**
-     * 设置头像
+     * Popupwindow初始化
      */
-    private void InitDialog() {
-        View view_dialog = LayoutInflater.from(this).inflate(R.layout.camera_albumdialog, null);
-        Camera_Ablumdialog.setContentView(view_dialog);
-        Window dialogWindow = Camera_Ablumdialog.getWindow();
-        dialogWindow.setGravity(Gravity.BOTTOM);
-        Camera_Ablumbutton[0] = (Button) view_dialog.findViewById(R.id.Camera_button);
-        Camera_Ablumbutton[1] = (Button) view_dialog.findViewById(R.id.Album_button);
-        Camera_Ablumbutton[2] = (Button) view_dialog.findViewById(R.id.Cancel_button);
+    private void InitPop() {
+        View contentView = getLayoutInflater().inflate(R.layout.camera_albumdialog, null);
+        popupWindow = new PopupWindow(contentView,
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setFocusable(true);
+       // popupWindow.showAtLocation(userCenter_linearLayout, Gravity.BOTTOM, 0, 0);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //userCenter_linearLayout.setBackgroundColor(Color.TRANSPARENT);
+                backgroundAlpha((float)1.0);
+            }
+        });
+        Camera_Ablumbutton[0] = (Button) contentView.findViewById(R.id.Camera_button);
+        Camera_Ablumbutton[1] = (Button) contentView.findViewById(R.id.Album_button);
+        Camera_Ablumbutton[2] = (Button) contentView.findViewById(R.id.Cancel_button);
         DialogClick dc = new DialogClick();
-            for (Button button : Camera_Ablumbutton) {
+        for (Button button : Camera_Ablumbutton) {
             button.setOnClickListener(dc);
         }
     }
 
     private class DialogClick implements View.OnClickListener {
         public void onClick(View v) {
-           // while(database.isAlive()){}
             switch (v.getId()) {
                 case R.id.Camera_button:
+                    popupWindow.dismiss();
                     if (ContextCompat.checkSelfPermission(UserCenter.this,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                             || ContextCompat.checkSelfPermission(UserCenter.this,
                             Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        //Log.d("TAGqq", "未开通权限,开通权限去");
                         ActivityCompat.requestPermissions(UserCenter.this,
                                 new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                     } else {
@@ -362,6 +397,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                     }
                     break;
                 case R.id.Album_button:
+                    popupWindow.dismiss();
                     if (ContextCompat.checkSelfPermission(UserCenter.this,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(UserCenter.this,
@@ -372,39 +408,15 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                     }
                     break;
                 case R.id.Cancel_button:
-                    Camera_Ablumdialog.cancel();
+                    popupWindow.dismiss();
                     break;
                 default:
                     break;
             }
         }
     }
-/**
- * 返回拍照或相册选择的图片
- */
- private void setHead_Portrait(Bitmap bitmap){
-     userCenter_headportrait.setImageBitmap(bitmap);
-     final Bitmap bitmap1=bitmap;
-     database=new Thread(new Runnable() {
-         @Override
-         public void run() {
-             db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
-             byte[] bytes=PictureFormatUtil.Bitmap2Bytes(bitmap1);
-             ContentValues values=new ContentValues();
-             values.put("Head_Portrait",bytes);
-             db.update("userinfo",values,"User_Name=?",new String[]{Username});
-             db.close();
-         }
-     });
-     database.start();
- }
-    /**
-     * 权限回调
-     * @param requestCode
-     * @param permission
-     * @param grantResults
-     */
-    @Override
+
+   /**/ @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission,
                                            int[] grantResults) {
         //请求权限时返回请求码的处理
@@ -414,6 +426,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                     openSysCamera();
                 } else {
                     Toast.makeText(this, "未开通权限", Toast.LENGTH_SHORT).show();
+                    //Log.d("TAGqq", "未开通权限");
                 }
                 break;
             case 2:
@@ -428,6 +441,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                 break;
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -437,19 +451,18 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                 if (resultCode == RESULT_OK) {
                     Log.d("TAGqq", "拍照跳转到裁剪");
                     startCropImage(imageUri);
-                }
-                else{
-                    Log.d("TAGqq","result_cancel");
+                } else {
+                    Log.d("TAGqq", "取消返回");
+
                 }
                 break;
             case CHOOSE_PHOTO:
-                if(resultCode==RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     imageUri = data.getData();//得到选择照片的Uri
-                    Log.d("TAGqq", "CHOOSE_PHOTO: " + imageUri);
+                   // Log.d("TAGqq", "CHOOSE_PHOTO: " + imageUri);
                     startCropImage(imageUri);
-                }
-                else{
-                    Log.d("TAGqq","result_cancel");
+                } else {
+                    Log.d("TAGqq", "取消返回");
                 }
                 break;
             case CROP_RESULT_CODE:
@@ -465,13 +478,34 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                }
-                else{
-                    Log.d("TAGqq","result_cancel");
+                } else {
+                    Log.d("TAGqq", "取消裁剪");
                 }
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 返回拍照或相册选择的图片
+     */
+    private void setHead_Portrait(Bitmap bitmap) {
+        userCenter_headportrait.setImageBitmap(bitmap);
+        final Bitmap bitmap1 = bitmap;
+        Thread database = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                byte[] bytes = PictureFormatUtil.Bitmap2Bytes(bitmap1);
+                ContentValues values = new ContentValues();
+                values.put("Head_Portrait", bytes);
+                db.update("userinfo", values, "User_Name=?", new String[]{Username});
+                //db.close();
+            }
+        });
+        database.start();
+        while (database.isAlive()) {
         }
     }
 
@@ -522,9 +556,9 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
         intent.putExtra("crop", "true");// 使图片处于可裁剪状态
         // 裁剪框的比例（根据需要显示的图片比例进行设置）
        /* if (Build.MANUFACTURER.equals("HUAWEI")) {
-            intent.putExtra("aspectX", 9998);
-            intent.putExtra("aspectY", 9999);
-        } else {}*/
+        intent.putExtra("aspectX", 9998);
+        intent.putExtra("aspectY", 9999);
+    } else {}*/
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         intent.putExtra("outputX", 320);        //输出图片大小
@@ -548,6 +582,7 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
         startActivityForResult(intent, CROP_RESULT_CODE);
     }
 
+
     /**
      * 为图片创建名称
      */
@@ -560,9 +595,6 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
         return fileName;
     }
 
-    /**
-     * 加载界面
-     */
     public void LoadingDialog() {
         LoadingDialog = loadDialogUtils.createLoadingDialog(UserCenter.this, "注销中...");
         //开启一个线程进行等待
@@ -570,11 +602,8 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
             @Override
             public void run() {
                 //开启等待界面
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                while(flag){}//等待网络请求的返回信息
+                flag=true;
                 if (NetWork_Code.equals("200")) {
                     handler.sendEmptyMessage(Close_success);
                 } else if (NetWork_Code.equals("201")) {
@@ -584,6 +613,16 @@ public class UserCenter extends AppCompatActivity  implements View.OnClickListen
                 }
             }
         }).start();
+    }
+
+    /**
+     * 遮罩层
+     * @param alpha
+     */
+    private void backgroundAlpha(float alpha) {
+        WindowManager.LayoutParams lp =getWindow().getAttributes();
+        lp.alpha = alpha;
+        getWindow().setAttributes(lp);
     }
 }
 

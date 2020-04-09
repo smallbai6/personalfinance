@@ -31,7 +31,7 @@ import java.util.List;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private String Username;
     private Intent intent;
@@ -97,7 +97,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail);
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        //db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
 
         intent=getIntent();
         Username=intent.getStringExtra("Username");
@@ -354,10 +354,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case 1://添加数据
-                int issave = data.getIntExtra("issave", -1);
-                if (!((resultCode == RESULT_OK) && (issave == 0))) {
+               // int issave = data.getIntExtra("issave", -1);
+               // if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Refresh_List();
-                }
+               // }
                 break;
             case 2://编辑数据
                 if (resultCode == RESULT_OK) {

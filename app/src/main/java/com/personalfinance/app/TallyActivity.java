@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Time_Type.CaculatorPop;
 import com.personalfinance.app.Time_Type.TimePop;
 import com.personalfinance.app.Time_Type.TypePop;
@@ -40,7 +41,7 @@ private Cursor cursor;
      *数据库
      */
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     /*
      *活动跳转
      */
@@ -78,7 +79,7 @@ private Cursor cursor;
     /*
      *背景
      */
-    private View background;
+   // private View background;
     /*
      *金额&时间&类别
      */
@@ -137,7 +138,7 @@ private Cursor cursor;
         process.setText("");
         contentView = getLayoutInflater().inflate(R.layout.textlist, null);
         InitchooseList();
-        background = this.findViewById(R.id.son_tally);
+        //background = this.findViewById(R.id.son_tally);
         PopParent = this.findViewById(R.id.parent_tally);
         choose.setText(income_expend[0]);//初始时是支付
         drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
@@ -169,7 +170,8 @@ private Cursor cursor;
         choosePopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                background.setBackgroundColor(Color.TRANSPARENT);
+                //background.setBackgroundColor(Color.TRANSPARENT);
+                backgroundAlpha((float)1.0);
                 drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
                 drawablel2tubiao();
             }
@@ -215,7 +217,7 @@ private Cursor cursor;
             public void run() {
 
                 try{
-                    db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     if (pos == 0) {
                         cursor = db.query("expendtype", null, null,
                                 null, null, null, null);
@@ -265,7 +267,8 @@ private Cursor cursor;
                     drawablel2tubiao();
                 }
                 //Level = 1;//支付收入
-                background.setBackgroundColor(Color.GRAY);
+                //background.setBackgroundColor(Color.GRAY);
+                backgroundAlpha((float)0.4);
                 break;
             case R.id.tallycontent_money://金额
                 mCaculatorPop = new CaculatorPop(TallyActivity.this, layout_money);
@@ -358,7 +361,7 @@ private Cursor cursor;
             @Override
             public void run() {
                   //  Log.d("TAG", "income_expend");
-                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                     ContentValues values = new ContentValues();
                     values.put("User_Name", Username);
                     values.put("Money", money.getText().toString());
@@ -379,13 +382,13 @@ private Cursor cursor;
        while(t1.isAlive()){}
     }
 
-    /*
-     *背景透明度
+    /**
+     * 遮罩层
+     * @param alpha
      */
-    private void darkenBackground(Float bgcolor) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = bgcolor;
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+    private void backgroundAlpha(float alpha) {
+        WindowManager.LayoutParams lp =getWindow().getAttributes();
+        lp.alpha = alpha;
         getWindow().setAttributes(lp);
     }
     /*

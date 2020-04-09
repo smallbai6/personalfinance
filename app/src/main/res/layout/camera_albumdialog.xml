@@ -7,33 +7,43 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="5dp"
-        />
+        android:layout_height="5dp" />
+
     <Button
         android:id="@+id/Camera_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorwhite"
         android:text="拍照"
+        android:textSize="16dp"
         android:textColor="@color/colorblue" />
 
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorwhitegray"
+        />
     <Button
         android:id="@+id/Album_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorwhite"
         android:text="相册"
+        android:textSize="16dp"
         android:textColor="@color/colorblue" />
-<View
-    android:layout_width="match_parent"
-    android:layout_height="5dp"
-    android:background="@color/colorwhitegray"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@color/colorwhitegray"
+        android:alpha="0.5"/>
+
     <Button
         android:id="@+id/Cancel_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorwhite"
         android:text="取消"
+        android:textSize="16dp"
         android:textColor="@color/colorblue" />
 </LinearLayout>

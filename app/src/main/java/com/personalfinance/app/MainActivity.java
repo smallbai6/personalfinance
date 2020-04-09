@@ -23,6 +23,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Main.MainListAdapter;
 import com.personalfinance.app.Main.MainListClass;
 import com.personalfinance.app.Sqlite.SQLiteDatabaseHelper;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *数据库建立
      */
     private SQLiteDatabaseHelper dbHelper;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private SQLiteDatabase db;
     private Cursor cursor;
     /*
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void Get_User() {
         try {
-            db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             cursor = db.query("userinfo", null, "User_Login=?",
                     new String[]{"1"}, null, null, null);
             if (cursor.moveToFirst()) {
@@ -292,13 +293,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent = new Intent(MainActivity.this, LoginActivity.class);
                     //startActivityForResult(intent, 1);
                     startActivity(intent);
-                    finish();
+
                 } else {//跳转到用户中心
                    intent = new Intent(MainActivity.this, UserCenter.class);
                     intent.putExtra("Username", Username);
                     intent.putExtra("Headportrait", PictureFormatUtil.Drawable2Bytes(Userheadportrait));
                     startActivity(intent);
-                    finish();
+
                 }
                 // finish();
                 break;
@@ -347,12 +348,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Set_YSMD();
                 break;
             case 2://编辑数据
-
-                int issave = data.getIntExtra("issave", -1);
-                Log.d("TAG", "返回到MainActivity issave=" + issave);
-                if (!((resultCode == RESULT_OK) && (issave == 0))) {
+                //记账活动直接点击返回按键data中没有数据；导致issave取不出来。
+                //Log.d("TAGaaa","判断是否可以");
+               // int issave = data.getIntExtra("issave", -1);
+                //Log.d("TAG", "返回到MainActivity issave=" + issave);
+               // if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Set_YSMD();
-                }
+               // }
                 break;
             default:
                 break;

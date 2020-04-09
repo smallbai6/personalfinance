@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Time_Type.CaculatorPop;
 import com.personalfinance.app.Time_Type.TimePop;
 import com.personalfinance.app.Time_Type.TypePop;
@@ -27,7 +28,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      *数据库
      */
     private SQLiteDatabase db;
-    final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private String Username;
     private Intent intent;
     private String huodong;
@@ -198,7 +199,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 if (choose.getText().toString().equals(income_expend[0])) {//支付
                     db.delete("expendinfo", "User_Name=? AND Money=? " +
                                     "AND Type=? AND Time=? AND Message=?",
@@ -237,7 +238,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         new Thread(new Runnable() {
             @Override
             public void run() {
-                db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                 ContentValues values = new ContentValues();
                 values.put("User_Name", Username);
                 values.put("Money", money.getText().toString());
