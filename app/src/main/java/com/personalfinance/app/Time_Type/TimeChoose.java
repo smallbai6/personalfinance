@@ -33,7 +33,7 @@ public class TimeChoose extends FrameLayout {
 
     public TimeChoose(Context context,String selectTime,int status) {
         super(context);
-        Log.d("showtime", "进入TimeChoose");
+        //Log.d("showtime", "进入TimeChoose");
         //Log.d("jinxing","进入TimeChoose");
         //Log.d("liang", "进入TimeChoose");
         select_mYear = Integer.valueOf(selectTime.substring(0, 4));
@@ -119,8 +119,7 @@ public class TimeChoose extends FrameLayout {
             mHourSpinner.setVisibility(GONE);
             mMinuteSpinner.setVisibility(GONE);
        }
-
- Log.d("showtime",mYearSpinner.getValue()+"   "+mMonthSpinner.getValue());
+      //  Log.d("showtime",mYearSpinner.getValue()+"   "+mMonthSpinner.getValue());
     }
 
     private OnValueChangeListener mOnYearChangedListener = new OnValueChangeListener() {

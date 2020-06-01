@@ -22,6 +22,7 @@ public class Data_ZIP {
         if (cursor.moveToFirst()) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("User_Name", Username);
+            jsonObject.put("User_Number",cursor.getString(cursor.getColumnIndex("User_Number")));
             byte[] bytes = cursor.getBlob(cursor.getColumnIndex("Head_Portrait"));
             jsonObject.put("Head_Portrait", Base64.encodeToString(bytes, Base64.NO_WRAP));
             jsonObject.put("Time",cursor.getLong(cursor.getColumnIndex("Time")));
@@ -46,11 +47,11 @@ public class Data_ZIP {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("DataSync_status",DataSync_status);
             jsonObject.put("User_Name", Username);
+            jsonObject.put("User_Number",cursor.getString(cursor.getColumnIndex("User_Number")));
             jsonObject.put("User_Password",Password);
             byte[] bytes = cursor.getBlob(cursor.getColumnIndex("Head_Portrait"));
             jsonObject.put("Head_Portrait", Base64.encodeToString(bytes, Base64.NO_WRAP));
             jsonObject.put("Time",cursor.getLong(cursor.getColumnIndex("Time")));
-            //    jsonArray.put(jsonObject);
             userinfo.put(jsonObject);
         }
         jsonArray.put(userinfo);
@@ -149,6 +150,7 @@ public class Data_ZIP {
         ContentValues values=new ContentValues();
 
         values.put("User_Name", jsonObject.getString("User_Name"));
+        values.put("User_Number",jsonObject.getString("User_Number"));
         //图片解码
         values.put("Head_Portrait", Base64.decode(jsonObject.getString("Head_Portrait"),Base64.NO_WRAP));
         values.put("Time", jsonObject.getLong("Time"));

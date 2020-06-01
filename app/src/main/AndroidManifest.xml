@@ -31,6 +31,16 @@
         <activity android:name=".DetailEditorActivity"></activity>
         <activity android:name=".StatisticalActivity"></activity>
         <activity android:name=".StatisticalEditorActivity"></activity>
+
+
+        <activity android:name=".Finance.FinanceProductActivty"></activity>
+        <activity android:name=".Finance.FinanceHoldActivity"></activity>
+        <activity android:name=".Finance.FinanceRecordActivity"></activity>
+        <activity android:name=".Finance.Product_DetailActivity"></activity>
+        <activity android:name=".Finance.HoldProduct_DetailActivity"></activity>
+        <activity android:name=".Finance.Record_DetailActivity"></activity>
+        <activity android:name=".Finance.BuyActivity"></activity>
+        <activity android:name=".Finance.SaleActivity"></activity>
         <activity android:name=".MainActivity"
             android:launchMode="singleTask">
             <intent-filter>

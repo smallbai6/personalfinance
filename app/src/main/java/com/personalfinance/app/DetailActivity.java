@@ -1,5 +1,6 @@
 package com.personalfinance.app;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,8 +20,10 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Detail.DetailAdapter;
 import com.personalfinance.app.Detail.OnInnerItemClickListener;
 import com.personalfinance.app.Detail.OnInnerItemLongClickListener;
@@ -38,6 +42,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     /*
     按键
      */
+    private ImageView backimage;
     private TextView backbutton, chooseysmd;
     private ImageView addtally;
     /*
@@ -108,9 +113,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         listView = (MyListView) findViewById(R.id.detail_listview);//流水列表
         backbutton = (TextView) findViewById(R.id.detail_back_button);
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 40, 40);
-        backbutton.setCompoundDrawables(drawable, null, null, null);
+        backimage=(ImageView)findViewById(R.id.detail_back_backimageview);
+       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+       // drawable.setBounds(0, 0, 40, 40);
+       // backbutton.setCompoundDrawables(drawable, null, null, null);
         //backbutton.setText(DetailList.LongToString(start_time).substring(0,5));
         BackbuttonText();
         chooseysmd = (TextView) findViewById(R.id.detail_choose_rmd);//选择季月
@@ -176,6 +182,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
         backbutton.setOnClickListener(this);
+        backimage.setOnClickListener(this);
         chooseysmd.setOnClickListener(this);
         chooseln.setOnClickListener(this);
         addtally.setOnClickListener(this);
@@ -249,6 +256,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.detail_back_backimageview:
             case R.id.detail_back_button://返回主活动
                 intent = new Intent(DetailActivity.this, MainActivity.class);
                 //startActivity(intent);
@@ -258,7 +266,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.detail_year_shengluetubiao://点击上一年下一年的省略图标
                 choosetype = 0;
                 Init2ysmdchooselist(choosetype);
-                choosePopupWindow.setWidth(200);
+                choosePopupWindow.setWidth(300);
                 choosePopupWindow.showAsDropDown(chooseln);
                 break;
             case R.id.detail_choose_rmd://选择季月日
@@ -306,16 +314,62 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         adapter.setOnInnerItemLongClickListener(new OnInnerItemLongClickListener() {
             @Override
             public void onClick(Node node, int position) {
+
                 NodeData nodeData = (NodeData) node.getData();
+                delete_showDialog(nodeData,position);
                 //  Toast.makeText(DetailActivity.this, "长点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
-                intent = new Intent(DetailActivity.this, DetailEditorActivity.class);
-                intent.putExtra("Username", Username);
-                intent.putExtra("start_time",start_time);
-                intent.putExtra("end_time",end_time);
+               // intent = new Intent(DetailActivity.this, DetailEditorActivity.class);
+              //  intent.putExtra("Username", Username);
+              //  intent.putExtra("start_time",start_time);
+              //  intent.putExtra("end_time",end_time);
                 //intent.putExtra("year", showyear);
-                startActivityForResult(intent, 3);
+               // startActivityForResult(intent, 3);
             }
         });
+    }
+    private void delete_showDialog(final NodeData nodeData,  final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //builder.setIcon(R.drawable.picture);
+        builder.setTitle("温馨提示");
+        builder.setMessage("你确定要将各个类型的预算汇总为总预算么？");
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                delete_data(nodeData,position);
+             }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void delete_data(NodeData nodeData,int position){
+        String type = nodeData.getC();
+        Log.d("liangjialing",type);
+        String money=nodeData.getE();
+        Log.d("liangjialing",money);
+        String time = String.valueOf(nodeData.getTime());
+        Log.d("liangjialing",time);
+        db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        if (type.substring(0, 1).equals("0")) {
+            //支出
+            db.delete("expendinfo", "User_Name=? AND Money=? " +
+                            "AND Type=? AND Time=?",
+                    new String[]{Username, money, type.substring(1), time});
+        } else if (type.substring(0, 1).equals("1")) {
+            db.delete("incomeinfo", "User_Name=? AND Money=? " +
+                            "AND Type=? AND Time=? ",
+                    new String[]{Username, money, type.substring(1), time});
+        }
+        db.close();
+        Log.d("liangjialing","进入refresh_List");
+        Refresh_List();
     }
     private void Total_show(){
 
@@ -365,9 +419,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 break;
             case 3://批量编辑
-             //   Log.d("TAG","返回到DetailActivity");
-                int isdelete = data.getIntExtra("isdelete", 0);
 
+                int isdelete = data.getIntExtra("isdelete", 0);
+                Log.d("TAGliang",isdelete+"");
                 if (resultCode == RESULT_OK) {//返回了
                     if (isdelete != 0) {
                       //  Log.d("TAG","Refresh_List列表重建");

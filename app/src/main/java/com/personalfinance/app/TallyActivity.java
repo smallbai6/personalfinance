@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -50,6 +51,7 @@ private Cursor cursor;
     /*
      *顶部按钮  底部保存按钮 判断数据是否有保存（点击过再记一笔和保存）
      */
+    private ImageView backimage;
     private TextView back,save,choose;
     private Drawable drawable;
     private Button buttonback, buttonagain;
@@ -118,9 +120,10 @@ private Cursor cursor;
         Username=intent.getStringExtra("Username");
 
         back = (TextView) findViewById(R.id.tally_back);
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 40, 40);
-        back.setCompoundDrawables(drawable, null, null, null);
+        backimage=(ImageView)findViewById(R.id.tally_backimageview);
+        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+       // drawable.setBounds(0, 0, 40, 40);
+       // back.setCompoundDrawables(drawable, null, null, null);
         choose = (TextView) findViewById(R.id.tally_choose);
         save = (TextView) findViewById(R.id.tally_save);
         money = (TextView) findViewById(R.id.tallycontent_money);
@@ -156,6 +159,7 @@ private Cursor cursor;
         layout_time.setOnClickListener(this);//时间
         save.setOnClickListener(this);//保存
         back.setOnClickListener(this);//返回主界面
+        backimage.setOnClickListener(this);
         buttonback.setOnClickListener(this);//下面的保存按钮
         buttonagain.setOnClickListener(this);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -330,6 +334,7 @@ private Cursor cursor;
                 //清空金额
                 money.setText("0.00");
                 break;
+            case R.id.tally_backimageview:
             case R.id.tally_back:
                 //直接退出记账活动
                 if(huodong.equals("MainActivity.java")){

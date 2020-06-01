@@ -104,5 +104,5 @@
         android:layout_height="5dp" />
 
 
-    <include layout="@layout/time_widget"/>
+    <include layout="@layout/time_widget" />
 </LinearLayout>

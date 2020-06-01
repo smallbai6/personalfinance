@@ -11,10 +11,16 @@
         android:background="@color/colorwhite"
         android:layout_height="40dp">
 
-
+        <ImageView
+            android:id="@+id/piechart_backimageview"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:srcCompat="@mipmap/zuojiantou"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/piechart_back"
+            android:layout_toRightOf="@+id/piechart_backimageview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

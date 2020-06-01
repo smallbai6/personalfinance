@@ -9,9 +9,15 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="45dp">
-
+        <ImageView
+            android:id="@+id/usercenter_backimageview"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:srcCompat="@mipmap/zuojiantou"
+            android:layout_centerVertical="true"/>
         <TextView
             android:id="@+id/userCenter_back"
+            android:layout_toRightOf="@+id/usercenter_backimageview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

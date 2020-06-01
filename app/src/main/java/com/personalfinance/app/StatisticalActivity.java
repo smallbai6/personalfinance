@@ -40,7 +40,7 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.personalfinance.app.Config.DatabaseConfig;
-import com.personalfinance.app.Statistical.TimeZDYPop;
+import com.personalfinance.app.Time_Type.TimeZDYPop;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +62,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
     /*
     上边的按键
      */
+    private ImageView backimage;
     private TextView backbutton, choosebutton;
     private String[] chooseString = {"支出", "收入"};
     /*
@@ -121,11 +122,13 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         SetChoosePopupWindow();//进行弹窗中数据的适配监听
         Set_Legend();//进行饼图标签控件的设置
         backbutton = (TextView) findViewById(R.id.piechart_back);//退出活动
-       drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 40, 40);
-        backbutton.setCompoundDrawables(drawable, null, null, null);
-        backbutton.setCompoundDrawablePadding(10);
+        backimage=(ImageView)findViewById(R.id.piechart_backimageview);
+       //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+       // drawable.setBounds(0, 0, 40, 40);
+       // backbutton.setCompoundDrawables(drawable, null, null, null);
+       // backbutton.setCompoundDrawablePadding(10);
         backbutton.setOnClickListener(this);
+        backimage.setOnClickListener(this);
         choosebutton = (TextView) findViewById(R.id.piechart_choose);//支出收入按键
         drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
         drawabletotubiao(choosebutton);
@@ -310,6 +313,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         StartEndTime startEndTime;
         long[] SE_time;
         switch (v.getId()) {
+            case R.id.piechart_backimageview:
             case R.id.piechart_back://返回到主界面
                 intent = new Intent(StatisticalActivity.this, MainActivity.class);
                 setResult(RESULT_OK,intent);

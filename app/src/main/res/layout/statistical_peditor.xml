@@ -2,19 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:background="@color/colorwhite"
-        android:layout_height="40dp">
-
+        android:layout_height="45dp">
+        <ImageView
+            android:id="@+id/statistical_pediotr_backimageview"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:srcCompat="@mipmap/zuojiantou"
+            android:layout_centerVertical="true"/>
         <TextView
             android:id="@+id/statistical_pediotr_back"
+            android:layout_toRightOf="@+id/statistical_pediotr_backimageview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="早午晚餐(支出)"
-            android:textSize="18dp"
+            android:textSize="20dp"
             android:layout_centerVertical="true"
             android:textColor="@color/colorblack"
             />

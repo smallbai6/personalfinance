@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,10 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailEditorActivity extends AppCompatActivity implements View.OnClickListener {
+    private final static int Detail_list = 1;
+    private final static int Delete = 2;
     private SQLiteDatabase db;
     //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private String Username;
-    private long start_time,end_time;
+    private long start_time, end_time;
     private Intent intent;
     /*
     列表
@@ -47,9 +50,6 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     private ImageView backIV;
     private Button allchoosebutton, allnochoosebutton, deletebutton;
     private int isdelete = 0;
-
-    private final static int Detail_list = 1;
-    private final static int Delete = 2;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -59,7 +59,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                     mAdapter = new DetailBulkAdapter(listView, DetailEditorActivity.this, list,
                             1, R.mipmap.shangjiantou, R.mipmap.xiajiantou);
                     listView.setAdapter(mAdapter);
-                    Log.d("TAG","handler");
+                    Log.d("TAG", "handler");
                     //选中状态监听
                     mAdapter.setCheckedChangeListener(new OnTreeNodeCheckedChangeListener() {
                         @Override
@@ -82,19 +82,20 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_bulkeditor);
-       // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
-        start_time=intent.getLongExtra("start_time",0);
-        end_time=intent.getLongExtra("end_time",0);
+        start_time = intent.getLongExtra("start_time", 0);
+        end_time = intent.getLongExtra("end_time", 0);
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
-        Log.d("TAG","onCreate");
+        Log.d("TAG", "onCreate");
         Detail_list();
-        Log.d("TAG","onCreate->Detail_list->over");
+        Log.d("TAG", "onCreate->Detail_list->over");
         allchoose = (TextView) findViewById(R.id.detail_bulkeditor_allchoose);
         allchoose.setOnClickListener(this);
         showchoosetotal = (TextView) findViewById(R.id.detail_bulkeditor_showchoosetotal);
@@ -141,7 +142,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.detail_bulkeditor_back:
-                Log.d("TAG","点击返回");
+                Log.d("TAG", "点击返回");
                 intent = new Intent(DetailEditorActivity.this, DetailActivity.class);
                 intent.putExtra("isdelete", isdelete);
                 setResult(RESULT_OK, intent);
@@ -166,17 +167,31 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.detail_bulkeditor_deletebutton://删除
                 isdelete++;
-                Log.d("TAG","isdelete="+isdelete);
+                Log.d("TAG", "isdelete=" + isdelete);
                 delete();
                 break;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Log.d("TAG", "点击返回");
+            intent = new Intent(DetailEditorActivity.this, DetailActivity.class);
+            intent.putExtra("isdelete", isdelete);
+            setResult(RESULT_OK, intent);
+            finish();
+            return false;
+        }
+        return false;
+
     }
 
     private void delete() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("TAG","delete->run");
+                Log.d("TAG", "delete->run");
                 List<Node> selectedNode = mAdapter.getSelectedNode();
                 for (Node node : selectedNode) {
                     NodeData nodeData = (NodeData) node.getData();
@@ -206,7 +221,6 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 showtotalmoney.setText("");*/
             }
         }).start();
-
 
 
     }
@@ -242,7 +256,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void run() {
                 list.clear();
-                Log.d("TAG","Detail_list->a");
+                Log.d("TAG", "Detail_list->a");
                 DetailList detailList = new DetailList(Username, start_time, end_time);
                 InfoList = detailList.DetailInfo();
                 Detailday_day();
@@ -250,7 +264,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 int i = 0;//为指针在list中的位置
                 int leveldivide01;//等级划分关联
                 NodeData nodeData;
-                Log.d("TAG","Detail_list->b");
+                Log.d("TAG", "Detail_list->b");
                 for (a = 0; a < day_dayList.size(); a++) {
                     nodeData = new NodeData(day_dayList.get(a), "", "", "", "", "", 0);
                     list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
@@ -270,7 +284,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                         }
                     }
                 }
-                Log.d("TAG","Detail_list->c");
+                Log.d("TAG", "Detail_list->c");
                 handler.sendEmptyMessage(Detail_list);
             }
         }).start();

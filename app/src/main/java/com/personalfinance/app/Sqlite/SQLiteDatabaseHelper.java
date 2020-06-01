@@ -16,7 +16,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String create_userinfo = "CREATE TABLE userinfo ("
             + " User_Name varchar(45)  NOT NULL,"
-           // + " User_Password varchar(45) DEFAULT NULL,"
+            + " User_Number varchar(45) DEFAULT NULL,"
             + "Head_Portrait blob DEFAULT NULL,"
             + " Time interger DEFAULT NULL,"
             + " User_Login int DEFAULT NULL,"
@@ -37,7 +37,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + "Time interger NOT NULL,"
             + "Message text ,"
             + "CONSTRAINT incomeinfo_ibfk_1 FOREIGN KEY (User_Name) REFERENCES userinfo (User_Name) ON DELETE CASCADE ON UPDATE CASCADE,"
-             + "CONSTRAINT incomeinfo_ibfk_2 FOREIGN KEY (Type) REFERENCES incometype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
+            + "CONSTRAINT incomeinfo_ibfk_2 FOREIGN KEY (Type) REFERENCES incometype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";
     public static final String create_expendinfo = "CREATE TABLE expendinfo("
             + " User_Name varchar(45)  NOT NULL,"
@@ -69,6 +69,43 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             + " CONSTRAINT expendbudget_ibfk_2 FOREIGN KEY (Type) REFERENCES expendtype (Type_Name) ON DELETE CASCADE ON UPDATE CASCADE"
             + ")";
 
+    public static final String create_financeproduct = "CREATE TABLE financeproduct ("
+            + " Product_Number varchar(45)  NOT NULL,"
+            + " Product_Name varchar(45)  NOT NULL,"
+            + " Company varchar(45)  NOT NULL,"
+            + " Yield varchar(45)  NOT NULL,"
+            + " Each_Amount varchar(45)  NOT NULL,"
+            + " Purchase_Amount varchar(45)  DEFAULT NULL,"
+            + " Introduct varchar(45)  NOT NULL,"
+            + " Picture blob  NOT NULL,"
+            + " PRIMARY KEY (Product_Number))";
+
+
+    public static final String create_holdproduct="CREATE TABLE holdproduct ("
+            + " User_Number varchar(45)  NOT NULL,"
+            + " Product_Number varchar(45) NOT NULL,"
+            + " Money varchar(45)  NOT NULL,"
+            + " Yesterday_income varchar(45) NOT NULL,"
+            + " Sum_income varchar(45) NOT NULL,"
+            + " Hold_Quotient varchar(45) NOT NULL,"
+            + " Each_Amount varchar(45) NOT NULL"
+            + ")";
+
+    public static final String create_recordproduct="CREATE TABLE recordproduct("
+            + " User_Number varchar(45) NOT NULL,"
+            + " Product_Number varchar(45) NOT NULL,"
+            + " Order_Number varchar(45)  NOT NULL,"
+            + " Buy_Sale varchar(45) NOT NULL,"
+            + " BMoney_SQuotient varchar(45)NOT NULL,"
+            + " Sure_Status varchar(45)  NOT NULL,"
+            + " BQuotient_SMoney varchar(45)  NOT NULL,"
+            + " Time interger NOT NULL,"
+            + " Sure_Time interger DEFAULT NULL,"
+            + " PRIMARY KEY (Order_Number)"
+            + ")";
+
+
+
     private Context mContext;
 
     public SQLiteDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -84,13 +121,18 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(create_expendinfo);
         db.execSQL(create_incomebudget);
         db.execSQL(create_expendbudget);
+
+
+        db.execSQL(create_financeproduct);
+        db.execSQL(create_holdproduct);
+        db.execSQL(create_recordproduct);
         InitDataBase(db, mContext);
     }
 
     private void InitDataBase(SQLiteDatabase db, Context context) {
-        String[] incometype = {"职业收入","礼金收入","经营所得", "其他收入","总预算"};
+        String[] incometype = {"职业收入", "礼金收入", "经营所得", "其他收入", "总预算"};
         String[] expendtype = {"食品酒水", "居家物业", "衣服饰品", "行车交通", "交流通讯"
-                , "休闲娱乐", "学习进修", "人情往来", "医疗保健", "金融保险", "其他支出","总预算"};
+                , "休闲娱乐", "学习进修", "人情往来", "医疗保健", "金融保险", "其他支出", "总预算"};
         ContentValues values = new ContentValues();
         for (int i = 0; i < incometype.length; i++) {
             values.put("Type_Name", incometype[i]);
@@ -102,23 +144,20 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             db.insert("expendtype", null, values);
             values.clear();
         }
-       //插入用户信息
-        InsertUserInfo(db, context, "请立即登录", "", 0, R.mipmap.defaultheadportrait);
+        //插入用户信息
+        InsertUserInfo(db, context, "请立即登录", R.mipmap.defaultheadportrait);
     }
 
     //将转换后的图片存入到数据库中
-    private void InsertUserInfo(SQLiteDatabase db, Context context, String Username, String Password,
-                                int loginstatus, int drawablepicture) {
+    private void InsertUserInfo(SQLiteDatabase db, Context context, String Username,
+                                int drawablepicture) {
         ContentValues values = new ContentValues();
         values.put("User_Name", Username);
-        //values.put("User_Password", Password);
-        values.put("User_Login", loginstatus);
-        Drawable drawable = ContextCompat.getDrawable(context,drawablepicture);//context.getResources().getDrawable(drawablepicture);
+        // values.put("User_Login", loginstatus);
+        Drawable drawable = ContextCompat.getDrawable(context, drawablepicture);//context.getResources().getDrawable(drawablepicture);
         values.put("Head_Portrait", PictureFormatUtil.Drawable2Bytes(drawable));
         db.insert("userinfo", null, values);
     }
-
-
 
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -129,7 +168,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("drop table if exists expendinfo");
         db.execSQL("drop table if exists incomebudget");
         db.execSQL("drop table if exists expendbudget");
+
+
+
+
+
+        db.execSQL("drop table if exists financeproduct");
+        db.execSQL("drop table if exists holdproduct");
+        db.execSQL("drop table if exists recordproduct");
         onCreate(db);
-        Log.d("SQLiteDatabasemy", "b");
+       // Log.d("SQLiteDatabasemy", "b");
     }
 }

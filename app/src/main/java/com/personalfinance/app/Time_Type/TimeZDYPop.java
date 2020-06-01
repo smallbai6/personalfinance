@@ -1,8 +1,9 @@
-package com.personalfinance.app.Statistical;
+package com.personalfinance.app.Time_Type;
 
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import java.util.Date;
 
 
 public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
+    private View Parent;
     private int select_mYear, select_mMonth, select_mDay, select_mHour, select_mMinute;
     private String Time;//时间选择器上显示内容
     private Calendar mDate = Calendar.getInstance();
@@ -37,6 +39,7 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
     public TimeZDYPop(final Activity context, View parent, long inputstart, long inputend) {
         super(context);
         this.context = context;
+        Parent=parent;
         //2020.01.15-2020.12.25
         //一开始就点击的是开始时间
         ClickStart(LongToString(inputstart));
@@ -44,19 +47,21 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
         endlong=inputend;
         mTimeChoose = new TimeChoose(context, Time, 1);
         time_sure = (TextView) mTimeChoose.findViewById(R.id.time_sure);
+        time_sure.setOnClickListener(this);
         time_cancel = (TextView)mTimeChoose.findViewById(R.id.time_cancel);
+        time_cancel.setOnClickListener(this);
         startlayout = (LinearLayout) mTimeChoose.findViewById(R.id.statistical_zidingyi_start);
+        startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
+        startlayout.setOnClickListener(this);
         endlayout = (LinearLayout) mTimeChoose.findViewById(R.id.statistical_zidingyi_end);
+        endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
+        endlayout.setOnClickListener(this);
         starttext = (TextView) mTimeChoose.findViewById(R.id.statistical_starttime);
         starttext.setText(LongToString(inputstart));
         endtext = (TextView) mTimeChoose.findViewById(R.id.statistical_endtime);
         endtext.setText(LongToString(inputend));
-        startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
-        endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
-        time_sure.setOnClickListener(this);
-        time_cancel.setOnClickListener(this);
-        startlayout.setOnClickListener(this);
-        endlayout.setOnClickListener(this);
+
+
         timePopupWindow = new PopupWindow(mTimeChoose,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         timePopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
@@ -73,10 +78,44 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
         Listener();
         // Log.d("tiancai", mTimeChoose.getWidth()+"   dialog.show()   "+ mTimeChoose.getHeight());
     }
+    /*private void Init(View parent){
+        mTimeChoose = new TimeChoose(context, Time, 1);
+        time_sure = (TextView) mTimeChoose.findViewById(R.id.time_sure);
+        time_sure.setOnClickListener(this);
+        time_cancel = (TextView)mTimeChoose.findViewById(R.id.time_cancel);
+        time_cancel.setOnClickListener(this);
+        startlayout = (LinearLayout) mTimeChoose.findViewById(R.id.statistical_zidingyi_start);
+        startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
+        startlayout.setOnClickListener(this);
+        endlayout = (LinearLayout) mTimeChoose.findViewById(R.id.statistical_zidingyi_end);
+        endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
+        endlayout.setOnClickListener(this);
+        starttext = (TextView) mTimeChoose.findViewById(R.id.statistical_starttime);
+        endtext = (TextView) mTimeChoose.findViewById(R.id.statistical_endtime);
+
+
+        timePopupWindow = new PopupWindow(mTimeChoose,
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        timePopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        timePopupWindow.setOutsideTouchable(true);
+        timePopupWindow.setTouchable(true);
+        timePopupWindow.setFocusable(true);
+        timePopupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
+        timePopupWindow.setOnDismissListener(new OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //不作任何更改
+            }
+        });
+        Listener();
+        // Log.d("tiancai", mTimeChoose.getWidth()+"   dialog.show()   "+ mTimeChoose.getHeight());
+
+    }*/
     private void ClickStart(String kaishi) {
         select_mYear = Integer.valueOf(kaishi.substring(0, 4));
         select_mMonth = Integer.valueOf(kaishi.substring(5, 7));
         select_mDay = Integer.valueOf(kaishi.substring(8));
+        //Log.d("liangjialing",select_mYear+"   "+select_mMonth+"    "+select_mDay);
         Time = kaishi + "  " + "00:00";
         select_mHour = 00;
         select_mMinute = 00;
@@ -88,6 +127,7 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
         select_mYear = Integer.valueOf(jieshu.substring(0, 4));
         select_mMonth = Integer.valueOf(jieshu.substring(5, 7));
         select_mDay = Integer.valueOf(jieshu.substring(8));
+        //Log.d("liangjialing",select_mYear+"   "+select_mMonth+"    "+select_mDay);
         Time = jieshu + "  " + "23:59";
         select_mHour = 23;
         select_mMinute = 59;
@@ -144,16 +184,17 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
             case R.id.statistical_zidingyi_start://点击开始时间
                 //获得显示开始地方的string
                 ClickStart(starttext.getText().toString());
-               // Log.d("showtime", "start  " + Time);
-               
+                Log.d("showtime", "start  " + Time);
                 mTimeChoose = new TimeChoose(context, Time, 1);
+                //Init(Parent);
                 startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
                 endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
                 break;
             case R.id.statistical_zidingyi_end://点击结束时间
                 ClickEnd(endtext.getText().toString());
-               // Log.d("showtime", "end  " + Time);
+                Log.d("showtime", "end  " + Time);
                 mTimeChoose = new TimeChoose(context, Time, 1);
+                //Init(Parent);
                 startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
                 endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
 

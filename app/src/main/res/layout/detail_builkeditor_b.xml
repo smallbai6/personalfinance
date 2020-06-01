@@ -44,20 +44,18 @@
         />
 
 
-
-    <TextView
-        android:id="@+id/b_builkeditor_money"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="15.00"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="20dp"
-        android:layout_alignParentRight="true"
-        android:ellipsize="end"
-        android:maxWidth="90dp"
-        android:singleLine="true"
-        android:textSize="20dp"
-        />
+  <TextView
+      android:id="@+id/b_builkeditor_money"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentRight="true"
+      android:layout_centerVertical="true"
+      android:layout_marginRight="20dp"
+      android:ellipsize="end"
+      android:maxWidth="150dp"
+      android:singleLine="true"
+      android:text="15.00"
+      android:textSize="20dp" />
 
 
 

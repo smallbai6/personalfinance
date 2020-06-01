@@ -182,10 +182,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             resultCode = jsonObject.getString("resultCode");
                             // Log.d("liangjialing",resultCode);
                             if (resultCode.equals("200")) {//成功
-                                //插入数据库
+                                //插入数据库 返回的有Time和User_Number(int)
                                 db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                                 ContentValues values = new ContentValues();
                                 values.put("User_Name", register_username.getText().toString());
+                                values.put("User_Number",jsonObject.getString("User_Number"));
                                 values.put("User_Login", 1);
                                 values.put("Head_Portrait", Picturebytes);
                                 values.put("Time", jsonObject.getLong("Time"));
@@ -217,6 +218,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 //开启等待界面
                 while (flag) {
                 }//等待网络请求的返回信息
+                Log.d("梁嘉玲","flag= "+flag+" NetWork_Code="+NetWork_Code);
+
                 flag = true;
                 if (NetWork_Code.equals("200")) {
                     handler.sendEmptyMessage(Register_success);

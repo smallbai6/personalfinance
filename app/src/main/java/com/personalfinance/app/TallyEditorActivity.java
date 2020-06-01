@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -36,6 +37,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     /*
      *顶部按钮
      */
+    private ImageView backimage;
     private TextView back, save, choose;
     private int record;
     private String[] income_expend = {"支出", "收入"};
@@ -72,9 +74,10 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.tally_editor);
         //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.tally_editor_back);
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 40, 40);
-        back.setCompoundDrawables(drawable, null, null, null);
+        backimage=(ImageView)findViewById(R.id.tally_editor_backimageview);
+       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+        //drawable.setBounds(0, 0, 40, 40);
+        //back.setCompoundDrawables(drawable, null, null, null);
         choose = (TextView) findViewById(R.id.tally_editor_choose);
         save = (TextView) findViewById(R.id.tally_editor_save);
 
@@ -116,6 +119,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
         layout_time.setOnClickListener(this);
 
         back.setOnClickListener(this);
+        backimage.setOnClickListener(this);
         save.setOnClickListener(this);
         buttonback.setOnClickListener(this);
         buttondelete.setOnClickListener(this);
@@ -177,6 +181,7 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
             case R.id.tallycontent_editor_delete://删除该条数据
                 delete_Dialog();
                 break;
+            case R.id.tally_editor_backimageview:
             case R.id.tally_editor_back:
                 //返回到上一个活动中
                 if(huodong.equals("DetailActivity.java")){

@@ -9,7 +9,6 @@
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="110dp"
-        android:background="@color/colorblack"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingBottom="10dp"
@@ -22,9 +21,12 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:indeterminateBehavior="repeat"
+            android:indeterminate="false"
+
+            />
+            <!--android:indeterminateBehavior="repeat"
             android:indeterminateDrawable="@color/colorwhite"
-            android:indeterminateOnly="true" />
+            android:indeterminateOnly="true"--> />
 
         <TextView
             android:id="@+id/dialog_loading_textview"
@@ -32,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:text="加载中..."
-            android:textColor="#f0f0f0"
+            android:textColor="@color/colorgray"
             android:textSize="20sp" />
     </LinearLayout>
 

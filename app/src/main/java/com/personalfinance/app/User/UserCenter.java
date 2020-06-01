@@ -79,6 +79,7 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
     private Drawable drawable;
 
     private LinearLayout userCenter_linearLayout;
+    private ImageView userCenter_backimage;
     private TextView userCenter_back, close_account, userCenter_name;
     private RelativeLayout logout, userCenter_headportraitR;
     private ImageView userCenter_headportrait;
@@ -129,10 +130,12 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                     Data_sync(jsonArray);
                     break;
                 case Exit_Activity://退出该活动
-                    // Log.d("TAG1", "本地更改登录状态完毕");
+                     Log.d("TAG1", "本地更改登录状态完毕");
                     db.close();
                     intent = new Intent(UserCenter.this, MainActivity.class);
-                    startActivity(intent);
+                   // startActivity(intent);
+                  //  finish();
+                    setResult(RESULT_OK);
                     finish();
                     break;
             }
@@ -149,11 +152,7 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
 
         userCenter_linearLayout = (LinearLayout) findViewById(R.id.userCenter_LinearLayout);//整体布局的id
         userCenter_back = (TextView) findViewById(R.id.userCenter_back);
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 50, 50);
-        userCenter_back.setCompoundDrawables(drawable, null, null, null);
-        userCenter_back.setCompoundDrawablePadding(10);
-
+        userCenter_backimage=(ImageView)findViewById(R.id.usercenter_backimageview);
         userCenter_name = (TextView) findViewById(R.id.usercenter_username);
         userCenter_headportrait = (ImageView) findViewById(R.id.userCenter_headportrait);
         userCenter_headportraitR = (RelativeLayout) findViewById(R.id.userCenter_headportraitR);
@@ -162,17 +161,17 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
         userCenter_name.setText(Username);
         userCenter_headportrait.setImageDrawable(Userheadportrait);
         userCenter_back.setOnClickListener(this);
+        userCenter_backimage.setOnClickListener(this);
         userCenter_headportraitR.setOnClickListener(this);
         logout.setOnClickListener(this);
         close_account.setOnClickListener(this);
-
-
         InitPop();
     }
 
     public void onClick(View v) {
 
         switch (v.getId()) {
+            case R.id.usercenter_backimageview:
             case R.id.userCenter_back://返回主页面
                 intent = new Intent(UserCenter.this, MainActivity.class);
                 startActivity(intent);
@@ -258,7 +257,6 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
         MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(jsonArray.toString(), mediaType);
         String address = AppNetConfig.Data_syncCS;
-        // Log.d("TAG1", "进入Data_sync");
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -363,11 +361,9 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         popupWindow.setOutsideTouchable(true);
         popupWindow.setFocusable(true);
-       // popupWindow.showAtLocation(userCenter_linearLayout, Gravity.BOTTOM, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                //userCenter_linearLayout.setBackgroundColor(Color.TRANSPARENT);
                 backgroundAlpha((float)1.0);
             }
         });

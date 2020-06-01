@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     /*
     返回键
      */
+    private ImageView backimage;
     private TextView backbutton;
     /*
     获取的用户名，收支类型，消费名称，开始时间，结束时间
@@ -76,16 +78,19 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         end_time = intent.getLongExtra("end", -1);
         listView = (ListView) findViewById(R.id.statistical_pediotr_listview);
         backbutton=(TextView)findViewById(R.id.statistical_pediotr_back);
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 40, 40);
-        backbutton.setCompoundDrawables(drawable, null, null, null);
+        backimage=(ImageView)findViewById(R.id.statistical_pediotr_backimageview);
+       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+       // drawable.setBounds(0, 0, 40, 40);
+       // backbutton.setCompoundDrawables(drawable, null, null, null);
         backbutton.setOnClickListener(this);
+        backimage.setOnClickListener(this);
         backbutton.setText(type+"("+iore+")");
         Get_List();
 
     }
     public void onClick(View v){
         switch (v.getId()){
+            case R.id.statistical_pediotr_backimageview:
             case R.id.statistical_pediotr_back:
                 intent=new Intent(StatisticalEditorActivity.this,StatisticalActivity.class);
                 setResult(RESULT_OK);

@@ -43,7 +43,6 @@ import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-   // final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Intent intent;
     private Cursor cursor;
 
@@ -196,10 +195,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 String resultCode = "500";
                 String responseText = response.body().string();
                 Log.d("TAG1", "responseText= "+responseText);
-               // Log.d("TAG1", "responseText= "+responseText.substring(responseText.length()/2));
-
                 if (!TextUtils.isEmpty(responseText)) {
-                    //  Log.d("TAG1","回调有值");
                     try {//接收到服务器返回的json格式数据，进行解析
                         JSONArray jsonArray = new JSONArray(responseText);
                         JSONArray jsonArray1 = jsonArray.getJSONArray(0);

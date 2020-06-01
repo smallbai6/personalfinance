@@ -61,7 +61,7 @@
         android:layout_marginRight="20dp"
         android:layout_alignParentRight="true"
         android:ellipsize="end"
-        android:maxWidth="90dp"
+        android:maxWidth="100dp"
         android:singleLine="true"
         android:textSize="20dp"
         />

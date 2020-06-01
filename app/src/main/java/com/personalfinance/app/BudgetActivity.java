@@ -55,6 +55,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     private String choose_ysmdString[] = new String[]{"本日", "本月", "本季", "本年"};
     private String choose_typeString[] = new String[]{"支出", "收入"};
     private int chooselevel = 0;//选择的时ysmd还是type
+    private ImageView backimage;
     private TextView back, choose_ysmd, choose_type,choose_genduo;
     private RelativeLayout layout_choose_type;
     private Drawable drawable;
@@ -138,9 +139,10 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         date = new Date();
         /*budget_update();*/
         back = (TextView) findViewById(R.id.budget_back_button);
-        drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        drawable.setBounds(0, 0, 40, 40);
-        back.setCompoundDrawables(drawable, null, null, null);
+        backimage=(ImageView)findViewById(R.id.budget_back_backimageview);
+        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
+       // drawable.setBounds(0, 0, 40, 40);
+       // back.setCompoundDrawables(drawable, null, null, null);
         refreshiv = (ImageView) findViewById(R.id.budget_total_refresh);//刷新图标
         choose_ysmd = (TextView) findViewById(R.id.budget_choose_yrmd); //年季月日
         choose_ysmd.setText(choose_ysmdString[0]);
@@ -160,6 +162,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
         chooselistView.setAdapter(chooseAdapter);
         InitPopupWindow();
         back.setOnClickListener(this);
+        backimage.setOnClickListener(this);
         choose_ysmd.setOnClickListener(this);
         refreshiv.setOnClickListener(this);
         layout_choose_type.setOnClickListener(this);

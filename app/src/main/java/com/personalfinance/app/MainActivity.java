@@ -1,5 +1,7 @@
 package com.personalfinance.app;
 
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,23 +21,40 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.personalfinance.app.CS_Data.Data_ZIP;
+import com.personalfinance.app.Config.AppNetConfig;
 import com.personalfinance.app.Config.DatabaseConfig;
+import com.personalfinance.app.Finance.FinanceProductActivty;
 import com.personalfinance.app.Main.MainListAdapter;
 import com.personalfinance.app.Main.MainListClass;
 import com.personalfinance.app.Sqlite.SQLiteDatabaseHelper;
 import com.personalfinance.app.User.LoginActivity;
 import com.personalfinance.app.User.UserCenter;
+import com.personalfinance.app.Util.HttpUtil;
 import com.personalfinance.app.Util.PictureFormatUtil;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     /*
@@ -47,16 +67,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*
      *用户名和用户头像
      */
-    private String Username = "";
+    private String Username,UserNumber;//用户名和用户编号
     private Drawable Userheadportrait;
     /*
      *drawerlayout
      */
     private DrawerLayout mDrawerLayout;
     private View userheaderView;
-    private RelativeLayout userheaderlayout;
+   // private RelativeLayout userheaderlayout;
     private TextView draweruserrname;
     private CircleImageView drawerheadportrait;
+    private ImageView SyncData;
 
     /*
     按键
@@ -65,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView main_opendraweriv;
 
     //  private Button tallybutton,detailbutton,budgetbutton,statisticalbutton;
-    private TextView tallybutton, detailbutton, budgetbutton, statisticalbutton;
+    private TextView tallybutton, detailbutton, budgetbutton, statisticalbutton,financebutton;
     private Drawable drawable;
     private Intent intent;
     /*
@@ -80,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private final static int Set_YSMD = 1;
     private final static int ysmd_listview_click = 2;
+    private final static int Sync=3;
+    private final static int failed=4;
+    private final static int success=5;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -97,6 +121,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.putExtra("end_time", time[1]);
                     intent.putExtra("timetype", position);
                     startActivityForResult(intent, 1);//返回之后进行列表的更新
+                    break;
+                case Sync:
+                    db.close();
+                    JSONArray jsonArray = (JSONArray) msg.obj;
+                    Log.d("TAG1", "进行数据同步:  "+jsonArray.toString());
+                    Data_sync(jsonArray);
+                  break;
+                case success:
+                    Toast.makeText(MainActivity.this,"数据同步成功",Toast.LENGTH_SHORT).show();
+                    break;
+                case failed:
+                    Log.d("TAG1","备份失败，请检查网络");
+                    Toast.makeText(MainActivity.this,"备份失败，请检查网络",Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -121,22 +158,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cursor = db.query("userinfo", null, "User_Login=?",
                     new String[]{"1"}, null, null, null);
             if (cursor.moveToFirst()) {
+
                 Username = cursor.getString(cursor.getColumnIndex("User_Name"));
+                UserNumber=cursor.getString(cursor.getColumnIndex("User_Number"));
                 // iv.setImageDrawable(getDrawable().get(0));
                 byte[] blob = cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
                 Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), blob);
+              //  Log.d("梁嘉玲","Username="+Username);
             } else {
-                //获取默认用户名和用户头像
-                cursor = db.query("userinfo", null, "User_Login=?",
-                        new String[]{"0"}, null, null, null);
-                if (cursor.moveToFirst()) {
-                    Username = cursor.getString(cursor.getColumnIndex("User_Name"));
-                    // iv.setImageDrawable(getDrawable().get(0));
-                    byte[] blob = cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
-                    Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), blob);
-                }
+
+                Username="请立即登录";
+                UserNumber="";
+                Userheadportrait = ContextCompat.getDrawable(this,R.mipmap.defaultheadportrait);
             }
-            Log.d("TAG", "GetUsername= " + Username);
+           // Log.d("TAG", "GetUsername= " + Username);
         } catch (Exception e) {
         } finally {
             cursor.close();
@@ -151,10 +186,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);//侧滑菜单
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         userheaderView = navView.getHeaderView(0);
-        userheaderlayout = (RelativeLayout) userheaderView.findViewById(R.id.userlayout_header);//用户
-        userheaderlayout.setOnClickListener(this);
         draweruserrname = (TextView) userheaderView.findViewById(R.id.drawer_username);//用户名
+        draweruserrname.setOnClickListener(this);
         drawerheadportrait=(CircleImageView)userheaderView.findViewById(R.id.drawer_headportrait);//用户头像
+        drawerheadportrait.setOnClickListener(this);
+        SyncData=(ImageView)userheaderView.findViewById(R.id.drawer_SyncData);//同步数据
+        SyncData.setOnClickListener(this);
         //用户名已获得
         draweruserrname.setText(Username);
         drawerheadportrait.setImageDrawable(Userheadportrait);
@@ -192,6 +229,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawable.setBounds(0, 0, 75, 75);
         statisticalbutton.setCompoundDrawables(null, drawable, null, null);
         statisticalbutton.setOnClickListener(this);
+
+
+        financebutton=(TextView)findViewById(R.id.mainfinance_button);//理财
+        drawable=getResources().getDrawable(R.mipmap.licaitubiao);
+        drawable.setBounds(0,0,75,75);
+        financebutton.setCompoundDrawables(null,drawable,null,null);
+        financebutton.setOnClickListener(this);
     }
 
     /*
@@ -285,24 +329,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.main_opendrawer://drawerlayout侧滑菜单显示
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
-            case R.id.userlayout_header://用户头
-                // Toast.makeText(MainActivity.this, "点击用户头像部分", Toast.LENGTH_SHORT).show();
+            case R.id.drawer_username://用户名
+            case R.id.drawer_headportrait://用户头像
+           // case R.id.userlayout_header://用户头
                 //进入用户中心
                 mDrawerLayout.closeDrawers();
                 if (draweruserrname.getText().toString().equals("请立即登录")) {//没有登录跳转到登录界面
                     intent = new Intent(MainActivity.this, LoginActivity.class);
                     //startActivityForResult(intent, 1);
-                    startActivity(intent);
+                   // startActivity(intent);
 
                 } else {//跳转到用户中心
                    intent = new Intent(MainActivity.this, UserCenter.class);
                     intent.putExtra("Username", Username);
                     intent.putExtra("Headportrait", PictureFormatUtil.Drawable2Bytes(Userheadportrait));
-                    startActivity(intent);
+                 //   startActivity(intent);
 
                 }
-                // finish();
+                 //finish();
+                startActivityForResult(intent, 3);//返回之后进行列表的更新
                 break;
+            case R.id.drawer_SyncData://同步数据
+               if(Username.equals("请立即登录")){
+                   Toast.makeText(MainActivity.this,"未登录，不能同步！",Toast.LENGTH_SHORT).show();
+               }else{//弹出对话框
+                   //SyncData();
+                   Sync_showDialog();
+               }
+               break;
             case R.id.maintally_button://进入记账
                 //  Toast.makeText(MainActivity.this, "进入记账中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, TallyActivity.class);
@@ -337,8 +391,104 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(intent, 1);//返回之后进行列表的更新
                 //finish();
                 break;
+            case R.id.mainfinance_button://进入理财
+                intent=new Intent(MainActivity.this, FinanceProductActivty.class);
+                //intent.putExtra("Username",Username);
+                intent.putExtra("UserNumber",UserNumber);
+                startActivity(intent);
+                //finish();
+                break;
         }
     }
+
+    private void Sync_showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //builder.setIcon(R.drawable.picture);
+        builder.setTitle("温馨提示");
+        builder.setMessage("你确定要同步数据么？");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+               SyncData();
+                 }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void SyncData(){
+        new Thread(new Runnable() {//进行同步操作
+            @Override
+            public void run() {
+                Message message = new Message();
+                message.what = 3;
+                try {
+                    db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                    message.obj = Data_ZIP.Data_Sync(db, Username);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("TAG1", "同步线程启动");
+                handler.sendMessage(message);
+            }
+        }).start();
+    }
+    private void Data_sync(JSONArray jsonArray) {
+        MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.Companion.create(jsonArray.toString(), mediaType);
+        String address = AppNetConfig.Data_syncCS;
+
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+                Log.d("TAG1", "退出登录,备份失败,没有网络");
+                handler.sendEmptyMessage(failed);
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+                //成功响应，接收数据
+                int isRegister = -1;
+                String responseText = response.body().string();
+                String resultCode = "500";
+                //byte[] bytesq = null;
+                //Log.d("TAG1", "返回response     :" + responseText);
+                if (!TextUtils.isEmpty(responseText)) {
+                    try {
+                        //Log.d("TAG1", "resultCode=a     " + resultCode);
+                        JSONObject jsonObject = new JSONObject(responseText);
+                        resultCode = jsonObject.getString("resultCode");
+                        // Log.d("TAG1", "resultCode=b    " + resultCode);
+                        if (resultCode.equals("200")) {//备份成功
+                            db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                            ContentValues values = new ContentValues();
+                            values.put("Time", jsonObject.getLong("Time"));
+                            db.update("userinfo", values, "User_Name=?",
+                                    new String[]{Username});
+                            // db.close();
+                            Log.d("TAG1", "备份成功");
+                            handler.sendEmptyMessage(success);
+                        }
+                    } catch (JSONException e) {
+                        Log.d("TAG1", "出现错误");
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.d("TAG1", "返回responseText为空  " + resultCode);
+                }
+               // handler.sendEmptyMessage(success);
+            }
+        });
+    }
+
 
 
     @Override
@@ -355,6 +505,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                // if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Set_YSMD();
                // }
+                break;
+            case 3://用户
+                Get_User();
+                Init_Drawerlayout();
+                Init_MainButton();
+                Init_YSMD();
+                Set_YSMD();
                 break;
             default:
                 break;
