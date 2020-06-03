@@ -17,7 +17,7 @@
             android:layout_marginLeft="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginRight="10dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -39,57 +39,73 @@
             android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="6"
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/recorditem_productname"
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="产品名称产品名称产品名称产品名称"
-                android:ellipsize="end"
-                android:maxWidth="250dp"
-                android:singleLine="true"
-                android:textColor="@color/colorblack"
-                android:textSize="18dp" />
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/recorditem_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorgray"
-                android:textSize="16dp"
+                <TextView
+                    android:id="@+id/recorditem_productname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxWidth="240dp"
+                    android:singleLine="true"
+                    android:text="产品名称产品产品名称产品产品名称产品产品名称产品"
+                    android:textColor="@color/colorblack"
+                    android:textSize="18dp"
+                    />
 
-                android:text="2020.5.24 13:15:30" />
+                <TextView
+                    android:id="@+id/recorditem_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2020.5.24 13:15:30 星期四"
+                    android:textColor="@color/colorgray"
+                    android:textSize="16dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_below="@+id/recorditem_productname"/>
+            </RelativeLayout>
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/recorditem_MQS"
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorblack"
-                android:ellipsize="end"
-                android:maxWidth="90dp"
-                android:singleLine="true"
-                android:textSize="20dp"
-                android:text="5555555.50元" />
-            <TextView
-                android:id="@+id/recorditem_yuanfen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorblack"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                android:textSize="20dp"
-                android:text="" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/recorditem_MQS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/recorditem_yuanfen"
+                    android:ellipsize="end"
+                    android:maxWidth="90dp"
+                    android:singleLine="true"
+                    android:text="5555555.50元"
+                    android:textColor="@color/colorblack"
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:id="@+id/recorditem_yuanfen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:text="元"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@color/colorblack"
+                    android:textSize="20dp" />
+            </RelativeLayout>
+
         </LinearLayout>
 
 
