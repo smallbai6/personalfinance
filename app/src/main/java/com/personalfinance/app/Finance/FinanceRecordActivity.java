@@ -2,6 +2,7 @@ package com.personalfinance.app.Finance;
 
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.personalfinance.app.Config.AppNetConfig;
 import com.personalfinance.app.Config.DatabaseConfig;
@@ -29,20 +30,20 @@ import com.personalfinance.app.Finance.FinanceFragment.LoadFailFragment;
 import com.personalfinance.app.Finance.FinanceFragment.NoHaveRecordFragment;
 import com.personalfinance.app.Finance.FinanceFragment.RecordFragment;
 import com.personalfinance.app.R;
-import com.personalfinance.app.User.loadDialogUtils;
+import com.personalfinance.app.Util.loadDialogUtils;
 import com.personalfinance.app.Util.HttpUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -65,12 +66,15 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
     private RelativeLayout All, Buy, Sale, UnderWay;
     private TextView TextAll, TextBuy, TextSale, TextUnderWay;
     private View ViewAll, ViewBuy, ViewSale, ViewUnderWay;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private String NetWork_Code = "500";
     private boolean flag = true;
     private int show = 0;//初始默认按钮
 
+
+    private int isDialogClose=1;
+    private OkHttpClient client;
     private final static int success = 1;
     private final static int fail = 2;
 
@@ -89,6 +93,7 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
                         setSelect(4);
                     }
                     Log.d("liangjialing", "handler数据加载成功");
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
                     //显示产品
                     break;
@@ -100,8 +105,10 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
                     } else {
                         setSelect(5);
                     }
-                    Log.d("liangjialing", "handler数据加载失败");
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
+                    Log.d("liangjialing", "handler数据加载失败");
+
                     break;
 
             }
@@ -115,13 +122,10 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
         intent = getIntent();
         UserNumber = intent.getStringExtra("User_Number");//用户编号
         ProductNumber = intent.getStringExtra("Product_Number");//产品编号
-        Log.d("liangjialing", UserNumber + "   " + ProductNumber);
+        //Log.d("liangjialing", UserNumber + "   " + ProductNumber);
         Buy_Sale = "";
         Sure_Status = "";
         Back = (ImageView) findViewById(R.id.financerecordfragment_back);
-      //  drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        //drawable.setBounds(0, 0, 50, 50);
-       // Back.setCompoundDrawables(drawable, null, null, null);
         Back.setOnClickListener(this);
 
         All = (RelativeLayout) findViewById(R.id.financerecordfragment_all);
@@ -141,13 +145,36 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
         TextUnderWay = (TextView) findViewById(R.id.financerecordfragment_textunderway);
         ViewUnderWay = (View) findViewById(R.id.financerecordfragment_viewunderway);
 
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.financerecordfragment_swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.coloryellow));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //进行刷新
+                Log.d("liangjialing","进行刷新");
+                if (UserNumber.equals("")) {
+                    Toast.makeText(FinanceRecordActivity.this, "请登录", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (!ishaveFinanceproduct()) {
+                        Requestproduct();
+                    }
+
+                    Init();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
+
         if (UserNumber.equals("")) {
+            setSelectColor(show);
             Toast.makeText(FinanceRecordActivity.this, "请登录", Toast.LENGTH_SHORT).show();
         } else {
             if (!ishaveFinanceproduct()) {
                 Requestproduct();
             }
-            // setSelect(0);
+
             Init();
         }
 
@@ -224,12 +251,6 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
             setSelectColor(show);
             Request();
         } else {
-            /*if (ishaveDatabase()) {
-                setSelect(show);
-                setSelectColor(show);
-            } else {
-                setSelect(5);
-            }*/
             InitDatabase();
         }
     }
@@ -238,7 +259,7 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
             setSelect(show);
             setSelectColor(show);
         } else {
-            setSelect(5);
+            setSelect(4);
         }
     }
 
@@ -252,6 +273,7 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
     }
 
     private void setSelectColor(int i) {
+        Log.d("liangjialing","setSelectColor");
         switch (i) {
             case 0://全部
                 TextAll.setTextColor(getResources().getColor(R.color.coloryellow));
@@ -348,7 +370,7 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
         RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
         String address = AppNetConfig.FinanceRecord;
         Log.d("liangjialing", "request");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 //  e.printStackTrace();
@@ -497,7 +519,7 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
         RequestBody requestBody = RequestBody.Companion.create("", mediaType);
         String address = AppNetConfig.FinanceProduct;
         Log.d("liangjialing", "request");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 //  e.printStackTrace();
@@ -582,6 +604,21 @@ public class FinanceRecordActivity extends AppCompatActivity implements View.OnC
                 }
             }
         }).start();
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                int i=0;
+                for (Call call: client.dispatcher().runningCalls()) {
+                    i++;
+                    client.dispatcher().cancelAll();
+                }
+                if(i==0){
+                    if(isDialogClose==1){
+                        finish();
+                    }
+                }
+                isDialogClose=1;
+            }
+        });
     }
-
 }

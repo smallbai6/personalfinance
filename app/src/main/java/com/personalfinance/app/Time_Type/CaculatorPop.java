@@ -10,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.personalfinance.app.R;
@@ -22,15 +24,15 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
     private OnCaculatorSetListener mOnCaculatorSetListener;//回调
     private PopupWindow moneyPop;
     //private Button btncancel;
-    private TextView btncancel;
+    private ImageView btncancel;
     private Activity context;
     private View contentView;
     private Drawable drawable;
 
 
-    private Button[] btnNum = new Button[11];// 数值按钮
-    private Button[] btnCommand = new Button[3];// 符号按钮
-    private ImageButton backspace;
+    private RelativeLayout[] btnNum = new RelativeLayout[11];// 数值按钮
+    private RelativeLayout[] btnCommand = new RelativeLayout[3];// 符号按钮
+    private ImageView backspace;
     private double result; // 计算结果
     private String process;//计算过程
     private String lastCommand; // 用于保存运算符当前运算符
@@ -48,63 +50,46 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
     public CaculatorPop(final Activity context, View parent) {
         super(context);
         this.context = context;
-        contentView = View.inflate(context, R.layout.detail_tally_caculator, null);
+        contentView = View.inflate(context, R.layout.tally_detail_caculator_pop, null);
         //弹窗设置
         moneyPop = new PopupWindow(contentView,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         moneyPop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         moneyPop.setOutsideTouchable(true);
-        //moneyPop.setTouchable(true);
-       // moneyPop.setFocusable(true);
-     //   contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+
         moneyPop.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
 
 
-       /* moneyPop.setTouchInterceptor(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction()==MotionEvent.ACTION_OUTSIDE){
-                    moneyPop.dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });*/
 
-
-
-
-        // 获取运算符
-        btnCommand[0] = (Button) contentView.findViewById(R.id.add);
-        btnCommand[1] = (Button) contentView.findViewById(R.id.subtract);
-        btnCommand[2] = (Button) contentView.findViewById(R.id.equal);
-        //btnCommand[3] = (Button) contentView.findViewById(R.id.backspace);
-        backspace = (ImageButton) contentView.findViewById(R.id.backspace);
+        // 获取运算符+-=
+        btnCommand[0] = (RelativeLayout) contentView.findViewById(R.id.add);
+        btnCommand[1] = (RelativeLayout) contentView.findViewById(R.id.subtract);
+        btnCommand[2] = (RelativeLayout) contentView.findViewById(R.id.equal);
+        //btnCommand[3] = (RelativeLayout) contentView.findViewById(R.id.backspace);
+        backspace = (ImageView) contentView.findViewById(R.id.backspace);
         backspace.setOnClickListener(this);
         // 获取数字
-        btnNum[0] = (Button) contentView.findViewById(R.id.num0);
-        btnNum[1] = (Button) contentView.findViewById(R.id.num1);
-        btnNum[2] = (Button) contentView.findViewById(R.id.num2);
-        btnNum[3] = (Button) contentView.findViewById(R.id.num3);
-        btnNum[4] = (Button) contentView.findViewById(R.id.num4);
-        btnNum[5] = (Button) contentView.findViewById(R.id.num5);
-        btnNum[6] = (Button) contentView.findViewById(R.id.num6);
-        btnNum[7] = (Button) contentView.findViewById(R.id.num7);
-        btnNum[8] = (Button) contentView.findViewById(R.id.num8);
-        btnNum[9] = (Button) contentView.findViewById(R.id.num9);
-        btnNum[10] = (Button) contentView.findViewById(R.id.point);
+        btnNum[0] = (RelativeLayout) contentView.findViewById(R.id.num0);
+        btnNum[1] = (RelativeLayout) contentView.findViewById(R.id.num1);
+        btnNum[2] = (RelativeLayout) contentView.findViewById(R.id.num2);
+        btnNum[3] = (RelativeLayout) contentView.findViewById(R.id.num3);
+        btnNum[4] = (RelativeLayout) contentView.findViewById(R.id.num4);
+        btnNum[5] = (RelativeLayout) contentView.findViewById(R.id.num5);
+        btnNum[6] = (RelativeLayout) contentView.findViewById(R.id.num6);
+        btnNum[7] = (RelativeLayout) contentView.findViewById(R.id.num7);
+        btnNum[8] = (RelativeLayout) contentView.findViewById(R.id.num8);
+        btnNum[9] = (RelativeLayout) contentView.findViewById(R.id.num9);
+        btnNum[10] = (RelativeLayout) contentView.findViewById(R.id.point);
         NumberAction na = new NumberAction();
         CommandAction ca = new CommandAction();
-        for (Button bc : btnNum) {
+        for (RelativeLayout bc : btnNum) {
             bc.setOnClickListener(na);
         }
-        for (Button bc : btnCommand) {
+        for (RelativeLayout bc : btnCommand) {
             bc.setOnClickListener(ca);
         }
         moneyPop.setOnDismissListener(mOnDissmissListener);
-        // btncancel = (Button) contentView.findViewById(R.id.money_cancel);
-        //btncancel.setOnClickListener(this);
-        btncancel = (TextView) contentView.findViewById(R.id.money_cancel);
+        btncancel = (ImageView) contentView.findViewById(R.id.money_cancel);
         btncancel.setOnClickListener(this);
         result = 0;
         process = "";
@@ -173,8 +158,8 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
     private class NumberAction implements OnClickListener {
         @Override
         public void onClick(View view) {
-            Button btn = (Button) view;
-            String input = btn.getText().toString();
+            RelativeLayout btn = (RelativeLayout) view;
+            String input = btn.getContentDescription().toString();
             if (firstFlag) { // 首次输入
                 // 一上就".",就什么也不做
                 if (input.equals(".")) {
@@ -201,7 +186,6 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
                 if (pointjudge) {
                     pointdigit += 1;
                 }
-                //  Log.d("liang", "点击数字 pointjudge:" + pointjudge + "  pointdigit:" + pointdigit + " commonClick:" + commonClick);
                 if (!commonClick && !input.equals(".")) {
                     switch (lastCommand) {
                         case "+":
@@ -222,11 +206,7 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
             }
             //共有的
             process = process + input;
-           /* if (!lastCommand.equals("=")) {
-                mOnCaculatorSetListener.OnCaculatorSet(2, process);
-            } else {
-                mOnCaculatorSetListener.OnCaculatorSet(2, "");
-            }*/
+
             process_equals();
             lastresult = lastresult + input;
             if (!input.equals(".")) {
@@ -240,8 +220,8 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
     private class CommandAction implements OnClickListener {
         @Override
         public void onClick(View view) {
-            Button btn = (Button) view;
-            inputCommand = (String) btn.getText();
+            RelativeLayout btn = (RelativeLayout) view;
+            inputCommand = btn.getContentDescription().toString();
             if (firstFlag) {// 首次输入"-"的情况
                 if (inputCommand.equals("-")) {
                     mOnCaculatorSetListener.OnCaculatorSet(1, "-");
@@ -253,9 +233,7 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
                     return;
                 }
             }
-            /*else if (btn.getId() == R.id.backspace) {
-                deletebtn();//点击删除键
-            }*/
+
             else if (inputCommand.equals("确\n定")) {
                 calculator();
                 moneyPop.dismiss();
@@ -263,9 +241,6 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
                 //  Log.d("lianga", "点击+/-");
                 addorsub();
                 //  Log.d("lianga", "点击+/-完成");
-                //lastpoint.add(String.valueOf(pointdigit));
-                // pointjudge = false;
-                // pointdigit = 0;
             }
 
         }
@@ -281,15 +256,12 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
                 return;
             }
         }
-        // Log.d("lianga","process:   "+process);
-        // Log.d("lianga","process.substring(process.length() - 1)==== "+process.substring(process.length() - 1));
         if (process.substring(process.length() - 1).equals("+") || process.substring(process.length() - 1).equals("-")) {
             process = process.substring(0, process.length() - 1) + inputCommand;
             mOnCaculatorSetListener.OnCaculatorSet(2, process);
             lastCommand = inputCommand; // 保存你点击的运算符
             lastfuhao.remove(lastfuhao.size() - 1);
             lastfuhao.add(inputCommand);
-            //lastvalues.remove(lastvalues.size() - 1);
         } else {
             process = process + inputCommand;
             mOnCaculatorSetListener.OnCaculatorSet(2, process);
@@ -326,11 +298,7 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
             if (pointdigit != 0) {
                 pointjudge = true;
             }
-            /*if (!lastCommand.equals("=")) {
-                mOnCaculatorSetListener.OnCaculatorSet(2, process);
-            } else {
-                mOnCaculatorSetListener.OnCaculatorSet(2, "");
-            }*/
+
 
             process_equals();
         } else {//考虑一开始输入的是"-"
@@ -380,13 +348,6 @@ public class CaculatorPop extends FrameLayout implements View.OnClickListener {
                 lastresult = lastresult.substring(0, lastresult.length() - 1);
                 calculate(Double.parseDouble(lastresult));
             }
-            //  Log.d("liang", "d:  result:" + result + "   process:" + process + "   lastresult:" + lastresult);
-
-            /*if (!lastCommand.equals("=")) {
-                mOnCaculatorSetListener.OnCaculatorSet(2, process);
-            } else {
-                mOnCaculatorSetListener.OnCaculatorSet(2, "");
-            }*/
             process_equals();
             if (process.substring(process.length() - 1).equals("+") || process.substring(process.length() - 1).equals("-")) {
                 commonClick = true;

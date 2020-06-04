@@ -8,12 +8,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="45dp">
+
         <ImageView
             android:id="@+id/sale_backimageview"
             android:layout_width="25dp"
             android:layout_height="25dp"
             app:srcCompat="@mipmap/zuojiantou"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true" />
+
         <TextView
             android:id="@+id/sale_back"
             android:layout_toRightOf="@+id/sale_backimageview"
@@ -81,17 +83,39 @@
             android:textColor="@color/colorblack"
             android:textSize="20dp" />
 
-        <EditText
-            android:id="@+id/sale_money"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:textColor="@color/colorblack"
-            android:textSize="30dp" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/sale_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorblack"
+                android:textSize="40dp"
+                android:layout_centerVertical="true"
+                android:text="￥" />
+
+            <TextView
+                android:id="@+id/sale_money"
+                android:layout_toRightOf="@+id/sale_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:ellipsize="end"
+                android:maxWidth="250dp"
+                android:layout_centerVertical="true"
+                android:singleLine="true"
+                android:textColor="@color/colorblack"
+                android:textSize="40dp" />
+        </RelativeLayout>
+
     </LinearLayout>
+
     <View
         android:layout_width="match_parent"
-        android:layout_height="30dp"/>
+        android:layout_height="30dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

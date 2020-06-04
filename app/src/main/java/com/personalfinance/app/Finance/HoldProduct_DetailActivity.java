@@ -38,9 +38,6 @@ public class HoldProduct_DetailActivity extends AppCompatActivity implements Vie
     }
     private void Init(){
         Back=(ImageView)findViewById(R.id.financeholddetail_back);
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // Back.setCompoundDrawables(drawable, null, null, null);
         Back.setOnClickListener(this);
         Detail=(TextView)findViewById(R.id.financeholddetail_detail);
         Detail.setOnClickListener(this);

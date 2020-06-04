@@ -2,6 +2,7 @@ package com.personalfinance.app.Finance;
 
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.personalfinance.app.Config.AppNetConfig;
 import com.personalfinance.app.Config.DatabaseConfig;
@@ -27,7 +29,8 @@ import com.personalfinance.app.Finance.FinanceFragment.HoldProductFragment;
 import com.personalfinance.app.Finance.FinanceFragment.LoadFailFragment;
 import com.personalfinance.app.Finance.FinanceFragment.NoHaveHoldFragment;
 import com.personalfinance.app.R;
-import com.personalfinance.app.User.loadDialogUtils;
+import com.personalfinance.app.Util.DataFormatUtil;
+import com.personalfinance.app.Util.loadDialogUtils;
 import com.personalfinance.app.Util.HttpUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +44,7 @@ import java.text.DecimalFormat;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -55,12 +59,13 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
     private NoHaveHoldFragment noHaveHoldFragment;//没有购买理财产品
     private FragmentTransaction ft;
 
-
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ImageView BackImage;
     private TextView Back,Record;
     private TextView Money, Yesterday_income, Sum_income;
 
-
+    private int isDialogClose=1;
+    private OkHttpClient client;
     private String NetWork_Code = "500";
     private boolean flag = true;
     private final static int success = 1;
@@ -81,11 +86,12 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
                     else{
                         setSelect(2);//显示未有产品持有
                     }
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
                     //显示产品
                     break;
                 case fail:
-                    Toast.makeText(FinanceHoldActivity.this, "数据加载失败,连接网络", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(FinanceHoldActivity.this, "数据加载失败", Toast.LENGTH_SHORT).show();
                     //先判断数据库中是否有数据
                     if (ishaveDatabase()) {
                         setSelect(0);//直接从数据库中显示
@@ -93,6 +99,7 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
                     } else {
                         setSelect(1);
                     }
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
                     //显示加载失败界面
                     break;
@@ -109,12 +116,9 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
         //先判断用户是否处于登录状态，未登录则不用进行网络请求
         intent = getIntent();
         UserNumber = intent.getStringExtra("User_Number");
-        Log.d("liang", "User_Number= "+UserNumber);
+        //Log.d("liang", "User_Number= "+UserNumber);
         Back=(TextView)findViewById(R.id.financeholdfragment_back);
         BackImage=(ImageView)findViewById(R.id.financeholdfragment_backimageview);
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // Back.setCompoundDrawables(drawable, null, null, null);
         Back.setOnClickListener(this);
         BackImage.setOnClickListener(this);
         Record=(TextView)findViewById(R.id.financeholdfragment_record);
@@ -122,6 +126,33 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
         Money = (TextView) findViewById(R.id.financeholdfragment_money);
         Yesterday_income = (TextView) findViewById(R.id.financeholdfragment_yesterday);
         Sum_income = (TextView) findViewById(R.id.financeholdfragment_sum);
+
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.financeproductfragment_swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.coloryellow));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //进行刷新
+                Log.d("liangjialing","进行刷新");
+                if(!ishaveFinanceproduct()){
+                    //请求
+                    Log.d("liangjialing","理财产品表为空");
+                    Requestproduct();
+                }
+                if (UserNumber.equals("")) {
+                    //处于未登录状态，提醒用户登陆，同时显示
+                    //setSelect(2);//登录提示
+                    Toast.makeText(FinanceHoldActivity.this, "请登录", Toast.LENGTH_SHORT).show();
+                } else {
+                    Init();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
+
+
         if(!ishaveFinanceproduct()){
             //请求
             Log.d("liangjialing","理财产品表为空");
@@ -157,7 +188,9 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
         if (FinanceProductActivty.isNetWork(this)) {
             Log.d("liangjialing", "网络请求");
             //进行网络请求
-            setSelect(0);//进行数据库的显示
+            if(ishaveDatabase()){
+                setSelect(0);//进行数据库的显示
+            }
            ShowTop();
             Request();
         } else {
@@ -191,9 +224,9 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
                 TotalSum = TotalSum + Double.valueOf(cursor.getString(cursor.getColumnIndex("Sum_income")));
             } while (cursor.moveToNext());
         }
-        Money.setText(formatDouble(TotalMoney));
-        Yesterday_income.setText(formatDouble(TotalYesterday));
-        Sum_income.setText(formatDouble(TotalSum));
+        Money.setText(DataFormatUtil.formatPrice(TotalMoney));
+        Yesterday_income.setText(DataFormatUtil.formatPrice(TotalYesterday));
+        Sum_income.setText(DataFormatUtil.formatPrice(TotalSum));
     }
 
     private void setSelect(int i) {
@@ -254,7 +287,7 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
         RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
         String address = AppNetConfig.FinanceHold;
         Log.d("liangjialing", "request");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 //  e.printStackTrace();
@@ -315,21 +348,13 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
                 Log.d("liang", jsonObject.toString());
                 ContentValues values = new ContentValues();
                 values.put("User_Number", UserNumber);
-              //  Log.d("liangjialing", "0 "+UserNumber);
                 values.put("Product_Number", jsonObject.getString("Product_Number"));
-               // Log.d("liangjialing", "1 "+jsonObject.getString("Product_Number"));
                 values.put("Money", jsonObject.getString("Money"));
-               // Log.d("liangjialing", "2 "+jsonObject.getString("Money"));
                 values.put("Yesterday_income", jsonObject.getString("Yesterday_income"));
-               // Log.d("liangjialing", "3 "+jsonObject.getString("Yesterday_income"));
                 values.put("Sum_income", jsonObject.getString("Sum_income"));
-               // Log.d("liangjialing", "4 "+jsonObject.getString("Sum_income"));
                 values.put("Hold_Quotient", jsonObject.getString("Hold_Quotient"));
-               // Log.d("liangjialing", "5 "+jsonObject.getString("Hold_Quotient"));
                 values.put("Each_Amount", jsonObject.getString("Each_Amount"));
-                //Log.d("liangjialing", "6 "+jsonObject.getString("Each_Amount"));
                 db.insert("holdproduct", null, values);
-              //  Log.d("liangjialing", "插入数据成功");
             }
             db.close();
         } catch (JSONException e) {
@@ -352,7 +377,7 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
             db.close();
             return true;
         }
-        db.close();//weikong
+        db.close();
         return false;
     }
     private void Requestproduct() {
@@ -361,7 +386,7 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
         RequestBody requestBody = RequestBody.Companion.create("", mediaType);
         String address = AppNetConfig.FinanceProduct;
         Log.d("liangjialing","request");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 //  e.printStackTrace();
@@ -442,11 +467,22 @@ public class FinanceHoldActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         }).start();
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                int i=0;
+                for (Call call: client.dispatcher().runningCalls()) {
+                    i++;
+                    client.dispatcher().cancelAll();
+                }
+                if(i==0){
+                    if(isDialogClose==1){
+                        finish();
+                    }
+                }
+                isDialogClose=1;
+            }
+        });
     }
 
-    public static String formatDouble(double data) {
-        DecimalFormat df = new DecimalFormat("0.00");
-        String format = df.format(data);
-        return format;
-    }
 }

@@ -22,6 +22,7 @@ import com.personalfinance.app.Detail.OnTreeNodeClickListener;
 import com.personalfinance.app.Sqlite.Info;
 import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Sqlite.NodeData;
+import com.personalfinance.app.Util.DataFormatUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,16 +88,13 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_bulkeditor);
-        // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         start_time = intent.getLongExtra("start_time", 0);
         end_time = intent.getLongExtra("end_time", 0);
         listView = (ListView) findViewById(R.id.detail_bulkeditor_listview);
-        Log.d("TAG", "onCreate");
         Detail_list();
-        Log.d("TAG", "onCreate->Detail_list->over");
-        allchoose = (TextView) findViewById(R.id.detail_bulkeditor_allchoose);
+       allchoose = (TextView) findViewById(R.id.detail_bulkeditor_allchoose);
         allchoose.setOnClickListener(this);
         showchoosetotal = (TextView) findViewById(R.id.detail_bulkeditor_showchoosetotal);
         showtotalmoney = (TextView) findViewById(R.id.detail_bulkeditor_showtotalmoney);
@@ -135,7 +133,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 }
             }
             showchoosetotal.setText("已选择了" + total + "条");
-            showtotalmoney.setText("合计: " + DetailList.formatPrice(totalmoney));
+            showtotalmoney.setText("合计: " + DataFormatUtil.formatPrice(totalmoney));
         }
     }
 
@@ -214,11 +212,8 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                         db.close();
                     }
                 }
-                //使用getVisibleNodes()删除allNode中的节点，更新显示的节点
                 handler.sendEmptyMessage(Delete);
-              /*  mAdapter.getVisibleNodes();
-                showchoosetotal.setText("未进行选择");
-                showtotalmoney.setText("");*/
+
             }
         }).start();
 
@@ -256,7 +251,6 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void run() {
                 list.clear();
-                Log.d("TAG", "Detail_list->a");
                 DetailList detailList = new DetailList(Username, start_time, end_time);
                 InfoList = detailList.DetailInfo();
                 Detailday_day();
@@ -264,8 +258,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                 int i = 0;//为指针在list中的位置
                 int leveldivide01;//等级划分关联
                 NodeData nodeData;
-                Log.d("TAG", "Detail_list->b");
-                for (a = 0; a < day_dayList.size(); a++) {
+               for (a = 0; a < day_dayList.size(); a++) {
                     nodeData = new NodeData(day_dayList.get(a), "", "", "", "", "", 0);
                     list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
                     leveldivide01 = i;
@@ -273,7 +266,7 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                     while (day_dayList.get(a).equals(DetailList.LongToString(InfoList.get(b).getTime()).substring(0, 11))) {
                         nodeData = new NodeData(InfoList.get(b).getType(),
                                 DetailList.LongToString(InfoList.get(b).getTime()).substring(12, 17),
-                                DetailList.formatPrice(InfoList.get(b).getMoney()),
+                                DataFormatUtil.formatPrice(InfoList.get(b).getMoney()),
                                 "", "", "",
                                 InfoList.get(b).getTime());
                         list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
@@ -284,7 +277,6 @@ public class DetailEditorActivity extends AppCompatActivity implements View.OnCl
                         }
                     }
                 }
-                Log.d("TAG", "Detail_list->c");
                 handler.sendEmptyMessage(Detail_list);
             }
         }).start();

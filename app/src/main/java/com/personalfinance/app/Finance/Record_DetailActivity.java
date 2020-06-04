@@ -53,9 +53,6 @@ public class Record_DetailActivity extends AppCompatActivity implements View.OnC
     private void Init() {
         back=(TextView)findViewById(R.id.financerecorddetail_back);
         backimage=(ImageView)findViewById(R.id.financerecorddetail_backimageview);
-      //  drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-      //  drawable.setBounds(0, 0, 40, 40);
-      //  back.setCompoundDrawables(drawable, null, null, null);
         back.setOnClickListener(this);
         backimage.setOnClickListener(this);
         CompanyPicture = (ImageView) findViewById(R.id.financerecorddetail_picture);

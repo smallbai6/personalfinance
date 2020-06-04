@@ -12,7 +12,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,8 +23,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.personalfinance.app.Config.AppNetConfig;
 import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.R;
-import com.personalfinance.app.Time_Type.CaculatorPop;
-import com.personalfinance.app.User.loadDialogUtils;
+import com.personalfinance.app.Time_Type.FinanceCaculatorPop;
+import com.personalfinance.app.Util.loadDialogUtils;
+import com.personalfinance.app.Util.DataFormatUtil;
 import com.personalfinance.app.Util.HttpUtil;
 import com.personalfinance.app.Util.PictureFormatUtil;
 
@@ -49,10 +49,9 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
     private String User_Number, Product_Number;
 
     private Drawable drawable;
-    private CaculatorPop mCaculatorPop;
+    private FinanceCaculatorPop mCaculatorPop;
     private ImageView Picture,Backimage;
-    private TextView Product_Name, Back;
-    private EditText Money;
+    private TextView Product_Name, Back,Money;
     private RelativeLayout Sure;
 
     private String Hold_Quotient = "";
@@ -97,14 +96,11 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
     private void Init() {
         Back = (TextView) findViewById(R.id.sale_back);
         Backimage=(ImageView)findViewById(R.id.sale_backimageview) ;
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // Back.setCompoundDrawables(drawable, null, null, null);
         Back.setOnClickListener(this);
         Backimage.setOnClickListener(this);
         Picture = (ImageView) findViewById(R.id.sale_picture);
         Product_Name = (TextView) findViewById(R.id.sale_productname);
-        Money = (EditText) findViewById(R.id.sale_money);
+        Money = (TextView) findViewById(R.id.sale_money);
         Money.setOnClickListener(this);
         Money.setShowSoftInputOnFocus(false);
         Sure = (RelativeLayout) findViewById(R.id.sale_sure);
@@ -136,8 +132,8 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.sale_money://份额输入
-                mCaculatorPop = new CaculatorPop(SaleActivity.this, Sure);
-                mCaculatorPop.setOnCaculatorSetListener(new CaculatorPop.OnCaculatorSetListener() {
+                mCaculatorPop = new FinanceCaculatorPop(SaleActivity.this, Sure,Money.getText().toString());
+                mCaculatorPop.setOnCaculatorSetListener(new FinanceCaculatorPop.OnCaculatorSetListener() {
                     @Override
                     public void OnCaculatorSet(int sort, String date) {
                         if (sort == 1) {
@@ -150,7 +146,9 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
                 if (!User_Number.equals("")) {
                     if (Money.getText().toString().equals("")) {
                         Toast.makeText(SaleActivity.this, "输入份额不能为空", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }  else if(Double.valueOf(Money.getText().toString())>100000){
+                        Toast.makeText(SaleActivity.this, "最多只能输入100000元(10万)", Toast.LENGTH_SHORT).show();
+                    }else {
 
                         if (Double.valueOf(Money.getText().toString()) > Double.valueOf(Hold_Quotient)) {
                             Toast.makeText(SaleActivity.this, "卖出份额不能高出持有份额！", Toast.LENGTH_SHORT).show();
@@ -179,7 +177,7 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
         try {
             jsonObject.put("User_Number", User_Number);
             jsonObject.put("Product_Number", Product_Number);
-            jsonObject.put("Money", Money.getText().toString());
+            jsonObject.put("Money", DataFormatUtil.formatPrice(Double.valueOf(Money.getText().toString())));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -194,13 +192,7 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
                 //  e.printStackTrace();
                 NetWork_Code = "500";
                 flag = false;
-                /*if(e instanceof SocketTimeoutException){//判断超时异常
-                    Log.d("liangjialing","SocketTimeoutException");
-                }
-                if(e instanceof ConnectException){
-                    //判断连接异常，我这里是报Failed to connect to 10.7.5.144
-                    Log.d("liangjialing","ConnectException");
-                }*/
+
             }
 
             @Override
@@ -208,19 +200,15 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
                 //成功响应，接收数据
                 int isRegister = -1;
                 String responseText = response.body().string();
-                //Log.d("liangjialing", responseText);
-                String resultCode = "500";
+                 String resultCode = "500";
 
                 if (!TextUtils.isEmpty(responseText)) {
                     try {
-                        Log.d("liangjialing", "!TextUtils");
                         JSONObject jsonObject = new JSONObject(responseText);
                         resultCode = jsonObject.getString("resultCode");
                         if (resultCode.equals("200")) {//
                             //重新加载holdproduct表和recordproduct表
-                            Log.d("liangjialing", "200");
-                            Log.d("liangjialing", jsonObject.getJSONArray("recordproduct").toString());
-                            WriteToHoldproduct(jsonObject.getJSONArray("holdproduct"));
+                           WriteToHoldproduct(jsonObject.getJSONArray("holdproduct"));
                             WriteToRecordproduct(jsonObject.getJSONArray("recordproduct"));
                             Money.setText("");
                         } else {

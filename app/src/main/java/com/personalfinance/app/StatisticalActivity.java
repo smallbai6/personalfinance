@@ -123,10 +123,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         Set_Legend();//进行饼图标签控件的设置
         backbutton = (TextView) findViewById(R.id.piechart_back);//退出活动
         backimage=(ImageView)findViewById(R.id.piechart_backimageview);
-       //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // backbutton.setCompoundDrawables(drawable, null, null, null);
-       // backbutton.setCompoundDrawablePadding(10);
         backbutton.setOnClickListener(this);
         backimage.setOnClickListener(this);
         choosebutton = (TextView) findViewById(R.id.piechart_choose);//支出收入按键
@@ -146,7 +142,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         //一开始支出收入部分和时间部分进行初始化显示
         choosebutton.setText(chooseString[0]);
         long[] SE_time=StartEndTime.GetYear();
-        //GetYear();
         start_time=SE_time[0];
         end_time=SE_time[1];
         choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
@@ -181,7 +176,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                // Log.d("liangjialing", ((PieEntry) e).getLabel() + "   " + ((PieEntry) e).getValue());
                 Activity_Change(Username, choosebutton.getText().toString(), ((PieEntry) e).getLabel(), start_time, end_time);
 
             }
@@ -325,9 +319,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 drawabletotubiao(choosebutton);
                 break;
             case R.id.statistical_time://进行时间选择
-                //点击弹出dialog
                 show_dialog(200);
-                //  Log.d("tiancai","进行时间选择");
                 break;
             case R.id.statistical_time_lastyear://上
                 startEndTime=new StartEndTime(start_time,end_time,choosetimetype);
@@ -335,7 +327,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 start_time=SE_time[0];
                 end_time=SE_time[1];
                 choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
-               // Log.d("liangjialing",start_time+"    "+end_time);
                 GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                 break;
             case R.id.statistical_time_nextyear://下
@@ -344,8 +335,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                 start_time=SE_time[0];
                 end_time=SE_time[1];
                 choosetime.setText(LongToString(start_time) + "-" + LongToString(end_time));
-               // Log.d("liangjialing",start_time+"    "+end_time);
-                GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
+                 GetAllConsume(choosebutton.getText().toString(), start_time, end_time);
                 break;
             default:
                 break;
@@ -366,7 +356,6 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
         Window dialogWindow = timedialog.getWindow();
         dialogWindow.setGravity(Gravity.BOTTOM);
         //设置弹出动画
-        //  dialogWindow.setWindowAnimations(R.style.main_menu_animStyle);
         WindowManager.LayoutParams lp = dialogWindow.getAttributes();
         lp.y = i;
         lp.width = (int) (width * 0.8);
@@ -434,9 +423,7 @@ public class StatisticalActivity extends AppCompatActivity implements View.OnCli
                     bundle.putDouble("totalmoney", totalmoney);
                     message.setData(bundle);
                     handler.sendMessage(message);
-                    // Create_Legend(consumemoney, consumetype);
-                    //  create_PieChart(consumepercent, totalmoney);
-                } catch (Exception e) {
+                    } catch (Exception e) {
                 } finally {
                     cursor.close();
                     db.close();

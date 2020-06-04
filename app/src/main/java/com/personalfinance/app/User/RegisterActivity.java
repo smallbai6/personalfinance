@@ -26,6 +26,7 @@ import com.personalfinance.app.MainActivity;
 import com.personalfinance.app.R;
 import com.personalfinance.app.Util.HttpUtil;
 import com.personalfinance.app.Util.PictureFormatUtil;
+import com.personalfinance.app.Util.loadDialogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -42,7 +43,6 @@ import okhttp3.Response;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Intent intent;
 
     private TextView back, login;
@@ -65,17 +65,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             super.handleMessage(msg);
             switch (msg.what) {
                 case Register_success:
-                    //Log.d("liangjialing", "handler");
-                    loadDialogUtils.closeDialog(mDialog);
+                   loadDialogUtils.closeDialog(mDialog);
                     Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
                     intent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                     break;
                 case Register_alreadyhave:
-                    // Log.d("liangjialing", "handler");
                     loadDialogUtils.closeDialog(mDialog);
-                    //Log.d("TAG1", "handler Register_alreadyhave");
                     Toast.makeText(RegisterActivity.this, "用户名已存在，请重新输入", Toast.LENGTH_SHORT).show();
                     break;
                 case Register_fail:
@@ -89,7 +86,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.register_back);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 50, 50);
@@ -143,28 +139,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         } else {
             LoadingDialog();
             //开始上传验证
-            // JSONArray jsonArray = new JSONArray();
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("User_Name", register_username.getText().toString());
                 jsonObject.put("User_Password", register_password.getText().toString());
                 Picturebytes = PictureFormatUtil.Drawable2Bytes(ContextCompat.getDrawable(this, R.mipmap.defaultheadportrait));
                 jsonObject.put("Head_Portrait", Base64.encodeToString(Picturebytes, Base64.NO_WRAP));
-                // jsonArray.put(jsonObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //Log.d("liangjialing","数据打包好了");
             MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
             RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
             String address = AppNetConfig.Register;
-            //Log.d("liangjialing","准备请求");
             HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     e.printStackTrace();
-                    //Toast.makeText(RegisterActivity.this, "注册失败,请重试", Toast.LENGTH_SHORT).show();
-                    //Log.d("liangjialing", "注册失败,请重试连接网络");
                     NetWork_Code = "500";
                     flag = false;
                 }
@@ -180,7 +170,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         try {
                             JSONObject jsonObject = new JSONObject(responseText);
                             resultCode = jsonObject.getString("resultCode");
-                            // Log.d("liangjialing",resultCode);
                             if (resultCode.equals("200")) {//成功
                                 //插入数据库 返回的有Time和User_Number(int)
                                 db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);

@@ -6,14 +6,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,10 +22,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.personalfinance.app.Config.AppNetConfig;
 import com.personalfinance.app.Config.DatabaseConfig;
-import com.personalfinance.app.Finance.Class.Product;
 import com.personalfinance.app.R;
-import com.personalfinance.app.Time_Type.CaculatorPop;
-import com.personalfinance.app.User.loadDialogUtils;
+import com.personalfinance.app.Time_Type.FinanceCaculatorPop;
+import com.personalfinance.app.Util.loadDialogUtils;
 import com.personalfinance.app.Util.DataFormatUtil;
 import com.personalfinance.app.Util.HttpUtil;
 import com.personalfinance.app.Util.PictureFormatUtil;
@@ -36,11 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -55,11 +49,11 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
     private String User_Number, Product_Number;
 
     private Drawable drawable;
-    private CaculatorPop mCaculatorPop;
+    private FinanceCaculatorPop mCaculatorPop;
     private ImageView Picture;
     private TextView Product_Name, Back;
     private ImageView Backimage;
-    private EditText Money;
+    private TextView Money;
     private RelativeLayout Sure;
 
     private String Purchase_Amount = "";
@@ -103,15 +97,13 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
 
     private void Init() {
         Back = (TextView) findViewById(R.id.buy_back);
-        Backimage=(ImageView)findViewById(R.id.buy_backimageview);
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // Back.setCompoundDrawables(drawable, null, null, null);
+        Backimage = (ImageView) findViewById(R.id.buy_backimageview);
+
         Back.setOnClickListener(this);
         Backimage.setOnClickListener(this);
         Picture = (ImageView) findViewById(R.id.buy_picture);
         Product_Name = (TextView) findViewById(R.id.buy_productname);
-        Money = (EditText) findViewById(R.id.buy_money);
+        Money = (TextView) findViewById(R.id.buy_money);
         Money.setShowSoftInputOnFocus(false);
         Money.setOnClickListener(this);
         Sure = (RelativeLayout) findViewById(R.id.buy_sure);
@@ -139,11 +131,12 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
                 finish();
                 break;
             case R.id.buy_money://价格输入
-                mCaculatorPop = new CaculatorPop(BuyActivity.this, Sure);
-                mCaculatorPop.setOnCaculatorSetListener(new CaculatorPop.OnCaculatorSetListener() {
+                mCaculatorPop = new FinanceCaculatorPop(BuyActivity.this, Sure, Money.getText().toString());
+                mCaculatorPop.setOnCaculatorSetListener(new FinanceCaculatorPop.OnCaculatorSetListener() {
                     @Override
                     public void OnCaculatorSet(int sort, String date) {
                         if (sort == 1) {
+                            Log.d("liangjialing", date);
                             Money.setText(date);
                         }
                     }
@@ -154,8 +147,9 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
 
                     if (Money.getText().toString().equals("")) {
                         Toast.makeText(BuyActivity.this, "输入金额不能为空", Toast.LENGTH_SHORT).show();
+                    } else if (Double.valueOf(Money.getText().toString()) > 100000) {
+                        Toast.makeText(BuyActivity.this, "最多只能输入100000元(10万)", Toast.LENGTH_SHORT).show();
                     } else {
-
                         if (Double.valueOf(Money.getText().toString()) < Double.valueOf(Purchase_Amount)) {
                             Toast.makeText(BuyActivity.this, "购买金额不能低于起购金额！", Toast.LENGTH_SHORT).show();
                         } else {
@@ -183,7 +177,7 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
         try {
             jsonObject.put("User_Number", User_Number);
             jsonObject.put("Product_Number", Product_Number);
-            jsonObject.put("Money", Money.getText().toString());
+            jsonObject.put("Money", DataFormatUtil.formatPrice(Double.valueOf(Money.getText().toString())));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -191,7 +185,7 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
         MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
         String address = AppNetConfig.FinanceBuy;
-        Log.d("liangjialing", "request1");
+        // Log.d("liangjialing", "request1");
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {

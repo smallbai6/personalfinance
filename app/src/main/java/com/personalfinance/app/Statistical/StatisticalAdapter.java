@@ -68,9 +68,6 @@ public class StatisticalAdapter extends TreeListViewAdapter {
                 }
                 nodeData=(NodeData)node.getData();
 
-                //RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tva.getLayoutParams();
-                //params.leftMargin = 60;
-                //tva.setLayoutParams(params);
                 holderb.tva.setText(nodeData.getA().substring(1));
                 holderb.tvb.setText(nodeData.getB());
                 holderb.tvc.setVisibility((nodeData.getC().equals("")) ? View.GONE : View.VISIBLE);
@@ -107,10 +104,8 @@ public class StatisticalAdapter extends TreeListViewAdapter {
     class ViewHoldera {
         private ImageView iv;
         private TextView tva, tvb;
-       // private RelativeLayout relativeLayout;
 
         public ViewHoldera(View convertView) {
-            //relativeLayout = (RelativeLayout) convertView.findViewById(R.id.a_detail_relativeLayout);
             iv = (ImageView) convertView.findViewById(R.id.a_statistical_imageView);
             tva = (TextView) convertView.findViewById(R.id.a_statistical_day);
             tvb = (TextView) convertView.findViewById(R.id.a_statistical_date);

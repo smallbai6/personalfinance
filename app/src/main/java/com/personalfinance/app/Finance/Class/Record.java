@@ -6,20 +6,17 @@ public class Record {
     private String Time;
     private String M_Q_S;
 
-   // private String User_Number;
-  //  private String Product_Number;
+
     private String Order_Number;
     private String Sure_Status;
 
-    public Record(String Buy_Sale, String Product_Name, String Time, String M_Q_S, String Order_Number,String Sure_Status) {
+    public Record(String Buy_Sale, String Product_Name, String Time, String M_Q_S, String Order_Number, String Sure_Status) {
         this.Buy_Sale = Buy_Sale;
         this.Product_Name = Product_Name;
         this.Time = Time;
         this.M_Q_S = M_Q_S;
-       // this.User_Number = User_Number;
-       // this.Product_Number = Product_Number;
-        this.Order_Number=Order_Number;
-        this.Sure_Status=Sure_Status;
+        this.Order_Number = Order_Number;
+        this.Sure_Status = Sure_Status;
     }
 
     public String getBuy_Sale() {
@@ -39,7 +36,7 @@ public class Record {
 
     }
 
-    public String getOrder_Number(){
+    public String getOrder_Number() {
         return Order_Number;
     }
    /* public String getUser_Number() {
@@ -50,9 +47,9 @@ public class Record {
         return Product_Number;
     }*/
 
-   public String getSure_Status(){
-       return Sure_Status;
-   }
+    public String getSure_Status() {
+        return Sure_Status;
+    }
 
     public void setBuy_Sale() {
         this.Buy_Sale = Buy_Sale;
@@ -71,17 +68,11 @@ public class Record {
     }
 
 
-  /*  public void setUser_Number() {
-        this.User_Number = User_Number;
+    public void setOrder_Number() {
+        this.Order_Number = Order_Number;
     }
 
-    public void setProduct_Number() {
-        this.Product_Number = Product_Number;
-    }*/
-  public void setOrder_Number(){
-      this.Order_Number=Order_Number;
-  }
-  public void setSure_Status(){
-      this.Sure_Status=Sure_Status;
-  }
+    public void setSure_Status() {
+        this.Sure_Status = Sure_Status;
+    }
 }

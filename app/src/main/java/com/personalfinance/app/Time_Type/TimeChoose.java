@@ -33,23 +33,15 @@ public class TimeChoose extends FrameLayout {
 
     public TimeChoose(Context context,String selectTime,int status) {
         super(context);
-        //Log.d("showtime", "进入TimeChoose");
-        //Log.d("jinxing","进入TimeChoose");
-        //Log.d("liang", "进入TimeChoose");
+
         select_mYear = Integer.valueOf(selectTime.substring(0, 4));
         select_mMonth = Integer.valueOf(selectTime.substring(5, 7));
         select_mDay = Integer.valueOf(selectTime.substring(8, 10));
         select_mHour = Integer.valueOf(selectTime.substring(12, 14));
         select_mMinute = Integer.valueOf(selectTime.substring(15,17));
-       // Log.d("liang", "selectTime=" + selectTime);
-       //  Log.d("jinxing",selectTime.substring(0,4)+" "+selectTime.substring(5,7)+" "+selectTime.substring(8,10)+
-       //          " "+selectTime.substring(12,14)+" "+selectTime.substring(15));
-        // Log.d("liang",select_mYear+" "+select_mMonth+" "+" "+select_mDay+" "+select_mHour+" "+select_mMinute);
-        mDate = Calendar.getInstance();
+      mDate = Calendar.getInstance();
         mYear = mDate.get(Calendar.YEAR);
         mMonth = mDate.get(Calendar.MONTH);
-        // mHour=mDate.get(Calendar.HOUR_OF_DAY);
-        // mMinute=mDate.get(Calendar.MINUTE);
         mHour = select_mHour;
         mMinute = select_mMinute;
         if(status==0){
@@ -88,7 +80,6 @@ public class TimeChoose extends FrameLayout {
         mDaySpinner.setMaxValue(6);
         mDaySpinner.setMinValue(0);
         updateDateControl();
-        // mDaySpinner.setValue(select_mDay);
         mDaySpinner.setWrapSelectorWheel(true);
        mDaySpinner.setOnValueChangedListener(mOnDayChangedListener);
 
@@ -111,22 +102,18 @@ public class TimeChoose extends FrameLayout {
         // mMinuteSpinner.setValue(mMinute);
         mMinuteSpinner.setWrapSelectorWheel(true);
         mMinuteSpinner.setOnValueChangedListener(mOnMinuteChangedListener);
-        // Log.d("liang", "onValueChangedListener  " + mDate.get(Calendar.YEAR));
        mYear = select_mYear;
         mMonth = select_mMonth - 1;
-        //  Log.d("liang", "主mMonth = " + mMonth);
         if (status == 1) {
             mHourSpinner.setVisibility(GONE);
             mMinuteSpinner.setVisibility(GONE);
        }
-      //  Log.d("showtime",mYearSpinner.getValue()+"   "+mMonthSpinner.getValue());
     }
 
     private OnValueChangeListener mOnYearChangedListener = new OnValueChangeListener() {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mYear = mYearSpinner.getValue();
-          //  Log.d("liang", "yearchangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
@@ -136,7 +123,6 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mMonth = mMonthSpinner.getValue() - 1;
-           // Log.d("liang", "monthchangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
@@ -146,7 +132,6 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mDate.add(Calendar.DAY_OF_MONTH, newVal - oldVal);
-           // Log.d("liang", "daychangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             updateDateControl();
             onDateTimeChanged();
@@ -156,7 +141,6 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mHour=mHourSpinner.getValue();
-           // Log.d("liang", "hourchangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             onDateTimeChanged();
         }
@@ -166,7 +150,6 @@ public class TimeChoose extends FrameLayout {
         @Override
         public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
             mMinute=mMinuteSpinner.getValue();
-           // Log.d("liang", "Miniutechangedlistener   mMonth = " + mMonth);
             mDate.set(mYear, mMonth, mDate.get(Calendar.DAY_OF_MONTH),mHour,mMinute);
             onDateTimeChanged();
         }
@@ -212,7 +195,6 @@ public class TimeChoose extends FrameLayout {
         mDaySpinner.setDisplayedValues(null);
         for (int i = 0; i < 7; ++i) {
             cal.add(Calendar.DAY_OF_MONTH, 1);
-            //   mDateDisplayValues[i] = (String) DateFormat.format("dd日", cal);
             mDateDisplayValues[i] = (String) DateFormat.format("dd日 EE", cal);
         }
         mDaySpinner.setDisplayedValues(mDateDisplayValues);

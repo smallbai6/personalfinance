@@ -9,6 +9,7 @@ import com.personalfinance.app.Sqlite.DetailSurplus;
 import com.personalfinance.app.Sqlite.Info;
 import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Sqlite.NodeData;
+import com.personalfinance.app.Util.DataFormatUtil;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -19,7 +20,6 @@ import java.util.List;
 
 public class DetailList {
     private SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private String Username;
     private long start_time;
@@ -36,8 +36,7 @@ public class DetailList {
         this.Username = Username;
         this.start_time = start_time;
         this.end_time = end_time;
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
-    }
+       }
 
     /*
    日详情列表
@@ -90,7 +89,7 @@ public class DetailList {
                 totalincomemoney += info.getMoney();
             }
         }
-        String[] money = new String[]{formatPrice(totalexpendmoney), formatPrice(totalincomemoney)};
+        String[] money = new String[]{DataFormatUtil.formatPrice(totalexpendmoney), DataFormatUtil.formatPrice(totalincomemoney)};
         return money;
     }
 
@@ -411,8 +410,8 @@ public class DetailList {
         for (a = 0; a < season_seasonList.size(); a++) {
 
             nodeData = new NodeData(season_seasonList.get(a).getDay(), season_seasonList.get(a).getDate(),
-                    formatPrice(season_seasonList.get(a).getJieyu()), formatPrice(season_seasonList.get(a).getShouru()),
-                    formatPrice(season_seasonList.get(a).getZhichu()), "",
+                    DataFormatUtil.formatPrice(season_seasonList.get(a).getJieyu()), DataFormatUtil.formatPrice(season_seasonList.get(a).getShouru()),
+                    DataFormatUtil.formatPrice(season_seasonList.get(a).getZhichu()), "",
                     season_seasonList.get(a).getTime());
             list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
@@ -422,8 +421,8 @@ public class DetailList {
                     && (Integer.valueOf(month_monthList.get(b).getDay().substring(0, 2)) >= (ji * 3 - 2))) {
 
                 nodeData = new NodeData(month_monthList.get(b).getDay(), month_monthList.get(b).getDate(),
-                        formatPrice(month_monthList.get(b).getJieyu()), formatPrice(month_monthList.get(b).getShouru()),
-                        formatPrice(month_monthList.get(b).getZhichu()), "",
+                        DataFormatUtil.formatPrice(month_monthList.get(b).getJieyu()), DataFormatUtil.formatPrice(month_monthList.get(b).getShouru()),
+                        DataFormatUtil.formatPrice(month_monthList.get(b).getZhichu()), "",
                         month_monthList.get(b).getTime());
                 list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "0"));
                 leveldivide12 = i;
@@ -432,7 +431,7 @@ public class DetailList {
 
                     nodeData = new NodeData(LongToString(InfoList.get(c).getTime()).substring(8, 10),
                             LongToString(InfoList.get(c).getTime()).substring(18), InfoList.get(c).getType(),
-                            LongToString(InfoList.get(c).getTime()).substring(12, 17), formatPrice(InfoList.get(c).getMoney()),
+                            LongToString(InfoList.get(c).getTime()).substring(12, 17), DataFormatUtil.formatPrice(InfoList.get(c).getMoney()),
                             InfoList.get(c).getText(), InfoList.get(c).getTime());
                     list.add(new Node<NodeData>(i + "", leveldivide12 + "", nodeData, "1"));
                     i++;
@@ -465,8 +464,8 @@ public class DetailList {
         Detailyear_year();
         if (!month_monthList.isEmpty()) {
             nodeData = new NodeData(year_yearList.get(0).getDay(), year_yearList.get(0).getDate(),
-                    formatPrice(year_yearList.get(0).getJieyu()), formatPrice(year_yearList.get(0).getShouru()),
-                    formatPrice(year_yearList.get(0).getZhichu()), "",
+                    DataFormatUtil.formatPrice(year_yearList.get(0).getJieyu()), DataFormatUtil.formatPrice(year_yearList.get(0).getShouru()),
+                    DataFormatUtil.formatPrice(year_yearList.get(0).getZhichu()), "",
                     year_yearList.get(0).getTime());
             list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             i++;
@@ -475,8 +474,8 @@ public class DetailList {
         for (a = 0; a < month_monthList.size(); a++) {
 
             nodeData = new NodeData(month_monthList.get(a).getDay(), month_monthList.get(a).getDate(),
-                    formatPrice(month_monthList.get(a).getJieyu()), formatPrice(month_monthList.get(a).getShouru()),
-                    formatPrice(month_monthList.get(a).getZhichu()), "",
+                    DataFormatUtil.formatPrice(month_monthList.get(a).getJieyu()), DataFormatUtil.formatPrice(month_monthList.get(a).getShouru()),
+                    DataFormatUtil.formatPrice(month_monthList.get(a).getZhichu()), "",
                     month_monthList.get(a).getTime());
             list.add(new Node<NodeData>(i + "", "0", nodeData, "1"));
             leveldivide01 = i;
@@ -485,7 +484,7 @@ public class DetailList {
 
                 nodeData = new NodeData(LongToString(InfoList.get(b).getTime()).substring(8, 10),
                         LongToString(InfoList.get(b).getTime()).substring(18), InfoList.get(b).getType(),
-                        LongToString(InfoList.get(b).getTime()).substring(12, 17), formatPrice(InfoList.get(b).getMoney()),
+                        LongToString(InfoList.get(b).getTime()).substring(12, 17), DataFormatUtil.formatPrice(InfoList.get(b).getMoney()),
                         InfoList.get(b).getText(), InfoList.get(b).getTime());
                 list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "2"));
                 i++;
@@ -513,8 +512,8 @@ public class DetailList {
         for (a = 0; a < month_monthList.size(); a++) {
 
             nodeData = new NodeData(month_monthList.get(a).getDay(), month_monthList.get(a).getDate(),
-                    formatPrice(month_monthList.get(a).getJieyu()), formatPrice(month_monthList.get(a).getShouru()),
-                    formatPrice(month_monthList.get(a).getZhichu()), "",
+                    DataFormatUtil.formatPrice(month_monthList.get(a).getJieyu()), DataFormatUtil.formatPrice(month_monthList.get(a).getShouru()),
+                    DataFormatUtil.formatPrice(month_monthList.get(a).getZhichu()), "",
                     month_monthList.get(a).getTime());
             list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
@@ -523,7 +522,7 @@ public class DetailList {
 
                 nodeData = new NodeData(LongToString(InfoList.get(b).getTime()).substring(8, 10),
                         LongToString(InfoList.get(b).getTime()).substring(18), InfoList.get(b).getType(),
-                        LongToString(InfoList.get(b).getTime()).substring(12, 17), formatPrice(InfoList.get(b).getMoney()),
+                        LongToString(InfoList.get(b).getTime()).substring(12, 17), DataFormatUtil.formatPrice(InfoList.get(b).getMoney()),
                         InfoList.get(b).getText(), InfoList.get(b).getTime());
                 list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
                 i++;
@@ -553,8 +552,8 @@ public class DetailList {
         for (a = 0; a < day_monthList.size(); a++) {
 
             nodeData = new NodeData(day_monthList.get(a).getDay(), day_monthList.get(a).getDate(),
-                    formatPrice(day_monthList.get(a).getJieyu()), formatPrice(day_monthList.get(a).getShouru()),
-                    formatPrice(day_monthList.get(a).getZhichu()), "",
+                    DataFormatUtil.formatPrice(day_monthList.get(a).getJieyu()), DataFormatUtil.formatPrice(day_monthList.get(a).getShouru()),
+                    DataFormatUtil.formatPrice(day_monthList.get(a).getZhichu()), "",
                     day_monthList.get(a).getTime());
             list.add(new Node<NodeData>(i + "", "-1", nodeData, "0"));
             leveldivide01 = i;
@@ -563,8 +562,8 @@ public class DetailList {
             while (day_monthList.get(a).getDay().equals(day_dayList.get(b).getDate().substring(5, 7) + "月")) {
 
                 nodeData = new NodeData(day_dayList.get(b).getDay(), day_dayList.get(b).getDate(),
-                        formatPrice(day_dayList.get(b).getJieyu()), formatPrice(day_dayList.get(b).getShouru()),
-                        formatPrice(day_dayList.get(b).getZhichu()), "",
+                        DataFormatUtil.formatPrice(day_dayList.get(b).getJieyu()), DataFormatUtil.formatPrice(day_dayList.get(b).getShouru()),
+                        DataFormatUtil.formatPrice(day_dayList.get(b).getZhichu()), "",
                         day_dayList.get(b).getTime());
                 list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "0"));
                 leveldivide12 = i;
@@ -576,7 +575,7 @@ public class DetailList {
                             LongToString(InfoList.get(c).getTime()).substring(18),
                             InfoList.get(c).getType(),
                             LongToString(InfoList.get(c).getTime()).substring(12, 17),
-                            formatPrice(InfoList.get(c).getMoney()),
+                            DataFormatUtil.formatPrice(InfoList.get(c).getMoney()),
                             InfoList.get(c).getText(),
                             InfoList.get(c).getTime());
                     list.add(new Node<NodeData>(i + "", leveldivide12 + "", nodeData, "1"));
@@ -602,10 +601,5 @@ public class DetailList {
         return sDateTime;
     }
 
-    public static String formatPrice(double price) {
-        DecimalFormat df = new DecimalFormat("0.00");
-        String format = df.format(price);
-        return format;
-    }
 
 }

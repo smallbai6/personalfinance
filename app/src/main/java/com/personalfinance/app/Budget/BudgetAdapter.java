@@ -2,6 +2,7 @@ package com.personalfinance.app.Budget;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ public class BudgetAdapter extends ArrayAdapter<BudgetClass> {
             viewHolder = (ViewHolder) view.getTag();//重新获取ViewHolder
         }
         viewHolder.type.setText(budgetClass.getType());
+        Log.d("liangjialing",budgetClass.getBudgetmoney());
         viewHolder.budgetmoney.setText(budgetClass.getBudgetmoney());
         viewHolder.zyc.setText(budgetClass.getZyc());
         viewHolder.resultmoney.setText(budgetClass.getResultmoney());

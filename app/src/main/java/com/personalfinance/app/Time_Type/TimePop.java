@@ -32,16 +32,12 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
         mDate.set(select_mYear,select_mMonth-1,select_mDay,select_mHour,select_mMinute);
 
 
-
-
         mTimeChoose=new TimeChoose(context,selectTime,0);
         buttoncancel=(TextView)mTimeChoose.findViewById(R.id.time_cancel);
 
         timepop = new PopupWindow(mTimeChoose,
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         timepop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        //timepop.setOutsideTouchable(true);
-        //timepop.setTouchable(true);
        timepop.setFocusable(true);
 
         buttoncancel.setOnClickListener(this);
@@ -54,7 +50,6 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
             public void onDismiss() {
                 if (mOnDateTimeSetListener != null) {
                     mOnDateTimeSetListener.OnDateTimeSet(mDate.getTimeInMillis());
-                   // Log.d("liang", "弹窗消失" + mDate.get(Calendar.MONTH));
                 }
             }
         });
@@ -71,7 +66,6 @@ public class TimePop extends PopupWindow implements View.OnClickListener{
                 if (mOnDateTimeSetListener != null) {
                     mOnDateTimeSetListener.OnDateTimeSet(mDate.getTimeInMillis());
                }
-               // Log.d("liang", "onDateTimeChanged  " + mDate.get(Calendar.MONTH));
             }
         });
    }

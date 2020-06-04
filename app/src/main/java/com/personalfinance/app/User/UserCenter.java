@@ -1,13 +1,11 @@
 package com.personalfinance.app.User;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,13 +19,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -50,6 +45,7 @@ import com.personalfinance.app.MainActivity;
 import com.personalfinance.app.R;
 import com.personalfinance.app.Util.HttpUtil;
 import com.personalfinance.app.Util.PictureFormatUtil;
+import com.personalfinance.app.Util.loadDialogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -61,7 +57,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.zip.Inflater;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -72,7 +67,6 @@ import okhttp3.Response;
 public class UserCenter extends AppCompatActivity implements View.OnClickListener {
 
     SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private String Username;
     private Drawable Userheadportrait;
     private Intent intent;
@@ -133,8 +127,7 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                      Log.d("TAG1", "本地更改登录状态完毕");
                     db.close();
                     intent = new Intent(UserCenter.this, MainActivity.class);
-                   // startActivity(intent);
-                  //  finish();
+
                     setResult(RESULT_OK);
                     finish();
                     break;
@@ -145,7 +138,6 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.usercenter);
-        // db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), intent.getByteArrayExtra("Headportrait"));
@@ -203,9 +195,7 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                 break;
             case R.id.userCenter_headportraitR://进行用户头像更改
                 //用户头像更改，如果联网则进行同步，反之等备份时同步
-                //InitPop();
                 popupWindow.showAtLocation(userCenter_linearLayout, Gravity.BOTTOM, 0, 0);
-                //userCenter_linearLayout.setBackgroundColor(Color.GRAY);
                 backgroundAlpha((float)0.4);
                 break;
         }
@@ -216,7 +206,6 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
      */
     private void setLogout() {
         //退出登录
-        //Log.d("TAG1", "进入setLogout");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -224,11 +213,8 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                 ContentValues values = new ContentValues();
                 values.put("User_Login", 0);
                 db.update("userinfo", values, "User_Name=?", new String[]{Username});
-                // db.close();
-                // Log.d("TAG1", "本地更改登录状态完成");
             }
         }).start();
-        //Log.d("TAG1", "本地更改登录状态线程启动");
         new Thread(new Runnable() {//进行同步操作
             @Override
             public void run() {
@@ -271,11 +257,9 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                 int isRegister = -1;
                 String responseText = response.body().string();
                 String resultCode = "500";
-                //byte[] bytesq = null;
-                //Log.d("TAG1", "返回response     :" + responseText);
+
                 if (!TextUtils.isEmpty(responseText)) {
                     try {
-                        //Log.d("TAG1", "resultCode=a     " + resultCode);
                         JSONObject jsonObject = new JSONObject(responseText);
                         resultCode = jsonObject.getString("resultCode");
                         // Log.d("TAG1", "resultCode=b    " + resultCode);
@@ -285,7 +269,6 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                             values.put("Time", jsonObject.getLong("Time"));
                             db.update("userinfo", values, "User_Name=?",
                                     new String[]{Username});
-                            // db.close();
                             Log.d("TAG1", "备份成功");
                         }
                     } catch (JSONException e) {
@@ -334,11 +317,9 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                     try {
                         JSONObject jsonObject = new JSONObject(responseText);
                         resultCode = jsonObject.getString("resultCode");
-                        //  Log.d("liangjialing",   resultCode);
                         if (resultCode.equals("200")) {//成功,本地也注销
                             db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                             db.delete("userinfo", "User_Name=?", new String[]{Username});
-                            //db.close();
                         }
                         NetWork_Code = resultCode;
 
@@ -398,7 +379,6 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(UserCenter.this,
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
-                        // Log.d("TAGqqq","未开");
                     } else {
                         openAlbum();
                     }
@@ -551,10 +531,6 @@ public class UserCenter extends AppCompatActivity implements View.OnClickListene
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra("crop", "true");// 使图片处于可裁剪状态
         // 裁剪框的比例（根据需要显示的图片比例进行设置）
-       /* if (Build.MANUFACTURER.equals("HUAWEI")) {
-        intent.putExtra("aspectX", 9998);
-        intent.putExtra("aspectY", 9999);
-    } else {}*/
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         intent.putExtra("outputX", 320);        //输出图片大小

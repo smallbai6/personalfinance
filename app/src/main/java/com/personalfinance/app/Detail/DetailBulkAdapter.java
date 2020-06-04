@@ -89,14 +89,6 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
 
                 holderb.tvmoney.setText(nodeData.getC());
 
-                /*if (node.getIcon() == -1) {
-                    holderb.ivExpand.setVisibility(View.INVISIBLE);
-                }
-                else {
-                    holderb.ivExpand.setVisibility(View.VISIBLE);
-                    holderb.ivExpand.setImageResource(node.getIcon());
-                }*/
-
                 //对空间进行监听
                 holderb.checkBox.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -135,14 +127,13 @@ public class DetailBulkAdapter extends TreeListViewAdapter {
     static class ViewHolderb {
         private CheckBox checkBox;
         private TextView tvtype, tvshowtime, tvmoney;
-        // private ImageView ivExpand;
+
 
         public ViewHolderb(View convertView) {
             checkBox = convertView.findViewById(R.id.b_builkeditor_checkbox);
             tvtype = convertView.findViewById(R.id.b_builkeditor_consumetype);
             tvshowtime = convertView.findViewById(R.id.b_builkeditor_time);
             tvmoney = convertView.findViewById(R.id.b_builkeditor_money);
-            //  ivExpand = convertView.findViewById(R.id.b_builkeditor_jiantou);
         }
     }
 

@@ -66,6 +66,10 @@
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:background="@color/colorblack"/>
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/detail_swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -176,12 +180,7 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- <ListView
-             android:id="@+id/detail_listview"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:scrollbars="none" />
- -->
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

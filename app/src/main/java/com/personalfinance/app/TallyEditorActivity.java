@@ -29,7 +29,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      *数据库
      */
     private SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private String Username;
     private Intent intent;
     private String huodong;
@@ -41,7 +40,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     private TextView back, save, choose;
     private int record;
     private String[] income_expend = {"支出", "收入"};
-    private Drawable drawable;
     /*
      *填写的内容
      */
@@ -72,12 +70,8 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tally_editor);
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.tally_editor_back);
         backimage=(ImageView)findViewById(R.id.tally_editor_backimageview);
-       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        //drawable.setBounds(0, 0, 40, 40);
-        //back.setCompoundDrawables(drawable, null, null, null);
         choose = (TextView) findViewById(R.id.tally_editor_choose);
         save = (TextView) findViewById(R.id.tally_editor_save);
 
@@ -129,7 +123,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
      *按钮响应事件
      */
     public void onClick(View v) {
-        //Toast.makeText(TallyEditorActivity.this, v.getId() + "", Toast.LENGTH_SHORT).show();
         switch (v.getId()) {
             case R.id.tallycontent_money://金额
 
@@ -147,7 +140,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.layout_type://分类类别
                 mTypePop = new TypePop(TallyEditorActivity.this, layout_type, record, type.getText().toString());
-                //Log.d("liang","进入mTypePop");
                 mTypePop.setOnTypeSetListener(new TypePop.OnTypeSetListener() {
                     @Override
                     public void OnTypeSet(String date) {
@@ -156,7 +148,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 });
                 break;
             case R.id.layout_time://时间
-                // Log.d("liang", "text的内容" + time.getText().toString());
                 mTimePop = new TimePop(TallyEditorActivity.this, layout_time, time.getText().toString());
                 mTimePop.setOnDateTimeSetListener(new TimePop.OnDateTimeSetListener() {
                     @Override
@@ -189,7 +180,6 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
                 }else if(huodong.equals("StatisticalEditorActivity.java")){
                     intent = new Intent(TallyEditorActivity.this, StatisticalEditorActivity.class);
                 }
-               // intent = new Intent(TallyEditorActivity.this, DetailActivity.class);
                 setResult(RESULT_CANCELED, intent);
                 finish();
                 break;
@@ -265,26 +255,4 @@ public class TallyEditorActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-
-    /*
-     *获取系统时间
-     */
-    private String getTimes(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
-        return format.format(date);
-    }
-
-    /*
-     *时间数据类型转换
-     */
-   /* private String LongToString(long date) {
-        Date dateOld = new Date(date); // 根据long类型的毫秒数生命一个date类型的时间
-        String sDateTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(dateOld);// 把date类型的时间转换为string
-        return sDateTime;
-    }
-
-    // date要转换的date类型的时间
-    public static long DateToLong(Date date) {
-        return date.getTime();
-    }*/
 }

@@ -26,6 +26,7 @@ import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.MainActivity;
 import com.personalfinance.app.R;
 import com.personalfinance.app.Util.HttpUtil;
+import com.personalfinance.app.Util.loadDialogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -90,7 +91,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         back = (TextView) findViewById(R.id.login_back);
         drawable = getResources().getDrawable(R.mipmap.zuojiantou);
         drawable.setBounds(0, 0, 50, 50);
@@ -148,7 +148,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         e.printStackTrace();
                     }
                 } else {//没有该用户,打包用户名+密码
-                    // JSONArray jsonArray=new JSONArray();
                     JSONArray user = new JSONArray();
                     try {
                         JSONObject jsonObject = new JSONObject();
@@ -217,15 +216,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         new String[]{login_username.getText().toString()});
                             }
                             db.close();
-                        }/*else  if(resultCode.equals("201")){//错误
-
-                        }else  if(resultCode.equals("500")){//失败
-
-                        }*/
+                        }
                         NetWork_Code = resultCode;
                         flag=false;
                     } catch (JSONException e) {
-                        //Log.d("liangjialing", "解析出错  ");
                         e.printStackTrace();
                     }
                 }
@@ -253,11 +247,5 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         }).start();
     }
-
-    public boolean isMainThread() {
-        Log.d("TAG1", Looper.getMainLooper().getThread().getId() + "    " + Thread.currentThread().getId());
-        return Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-    }
-
 
 }

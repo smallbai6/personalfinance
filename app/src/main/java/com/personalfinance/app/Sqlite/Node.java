@@ -37,7 +37,7 @@ public class Node<T> {
     /**
      * 是否展开
      */
-    private boolean isExpand = false;
+    private boolean isExpand = true;
 
     private int icon = -1;
 

@@ -3,10 +3,10 @@ package com.personalfinance.app.Finance;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -16,6 +16,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,28 +25,27 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.personalfinance.app.Config.AppNetConfig;
 import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Finance.FinanceFragment.LoadFailFragment;
 import com.personalfinance.app.Finance.FinanceFragment.ProductFragment;
 import com.personalfinance.app.R;
-import com.personalfinance.app.User.loadDialogUtils;
+import com.personalfinance.app.Util.loadDialogUtils;
 import com.personalfinance.app.Util.HttpUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -54,19 +54,22 @@ import okhttp3.Response;
  */
 public class FinanceProductActivty extends AppCompatActivity implements View.OnClickListener{
     private SQLiteDatabase db;
-    private ProductFragment productFragment;//=new ProductFragment();//理财产品显示
-    private LoadFailFragment loadFailFragment;//= new LoadFailFragment();//加载失败
+    private ProductFragment productFragment;//理财产品显示
+    private LoadFailFragment loadFailFragment;//加载失败
     private Dialog mDialog;
     private FragmentTransaction ft;
     private String NetWork_Code = "500";
     private boolean flag = true;
 
-    private Drawable drawable;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private Intent intent;
     private ImageView backimage;
     private TextView back,have;
     private String UserNumber;
 
+
+    private int isDialogClose=1;//0为请求返回结果关闭等待界面 1为点击返回键取消请求关闭等待界面
+    private OkHttpClient client;
     private final static int success = 1;
     private final static int fail = 2;
     private Handler handler = new Handler() {
@@ -75,27 +78,29 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
             super.handleMessage(msg);
             switch (msg.what) {
                 case success:
+
                     Toast.makeText(FinanceProductActivty.this,"数据加载成功",Toast.LENGTH_SHORT).show();
                     setSelect(0);
                     Log.d("liangjialing", "handler数据加载成功");
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
-                    //显示产品
-
+                   // isDialogClose=1;
                       break;
                 case fail:
+
                     Toast.makeText(FinanceProductActivty.this,"数据加载失败",Toast.LENGTH_SHORT).show();
                     //先判断数据库中是否有数据
                     if (ishaveDatabase()) {
-                        //Log.d("liangjialing", "数据库中有");
                         setSelect(0);//直接从数据库中显示
                     } else {
-                      //  Log.d("liangjialing", "数据库中没有");
                         setSelect(1);
                     }
-                   // setSelect(1);
-                    // Log.d("liangjialing", "handler数据加载失败");
-                    loadDialogUtils.closeDialog(mDialog);
                     //显示加载失败界面
+
+                    isDialogClose=0;Log.d("liangjialing","00");
+                    loadDialogUtils.closeDialog(mDialog);
+                   // Log.d("liangjialing","aa");
+                   // isDialogClose=1;Log.d("liangjialing","11");
                     break;
 
             }
@@ -111,33 +116,41 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
         UserNumber=intent.getStringExtra("UserNumber");
         back=(TextView)findViewById(R.id.financeproductfragment_back);
         backimage=(ImageView)findViewById(R.id.financeproductfragment_backimageview) ;
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-        //drawable.setBounds(0, 0, 40, 40);
-       // back.setCompoundDrawables(drawable, null, null, null);
         back.setOnClickListener(this);
         backimage.setOnClickListener(this);
         have=(TextView)findViewById(R.id.financeproductfragment_hold);
         have.setOnClickListener(this);
+
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.financeproductfragment_swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.coloryellow));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //进行刷新
+                Log.d("liangjialing","进行刷新");
+                Init();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         //首先判断是否联网
         Init();
     }
 
     private void Init() {
         if (isNetWork(this)) {
-            Log.d("liangjialing", "网络请求");
+           // Log.d("liangjialing", "网络请求");
             //进行网络请求
-             setSelect(0);
+            if(ishaveDatabase()){
+                setSelect(0);
+            }
             Requestproduct();
         } else {
             //先判断数据库中是否有数据
             Toast.makeText(FinanceProductActivty.this,"请连接网络",Toast.LENGTH_SHORT).show();
 
             if (ishaveDatabase()) {
-                Log.d("liangjialing", "数据库中有");
-                setSelect(0);//直接从数据库中显示
+               setSelect(0);//直接从数据库中显示
             } else {
-
-                Log.d("liangjialing", "数据库中没有");
                 setSelect(1);
             }
         }
@@ -147,7 +160,6 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
         switch (v.getId()){
             case R.id.financeproductfragment_backimageview:
             case R.id.financeproductfragment_back://退出界面
-               // Log.d("liangjialing","back");
                 finish();
                 break;
             case R.id.financeproductfragment_hold://持有界面的进入按钮
@@ -164,14 +176,12 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
 
         FragmentManager fm = getSupportFragmentManager();//fragment管理器
         ft = fm.beginTransaction();//开始进行管理
-       // hideFragment();
         switch (i) {
             case 0://正常
                 productFragment = new ProductFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("UserNumber",UserNumber);
                 productFragment.setArguments(bundle);//数据传递到fragment中
-
                 ft.replace(R.id.financeproductfragment_framelayout,productFragment).commit();
                 break;
             case 1://失败
@@ -180,7 +190,6 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
                 loadFailFragment.setOnfragmentClick(new LoadFailFragment.OnfragmentClick() {
                     @Override
                     public void onClick(View view) {
-                        Log.d("liangjialing","a");
                         Init();
                     }
                 });
@@ -225,27 +234,26 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
         MediaType mediaType = MediaType.Companion.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create("", mediaType);
         String address = AppNetConfig.FinanceProduct;
-        Log.d("liangjialing","request");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                //  e.printStackTrace();
+                e.printStackTrace();
+              //  Log.d("liangjialing",e.toString());
                 NetWork_Code = "500";
                 flag = false;
-
         }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
                 //成功响应，接收数据
                 int isRegister = -1;
-
+                Log.d("liangjialing", "!TextUtilsa");
                 String responseText = response.body().string();
                 String resultCode = "500";
 
                 if (!TextUtils.isEmpty(responseText)) {
                     try {
-                        Log.d("liangjialing", "!TextUtilsa");
+
                         JSONObject jsonObject = new JSONObject(responseText);
                         resultCode = jsonObject.getString("resultCode");
                         if (resultCode.equals("200")) {
@@ -261,6 +269,7 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
                 }
             }
         });
+
     }
 
     private void DeleteToDatabase(){//删除数据库中内容
@@ -306,12 +315,31 @@ public class FinanceProductActivty extends AppCompatActivity implements View.OnC
                 flag = true;
                 if (NetWork_Code.equals("200")) {
                     handler.sendEmptyMessage(success);
-                } else {
+                }
+                else {
                     handler.sendEmptyMessage(fail);
                 }
             }
         }).start();
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Log.d("liangjialing","onDissmiss");
+                int i=0;
+                for (Call call: client.dispatcher().runningCalls()) {
+                    i++;
+                    client.dispatcher().cancelAll();
+                }
+                if(i==0){
+                    if(isDialogClose==1){
+                        finish();
+                    }
+                }
+                isDialogClose=1;
+            }
+        });
     }
+
 }
 
 

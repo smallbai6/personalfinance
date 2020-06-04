@@ -1,7 +1,8 @@
-package com.personalfinance.app.User;
+package com.personalfinance.app.Util;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,7 @@ public class loadDialogUtils {
         window.setAttributes(lp);
       //  window.setWindowAnimations(R.style.PopWindowAnimStyle);
         loadingDialog.show();
-
+       // loadingDialog.setOnDismissListener();
         return loadingDialog;
     }
 
@@ -51,8 +52,10 @@ public class loadDialogUtils {
      */
     public static void closeDialog(Dialog mDialogUtils) {
         if (mDialogUtils != null && mDialogUtils.isShowing()) {
+            Log.d("liangjialing","关闭Dialog");
             mDialogUtils.dismiss();
         }
     }
+
 
 }

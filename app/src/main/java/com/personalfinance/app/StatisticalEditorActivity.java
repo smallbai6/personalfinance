@@ -21,6 +21,7 @@ import com.personalfinance.app.Sqlite.Info;
 import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Sqlite.NodeData;
 import com.personalfinance.app.Statistical.StatisticalAdapter;
+import com.personalfinance.app.Util.DataFormatUtil;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -29,9 +30,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class StatisticalEditorActivity extends AppCompatActivity implements View.OnClickListener{
+public class StatisticalEditorActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-  //  final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
+    //  final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private Intent intent;
     private Drawable drawable;
@@ -53,23 +54,24 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
     private List<Info> InfoList = new ArrayList<>();
     private List<String> TimeList = new ArrayList<>();
 
-    private final static int list_adapter=1;
-    private Handler handler=new Handler(){
+    private final static int list_adapter = 1;
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case list_adapter:
                     list_adapter();
                     break;
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statistical_peditor);
-       // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+        // db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent = getIntent();
         Username = intent.getStringExtra("Username");
         iore = intent.getStringExtra("iore");
@@ -77,27 +79,26 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         start_time = intent.getLongExtra("start", -1);
         end_time = intent.getLongExtra("end", -1);
         listView = (ListView) findViewById(R.id.statistical_pediotr_listview);
-        backbutton=(TextView)findViewById(R.id.statistical_pediotr_back);
-        backimage=(ImageView)findViewById(R.id.statistical_pediotr_backimageview);
-       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // backbutton.setCompoundDrawables(drawable, null, null, null);
+        backbutton = (TextView) findViewById(R.id.statistical_pediotr_back);
+        backimage = (ImageView) findViewById(R.id.statistical_pediotr_backimageview);
         backbutton.setOnClickListener(this);
         backimage.setOnClickListener(this);
-        backbutton.setText(type+"("+iore+")");
+        backbutton.setText(type + "(" + iore + ")");
         Get_List();
 
     }
-    public void onClick(View v){
-        switch (v.getId()){
+
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.statistical_pediotr_backimageview:
             case R.id.statistical_pediotr_back:
-                intent=new Intent(StatisticalEditorActivity.this,StatisticalActivity.class);
+                intent = new Intent(StatisticalEditorActivity.this, StatisticalActivity.class);
                 setResult(RESULT_OK);
                 finish();
                 break;
         }
-}
+    }
+
     private void Get_InfoList() {
         InfoList.clear();
         int i = 0;
@@ -157,9 +158,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
             }
 
         }
-      /*  for (String string : TimeList) {
-            Log.d("liangjialing", string);
-        }*/
+
     }
 
     private void Get_List() {
@@ -182,7 +181,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
                         nodeData = new NodeData(InfoList.get(b).getType(),
                                 LongToString(InfoList.get(b).getTime()).substring(11, 16),
                                 InfoList.get(b).getText(),
-                                formatPrice(InfoList.get(b).getMoney()), "", "", InfoList.get(b).getTime());
+                                DataFormatUtil.formatPrice(InfoList.get(b).getMoney()), "", "", InfoList.get(b).getTime());
                         list.add(new Node<NodeData>(i + "", leveldivide01 + "", nodeData, "1"));
                         i++;
                         b++;
@@ -192,7 +191,6 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
                     }
                 }
                 handler.sendEmptyMessage(list_adapter);
-                //list_adapter();
             }
         }).start();
     }
@@ -205,23 +203,23 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
             @Override
             public void onClick(Node node, int position) {
                 NodeData nodeData = (NodeData) node.getData();
-                Toast.makeText(StatisticalEditorActivity.this, "短点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(StatisticalEditorActivity.this, TallyEditorActivity.class);
                 intent.putExtra("Username", Username);
                 intent.putExtra("money", nodeData.getD());
                 intent.putExtra("type", nodeData.getA());
                 intent.putExtra("time", nodeData.getTime());
                 intent.putExtra("message", nodeData.getC());
-                intent.putExtra("HuoDong","StatisticcalEditorActivity.java");
+                intent.putExtra("HuoDong", "StatisticcalEditorActivity.java");
                 startActivityForResult(intent, 1);
             }
         });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case 1://重新刷新一遍
-                if(resultCode==RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     Get_List();
                 }
                 break;
@@ -229,6 +227,7 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
                 break;
         }
     }
+
     /*
      *时间数据类型转换
      */
@@ -238,9 +237,4 @@ public class StatisticalEditorActivity extends AppCompatActivity implements View
         return sDateTime;
     }
 
-    public static String formatPrice(double price) {
-        DecimalFormat df = new DecimalFormat("0.00");
-        String format = df.format(price);
-        return format;
-    }
 }

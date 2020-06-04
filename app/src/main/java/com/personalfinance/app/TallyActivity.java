@@ -42,7 +42,6 @@ private Cursor cursor;
      *数据库
      */
     private SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     /*
      *活动跳转
      */
@@ -81,7 +80,6 @@ private Cursor cursor;
     /*
      *背景
      */
-   // private View background;
     /*
      *金额&时间&类别
      */
@@ -121,10 +119,7 @@ private Cursor cursor;
 
         back = (TextView) findViewById(R.id.tally_back);
         backimage=(ImageView)findViewById(R.id.tally_backimageview);
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // back.setCompoundDrawables(drawable, null, null, null);
-        choose = (TextView) findViewById(R.id.tally_choose);
+      choose = (TextView) findViewById(R.id.tally_choose);
         save = (TextView) findViewById(R.id.tally_save);
         money = (TextView) findViewById(R.id.tallycontent_money);
         layout_money = (LinearLayout) findViewById(R.id.layout_money);
@@ -141,7 +136,6 @@ private Cursor cursor;
         process.setText("");
         contentView = getLayoutInflater().inflate(R.layout.textlist, null);
         InitchooseList();
-        //background = this.findViewById(R.id.son_tally);
         PopParent = this.findViewById(R.id.parent_tally);
         choose.setText(income_expend[0]);//初始时是支付
         drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
@@ -174,8 +168,7 @@ private Cursor cursor;
         choosePopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                //background.setBackgroundColor(Color.TRANSPARENT);
-                backgroundAlpha((float)1.0);
+               backgroundAlpha((float)1.0);
                 drawable = getResources().getDrawable(R.mipmap.shangsanjiao);
                 drawablel2tubiao();
             }
@@ -244,10 +237,10 @@ private Cursor cursor;
                     }
                 }catch(Exception e){
                 }finally {
-                   // if(null!=cursor){
+
                         cursor.close();
                         db.close();
-                   // }
+
                 }
             }
         }).start();
@@ -289,7 +282,6 @@ private Cursor cursor;
                 break;
             case R.id.layout_type://分类类别
                 mTypePop = new TypePop(TallyActivity.this, layout_type, record, type.getText().toString());
-                //Log.d("liang","进入mTypePop");
                 mTypePop.setOnTypeSetListener(new TypePop.OnTypeSetListener() {
                     @Override
                     public void OnTypeSet(String date) {
@@ -298,7 +290,6 @@ private Cursor cursor;
                 });
                 break;
             case R.id.layout_time://时间
-                // Log.d("liang", "text的内容" + time.getText().toString());
                 mTimePop = new TimePop(TallyActivity.this, layout_time, time.getText().toString());
                 mTimePop.setOnDateTimeSetListener(new TimePop.OnDateTimeSetListener() {
                     @Override
@@ -308,18 +299,15 @@ private Cursor cursor;
                         Log.d("liangjialing", currentdate + "");
                     }
                 });
-                // Log.d("liang", "完毕");
                 break;
             case R.id.tally_save:
             case R.id.tallycontent_save://进行保存
-                //  Log.d("TAG","点击保存  "+choose.getText().toString());
                 issave=1;
                 income_expend(choose.getText().toString());
                 //退出记账活动
                 //判断是由哪一个活动进入的TallyActivity
                 if(huodong.equals("MainActivity.java")){
                     intent = new Intent(TallyActivity.this, MainActivity.class);
-                    //   Log.d("TAG","返回到MainActivity");
                 }else if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyActivity.this, DetailActivity.class);
                 }
@@ -339,17 +327,12 @@ private Cursor cursor;
                 //直接退出记账活动
                 if(huodong.equals("MainActivity.java")){
                     intent = new Intent(TallyActivity.this, MainActivity.class);
-                   // startActivity(intent);
-                    // finish();
                 }else if(huodong.equals("DetailActivity.java")){
                     intent = new Intent(TallyActivity.this, DetailActivity.class);
-                    //startActivity(intent);
-
                 }
                 intent.putExtra("issave", issave);
                 setResult(RESULT_CANCELED,intent);
                 finish();
-                //Toast.makeText(TallyActivity.this, "tally_back", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -380,8 +363,7 @@ private Cursor cursor;
                     }
                     values.clear();
                     db.close();
-                //Log.d("liangjialing","a");
-            }
+                   }
         });
        t1.start();
        while(t1.isAlive()){}

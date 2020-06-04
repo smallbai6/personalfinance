@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.personalfinance.app.Config.DatabaseConfig;
 import com.personalfinance.app.Detail.DetailAdapter;
@@ -29,16 +30,17 @@ import com.personalfinance.app.Detail.OnInnerItemClickListener;
 import com.personalfinance.app.Detail.OnInnerItemLongClickListener;
 import com.personalfinance.app.Sqlite.Node;
 import com.personalfinance.app.Sqlite.NodeData;
+import com.personalfinance.app.Util.DataFormatUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
     private Cursor cursor;
     private String Username;
     private Intent intent;
+    private SwipeRefreshLayout swipeRefreshLayout;
     /*
     按键
      */
@@ -114,10 +116,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         listView = (MyListView) findViewById(R.id.detail_listview);//流水列表
         backbutton = (TextView) findViewById(R.id.detail_back_button);
         backimage=(ImageView)findViewById(R.id.detail_back_backimageview);
-       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // backbutton.setCompoundDrawables(drawable, null, null, null);
-        //backbutton.setText(DetailList.LongToString(start_time).substring(0,5));
         BackbuttonText();
         chooseysmd = (TextView) findViewById(R.id.detail_choose_rmd);//选择季月
         chooseysmd.setText(ysmdString[timetype]);
@@ -188,6 +186,23 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         addtally.setOnClickListener(this);
 
         Refresh_List();
+
+
+
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.detail_swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.coloryellow));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //进行刷新
+                Refresh_List();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
+
+
     }
     private void BackbuttonText(){
         new Thread(new Runnable() {
@@ -285,8 +300,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 intent.putExtra("Username",Username);
                 intent.putExtra("HuoDong", "DetailActivity.java");
                 startActivityForResult(intent, 1);//requestCode=1为进入TallyActivity.class中
-                //startActivity(intent);
-                //finish();
+
         }
     }
 
@@ -298,9 +312,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         adapter.setOnInnerItemClickListener(new OnInnerItemClickListener() {
             @Override
             public void onClick(Node node, int position) {
-                //   Log.d("onClick"," position    "+position);
                 NodeData nodeData = (NodeData) node.getData();
-                //Toast.makeText(DetailActivity.this, "短点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
                 intent = new Intent(DetailActivity.this, TallyEditorActivity.class);
                 intent.putExtra("Username", Username);
                 intent.putExtra("money", nodeData.getE());
@@ -317,13 +329,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
                 NodeData nodeData = (NodeData) node.getData();
                 delete_showDialog(nodeData,position);
-                //  Toast.makeText(DetailActivity.this, "长点  " + nodeData.getC(), Toast.LENGTH_SHORT).show();
-               // intent = new Intent(DetailActivity.this, DetailEditorActivity.class);
-              //  intent.putExtra("Username", Username);
-              //  intent.putExtra("start_time",start_time);
-              //  intent.putExtra("end_time",end_time);
-                //intent.putExtra("year", showyear);
-               // startActivityForResult(intent, 3);
+
             }
         });
     }
@@ -331,7 +337,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         //builder.setIcon(R.drawable.picture);
         builder.setTitle("温馨提示");
-        builder.setMessage("你确定要将各个类型的预算汇总为总预算么？");
+        builder.setMessage("你确定要删除么？");
 
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
@@ -351,11 +357,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
     private void delete_data(NodeData nodeData,int position){
         String type = nodeData.getC();
-        Log.d("liangjialing",type);
         String money=nodeData.getE();
-        Log.d("liangjialing",money);
         String time = String.valueOf(nodeData.getTime());
-        Log.d("liangjialing",time);
         db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         if (type.substring(0, 1).equals("0")) {
             //支出
@@ -368,7 +371,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     new String[]{Username, money, type.substring(1), time});
         }
         db.close();
-        Log.d("liangjialing","进入refresh_List");
         Refresh_List();
     }
     private void Total_show(){
@@ -392,26 +394,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Message message=new Message();
                 message.what=3;
                 Bundle bundle=new Bundle();
-                bundle.putString("totalmoney",DetailList.formatPrice(totalmoney));
-                bundle.putString("totalexpendmoney",DetailList.formatPrice(totalexpendmoney));
-                bundle.putString("totalincomemoney",DetailList.formatPrice(totalincomemoney));
+                bundle.putString("totalmoney", DataFormatUtil.formatPrice(totalmoney));
+                bundle.putString("totalexpendmoney",DataFormatUtil.formatPrice(totalexpendmoney));
+                bundle.putString("totalincomemoney",DataFormatUtil.formatPrice(totalincomemoney));
                 message.setData(bundle);
                 handler.sendMessage(message);
             }
         }).start();
 
-     /*  detail_money.setText(DetailList.formatPrice(totalmoney));
-        detail_expendmoney.setText(DetailList.formatPrice(totalexpendmoney));
-        detail_incomemoney.setText(DetailList.formatPrice(totalincomemoney));*/
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case 1://添加数据
-               // int issave = data.getIntExtra("issave", -1);
-               // if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Refresh_List();
-               // }
                 break;
             case 2://编辑数据
                 if (resultCode == RESULT_OK) {
@@ -424,7 +420,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Log.d("TAGliang",isdelete+"");
                 if (resultCode == RESULT_OK) {//返回了
                     if (isdelete != 0) {
-                      //  Log.d("TAG","Refresh_List列表重建");
                         Refresh_List();
                     }
                 }

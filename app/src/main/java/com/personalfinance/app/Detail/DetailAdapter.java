@@ -69,9 +69,6 @@ public class DetailAdapter extends TreeListViewAdapter {
                 }
                 nodeData =(NodeData)node.getData();
 
-                //RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tva.getLayoutParams();
-                //params.leftMargin = 60;
-                //tva.setLayoutParams(params);
                 holderb.tva.setText(nodeData.getA());
                 holderb.tvb.setText(nodeData.getB());
                 holderb.tvc.setText(nodeData.getC().substring(1));

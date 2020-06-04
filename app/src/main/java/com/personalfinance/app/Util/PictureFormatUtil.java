@@ -58,9 +58,7 @@ public class PictureFormatUtil {
     // Bitmap转换成Drawable
     public static Drawable bitmap2Drawable(Resources resources, Bitmap bitmap) {
         Drawable drawable = new BitmapDrawable(resources, bitmap);
-       // BitmapDrawable bd = new BitmapDrawable(resources, bitmap);
-       // Drawable d = (Drawable) bd;
-        return drawable;
+       return drawable;
     }
 
 }

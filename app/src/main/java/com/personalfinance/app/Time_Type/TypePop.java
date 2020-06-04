@@ -21,17 +21,14 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
     private TypeChoose mTypeChoose;
     private OnTypeSetListener mOnTypeSetListener;//接口
     int select = 0;
-    // private List<String> chooseList=new ArrayList<>();
     private String[] chooseList = new String[15];
     private int position = 0;
     private Activity context;
     private SQLiteDatabase db;
-    //final String DATABASE_PATH = "data/data/" + "com.personalfinance.app" + "/databases/personal.db";
 
     public TypePop(final Activity context, View parent, int typecategory, String typeposition) {
         super(context);
         this.context = context;
-        //  Log.d("liang","数据库");
         try {
             db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
             //cursor = db.query("expendtype", null, null, null, null, null, null);
@@ -82,8 +79,6 @@ public class TypePop extends PopupWindow implements View.OnClickListener {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         timepop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         timepop.setOutsideTouchable(true);
-        // timepop.setTouchable(true);
-        //timepop.setFocusable(true);
 
         timepop.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
 

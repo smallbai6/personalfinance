@@ -43,28 +43,24 @@ public class StartEndTime {
             case 3:
                 start_time = start_date(0);
                 end_time = end_date(2);
-                // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
                 break;
             case 4:
             case 5:
             case 6:
                 start_time = start_date(3);
                 end_time = end_date(5);
-                // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
                 break;
             case 7:
             case 8:
             case 9:
                 start_time = start_date(6);
                 end_time = end_date(8);
-                // Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
                 break;
             case 10:
             case 11:
             case 12:
                 start_time = start_date(9);
                 end_time = end_date(11);
-                //Log.d("liangjialing", LongToString(start_time) + "-----" + LongToString(end_time));
                 break;
             default:
                 break;

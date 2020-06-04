@@ -30,7 +30,9 @@ import com.personalfinance.app.Budget.BudgetAdapter;
 import com.personalfinance.app.Budget.BudgetClass;
 import com.personalfinance.app.Budget.Budget_Caculator;
 import com.personalfinance.app.Config.DatabaseConfig;
+import com.personalfinance.app.Util.DataFormatUtil;
 
+import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -108,15 +110,17 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                             mCaculatorPop = new Budget_Caculator(BudgetActivity.this, chooselistView);
                             mCaculatorPop.setOnCaculatorSetListener(new Budget_Caculator.OnCaculatorSetListener() {
                                 @Override
-                                public void OnCaculatorSet(String date) {
+                                public void OnCaculatorSet(int Sort,String date) {
                                     Log.d("TAG", "OnCaculatorSet");
                                     //budgetList列表的显示更新
-                                    if (Double.valueOf(date) >= 0) {
-                                        budgetlist_change(date, position);
-                                        budget_change(choose_ysmd.getText().toString(), choose_type.getText().toString(), consumetype[position], date);
-                                        total_budget(choose_ysmd.getText().toString(), choose_type.getText().toString());
-                                    } else {
-                                        Toast.makeText(BudgetActivity.this, "设置金额不能为负数", Toast.LENGTH_SHORT).show();
+                                    if(!date.equals("")) {
+                                        if (Double.valueOf(date) >= 0) {
+                                            budgetlist_change(DataFormatUtil.formatPrice(Double.valueOf(date)), position);
+                                            budget_change(choose_ysmd.getText().toString(), choose_type.getText().toString(), consumetype[position], DataFormatUtil.formatPrice(Double.valueOf(date)));
+                                            total_budget(choose_ysmd.getText().toString(), choose_type.getText().toString());
+                                        } else {
+                                            Toast.makeText(BudgetActivity.this, "设置金额不能为负数", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 }
                             });
@@ -133,16 +137,11 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.budget);
-        //db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
         intent=getIntent();
         Username=intent.getStringExtra("Username");
         date = new Date();
-        /*budget_update();*/
         back = (TextView) findViewById(R.id.budget_back_button);
         backimage=(ImageView)findViewById(R.id.budget_back_backimageview);
-        //drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // back.setCompoundDrawables(drawable, null, null, null);
         refreshiv = (ImageView) findViewById(R.id.budget_total_refresh);//刷新图标
         choose_ysmd = (TextView) findViewById(R.id.budget_choose_yrmd); //年季月日
         choose_ysmd.setText(choose_ysmdString[0]);
@@ -249,13 +248,14 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
                 mCaculatorPop = new Budget_Caculator(BudgetActivity.this, chooselistView);
                 mCaculatorPop.setOnCaculatorSetListener(new Budget_Caculator.OnCaculatorSetListener() {
                     @Override
-                    public void OnCaculatorSet(String date) {
+                    public void OnCaculatorSet(int Sort,String date) {
+                        if(!date.equals("")) {
                         if(Double.valueOf(date)>=0){
-                            totalbudget_change(choose_ysmd.getText().toString(), choose_type.getText().toString(), date);
+                            totalbudget_change(choose_ysmd.getText().toString(), choose_type.getText().toString(), DataFormatUtil.formatPrice(Double.valueOf(date)));
                         }else{
                             Toast.makeText(BudgetActivity.this,"设置金额不能为负数",Toast.LENGTH_SHORT).show();
                         }
-                    }
+                    }}
                 });
         }
     }
@@ -406,6 +406,7 @@ public class BudgetActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void budgetlist_change(String date, int position) {
         final String stringdate = date;
+       // Log.d("liangjialing","stringdate=  "+stringdate);
         final int pos = position;
         new Thread(new Runnable() {
             @Override

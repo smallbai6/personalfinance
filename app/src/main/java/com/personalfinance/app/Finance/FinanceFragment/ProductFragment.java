@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import com.personalfinance.app.Config.DatabaseConfig;
@@ -37,6 +38,10 @@ public class ProductFragment extends Fragment {
 
         Bundle bundle = this.getArguments();//得到从Activity传来的数据
         String UserNumber = bundle.getString("UserNumber");//根据用户数据进行在数据库中进行查找
+
+
+
+
         InitProduct(UserNumber);
         return view;
     }
@@ -64,7 +69,6 @@ public class ProductFragment extends Fragment {
                 String Yield = cursor.getString(cursor.getColumnIndex("Yield"));
                 String Purchase_Amount = cursor.getString(cursor.getColumnIndex("Purchase_Amount"));
                 String Product_Number = cursor.getString(cursor.getColumnIndex("Product_Number"));
-                //String UserName=cursor.getString(cursor.getColumnIndex("User_Name"));
                 Product product = new Product(Picture, Product_Name, Yield, Purchase_Amount, Product_Number, usernumber);
                 productList.add(product);
             } while (cursor.moveToNext());

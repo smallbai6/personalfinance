@@ -49,9 +49,6 @@ public class Product_DetailActivity extends AppCompatActivity implements View.On
     private void Init() {
         back = (TextView) findViewById(R.id.productdetail_back);
         backimage=(ImageView)findViewById(R.id.productdetail_backimageview);
-       // drawable = getResources().getDrawable(R.mipmap.zuojiantou);
-       // drawable.setBounds(0, 0, 40, 40);
-       // back.setCompoundDrawables(drawable, null, null, null);
         back.setOnClickListener(this);
         backimage.setOnClickListener(this);
         buy = (RelativeLayout) findViewById(R.id.productdetail_buy);

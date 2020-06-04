@@ -15,13 +15,14 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_centerVertical="true"
-            app:srcCompat="@mipmap/zuojiantou"/>
+            app:srcCompat="@mipmap/zuojiantou" />
+
         <TextView
             android:id="@+id/buy_back"
-            android:layout_toRightOf="@+id/buy_backimageview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/buy_backimageview"
             android:text="买入"
             android:textColor="@color/colorblack"
             android:textSize="20dp" />
@@ -83,23 +84,48 @@
             android:textColor="@color/colorblack"
             android:textSize="20dp" />
 
-        <EditText
-            android:id="@+id/buy_money"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:textColor="@color/colorblack"
-            android:textSize="30dp" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/buy_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="￥"
+                android:textColor="@color/colorblack"
+                android:textSize="40dp" />
+
+            <TextView
+                android:id="@+id/buy_money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_toRightOf="@+id/buy_textView"
+                android:ellipsize="end"
+                android:maxWidth="250dp"
+                android:singleLine="true"
+                android:textColor="@color/colorblack"
+                android:textSize="30dp" />
+
+        </RelativeLayout>
+
+
     </LinearLayout>
-<View
-    android:layout_width="match_parent"
-    android:layout_height="30dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="30dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:layout_marginLeft="7dp"
-        android:layout_marginRight="7dp">
+        android:layout_marginRight="7dp"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/buy_sure"

@@ -118,8 +118,6 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
                 if (onTreeNodeClickListener != null) {
                     onTreeNodeClickListener.onClick(mNodes.get(position), position);
                 }
-              //  Log.d("setcheck", "n.isLeaf  "+n.isChecked());
-                // n.setChecked(!n.isChecked());
             }
         }
     }
@@ -236,8 +234,6 @@ public abstract class TreeListViewAdapter extends BaseAdapter {
                 node.getParent().setChecked(false);
             }
         }
-        /*if (node.getParent() != null)
-            setNodeParentChecked(node.getParent(), checked);*/
         notifyDataSetChanged();
     }
 

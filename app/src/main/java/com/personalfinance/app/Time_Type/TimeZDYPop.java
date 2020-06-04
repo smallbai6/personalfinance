@@ -78,39 +78,6 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
         Listener();
         // Log.d("tiancai", mTimeChoose.getWidth()+"   dialog.show()   "+ mTimeChoose.getHeight());
     }
-    /*private void Init(View parent){
-        mTimeChoose = new TimeChoose(context, Time, 1);
-        time_sure = (TextView) mTimeChoose.findViewById(R.id.time_sure);
-        time_sure.setOnClickListener(this);
-        time_cancel = (TextView)mTimeChoose.findViewById(R.id.time_cancel);
-        time_cancel.setOnClickListener(this);
-        startlayout = (LinearLayout) mTimeChoose.findViewById(R.id.statistical_zidingyi_start);
-        startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
-        startlayout.setOnClickListener(this);
-        endlayout = (LinearLayout) mTimeChoose.findViewById(R.id.statistical_zidingyi_end);
-        endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
-        endlayout.setOnClickListener(this);
-        starttext = (TextView) mTimeChoose.findViewById(R.id.statistical_starttime);
-        endtext = (TextView) mTimeChoose.findViewById(R.id.statistical_endtime);
-
-
-        timePopupWindow = new PopupWindow(mTimeChoose,
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        timePopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        timePopupWindow.setOutsideTouchable(true);
-        timePopupWindow.setTouchable(true);
-        timePopupWindow.setFocusable(true);
-        timePopupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
-        timePopupWindow.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                //不作任何更改
-            }
-        });
-        Listener();
-        // Log.d("tiancai", mTimeChoose.getWidth()+"   dialog.show()   "+ mTimeChoose.getHeight());
-
-    }*/
     private void ClickStart(String kaishi) {
         select_mYear = Integer.valueOf(kaishi.substring(0, 4));
         select_mMonth = Integer.valueOf(kaishi.substring(5, 7));
@@ -127,8 +94,7 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
         select_mYear = Integer.valueOf(jieshu.substring(0, 4));
         select_mMonth = Integer.valueOf(jieshu.substring(5, 7));
         select_mDay = Integer.valueOf(jieshu.substring(8));
-        //Log.d("liangjialing",select_mYear+"   "+select_mMonth+"    "+select_mDay);
-        Time = jieshu + "  " + "23:59";
+       Time = jieshu + "  " + "23:59";
         select_mHour = 23;
         select_mMinute = 59;
         mDate.set(select_mYear, select_mMonth - 1, select_mDay, select_mHour, select_mMinute);
@@ -158,10 +124,7 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
                     endlong = mDate.getTimeInMillis();
                     endtext.setText(LongToString(endlong));
                 }
-                /*if (mOnDateTimeSetListener != null) {
-                    mOnDateTimeSetListener.OnDateTimeSet(mDate.getTimeInMillis());
-                }*/
-                // Log.d("liang", "onDateTimeChanged  " + mDate.get(Calendar.MONTH));
+
             }
         });
     }
@@ -186,7 +149,6 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
                 ClickStart(starttext.getText().toString());
                 Log.d("showtime", "start  " + Time);
                 mTimeChoose = new TimeChoose(context, Time, 1);
-                //Init(Parent);
                 startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
                 endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
                 break;
@@ -194,7 +156,7 @@ public class TimeZDYPop extends PopupWindow implements View.OnClickListener {
                 ClickEnd(endtext.getText().toString());
                 Log.d("showtime", "end  " + Time);
                 mTimeChoose = new TimeChoose(context, Time, 1);
-                //Init(Parent);
+
                 startlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhite));
                 endlayout.setBackgroundColor(context.getResources().getColor(R.color.colorwhitewhitegray));
 

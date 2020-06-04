@@ -56,8 +56,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
                 //跳转进入该产品的详情内
                 Intent intent = new Intent(v.getContext(), Record_DetailActivity.class);//进入交易记录详情
                 intent.putExtra("Order_Number",record.getOrder_Number());//传递订单号，准确锁定交易信息
-                //intent.putExtra("User_Number",record.getUser_Number());//用户编号传递
-               // intent.putExtra("Product_Number", record.getProduct_Number());//产品编号传递
                 v.getContext().startActivity(intent);
             }
         });
@@ -67,7 +65,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {//绑定ViewHolder
         Record record = recordList.get(position);
-       // holder.Buy_Sale.setText(record.getBuy_Sale());
         holder.Product_Name.setText(record.getProduct_Name());
         holder.Time.setText(record.getTime());
         holder.M_Q_S.setText(record.getM_Q_S());

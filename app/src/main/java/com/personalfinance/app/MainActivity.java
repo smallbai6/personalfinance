@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private DrawerLayout mDrawerLayout;
     private View userheaderView;
-   // private RelativeLayout userheaderlayout;
     private TextView draweruserrname;
     private CircleImageView drawerheadportrait;
     private ImageView SyncData;
@@ -85,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RelativeLayout main_opendrawer;
     private ImageView main_opendraweriv;
 
-    //  private Button tallybutton,detailbutton,budgetbutton,statisticalbutton;
     private TextView tallybutton, detailbutton, budgetbutton, statisticalbutton,financebutton;
     private Drawable drawable;
     private Intent intent;
@@ -161,17 +159,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Username = cursor.getString(cursor.getColumnIndex("User_Name"));
                 UserNumber=cursor.getString(cursor.getColumnIndex("User_Number"));
-                // iv.setImageDrawable(getDrawable().get(0));
                 byte[] blob = cursor.getBlob(cursor.getColumnIndexOrThrow("Head_Portrait"));
                 Userheadportrait = PictureFormatUtil.Bytes2Drawable(getResources(), blob);
-              //  Log.d("梁嘉玲","Username="+Username);
             } else {
 
                 Username="请立即登录";
                 UserNumber="";
                 Userheadportrait = ContextCompat.getDrawable(this,R.mipmap.defaultheadportrait);
             }
-           // Log.d("TAG", "GetUsername= " + Username);
         } catch (Exception e) {
         } finally {
             cursor.close();
@@ -248,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ysmd_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                //  Toast.makeText(MainActivity.this, ysmd_list.get(position).getName(), Toast.LENGTH_SHORT).show();
                 //0本日 1本月 2本季 3本年
                 final int pt = position;
                 new Thread(new Runnable() {
@@ -336,29 +330,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawerLayout.closeDrawers();
                 if (draweruserrname.getText().toString().equals("请立即登录")) {//没有登录跳转到登录界面
                     intent = new Intent(MainActivity.this, LoginActivity.class);
-                    //startActivityForResult(intent, 1);
-                   // startActivity(intent);
 
                 } else {//跳转到用户中心
                    intent = new Intent(MainActivity.this, UserCenter.class);
                     intent.putExtra("Username", Username);
                     intent.putExtra("Headportrait", PictureFormatUtil.Drawable2Bytes(Userheadportrait));
-                 //   startActivity(intent);
 
                 }
-                 //finish();
                 startActivityForResult(intent, 3);//返回之后进行列表的更新
                 break;
             case R.id.drawer_SyncData://同步数据
                if(Username.equals("请立即登录")){
                    Toast.makeText(MainActivity.this,"未登录，不能同步！",Toast.LENGTH_SHORT).show();
                }else{//弹出对话框
-                   //SyncData();
                    Sync_showDialog();
                }
                break;
             case R.id.maintally_button://进入记账
-                //  Toast.makeText(MainActivity.this, "进入记账中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, TallyActivity.class);
                 intent.putExtra("Username", Username);
                 intent.putExtra("HuoDong","MainActivity.java");
@@ -366,7 +354,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
             case R.id.maindetail_button://进入流水 输入进去start_time end_time
-                //   Toast.makeText(MainActivity.this, "进入流水中", Toast.LENGTH_SHORT).show();
                 long[] time = StartEndTime.GetYear();//按年算
                 intent = new Intent(MainActivity.this, DetailActivity.class);
                 intent.putExtra("Username", Username);
@@ -374,36 +361,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("end_time", time[1]);
                 intent.putExtra("timetype", 3);
                 startActivityForResult(intent, 1);//返回之后进行列表的更新
-                //startActivity(intent);
-                //finish();
                 break;
             case R.id.mainbudget_button://进入预算
-                //  Toast.makeText(MainActivity.this, "进入预算中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, BudgetActivity.class);
                 intent.putExtra("Username", Username);
                 startActivity(intent);//不需要进行列表刷新，在预算中只能更改预算
-                // finish();
                 break;
             case R.id.mainstatistical_button://进入统计
-                //  Toast.makeText(MainActivity.this, "进入统计中", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, StatisticalActivity.class);
                 intent.putExtra("Username", Username);
                 startActivityForResult(intent, 1);//返回之后进行列表的更新
-                //finish();
                 break;
             case R.id.mainfinance_button://进入理财
                 intent=new Intent(MainActivity.this, FinanceProductActivty.class);
-                //intent.putExtra("Username",Username);
                 intent.putExtra("UserNumber",UserNumber);
                 startActivity(intent);
-                //finish();
                 break;
         }
     }
 
     private void Sync_showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        //builder.setIcon(R.drawable.picture);
         builder.setTitle("温馨提示");
         builder.setMessage("你确定要同步数据么？");
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -459,22 +437,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int isRegister = -1;
                 String responseText = response.body().string();
                 String resultCode = "500";
-                //byte[] bytesq = null;
-                //Log.d("TAG1", "返回response     :" + responseText);
                 if (!TextUtils.isEmpty(responseText)) {
                     try {
-                        //Log.d("TAG1", "resultCode=a     " + resultCode);
                         JSONObject jsonObject = new JSONObject(responseText);
                         resultCode = jsonObject.getString("resultCode");
-                        // Log.d("TAG1", "resultCode=b    " + resultCode);
                         if (resultCode.equals("200")) {//备份成功
                             db = SQLiteDatabase.openDatabase(DatabaseConfig.DATABASE_PATH, null, SQLiteDatabase.OPEN_READWRITE);
                             ContentValues values = new ContentValues();
                             values.put("Time", jsonObject.getLong("Time"));
                             db.update("userinfo", values, "User_Name=?",
                                     new String[]{Username});
-                            // db.close();
-                            Log.d("TAG1", "备份成功");
                             handler.sendEmptyMessage(success);
                         }
                     } catch (JSONException e) {
@@ -484,7 +456,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     Log.d("TAG1", "返回responseText为空  " + resultCode);
                 }
-               // handler.sendEmptyMessage(success);
             }
         });
     }
@@ -498,13 +469,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Set_YSMD();
                 break;
             case 2://编辑数据
-                //记账活动直接点击返回按键data中没有数据；导致issave取不出来。
-                //Log.d("TAGaaa","判断是否可以");
-               // int issave = data.getIntExtra("issave", -1);
-                //Log.d("TAG", "返回到MainActivity issave=" + issave);
-               // if (!((resultCode == RESULT_OK) && (issave == 0))) {
                     Set_YSMD();
-               // }
                 break;
             case 3://用户
                 Get_User();
