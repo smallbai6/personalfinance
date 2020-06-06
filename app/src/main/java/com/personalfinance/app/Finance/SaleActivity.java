@@ -2,6 +2,7 @@ package com.personalfinance.app.Finance;
 
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -58,6 +60,8 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
     private String NetWork_Code = "500";
     private boolean flag = true;
 
+    private OkHttpClient client;
+    private int isDialogClose=1;
     private final static int success = 1;
     private final static int fail = 2;
     private Handler handler = new Handler() {
@@ -66,10 +70,13 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
             super.handleMessage(msg);
             switch (msg.what) {
                 case success:
+                    isDialogClose=0;
+                    Money.setText("");
                     Toast.makeText(SaleActivity.this, "卖出成功", Toast.LENGTH_SHORT).show();
                     loadDialogUtils.closeDialog(mDialog);
                     break;
                 case fail:
+                    isDialogClose=0;
                     Toast.makeText(SaleActivity.this, "卖出失败", Toast.LENGTH_SHORT).show();
                     loadDialogUtils.closeDialog(mDialog);
                     break;
@@ -186,7 +193,7 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
         RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
         String address = AppNetConfig.FinanceSale;
         Log.d("liangjialing", "requestsale");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 //  e.printStackTrace();
@@ -210,7 +217,7 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
                             //重新加载holdproduct表和recordproduct表
                            WriteToHoldproduct(jsonObject.getJSONArray("holdproduct"));
                             WriteToRecordproduct(jsonObject.getJSONArray("recordproduct"));
-                            Money.setText("");
+
                         } else {
                             Log.d("liang", "shujufanhuishibai");
                         }
@@ -305,5 +312,21 @@ public class SaleActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }).start();
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                int i=0;
+                for (Call call: client.dispatcher().runningCalls()) {
+                    i++;
+                    client.dispatcher().cancelAll();
+                }
+                if(i==0){
+                    if(isDialogClose==1){
+                        finish();
+                    }
+                }
+                isDialogClose=1;
+            }
+        });
     }
 }

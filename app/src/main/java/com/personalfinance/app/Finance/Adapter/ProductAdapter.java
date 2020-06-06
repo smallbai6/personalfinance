@@ -70,7 +70,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         holder.Picture.setImageDrawable(product.getPicture());
         holder.Product_Name.setText(product.getProduct_Name());
         holder.Product_Yield.setText(product.getYield()+"%");
-        holder.Purchase_Amount.setText(product.getPurchase_Amount());
+        if(product.getPurchase_Amount().equals("")){
+            holder.Purchase_Amount.setText("不限起购金额");
+        }else{
+            holder.Purchase_Amount.setText(product.getPurchase_Amount()+"元起购");
+        }
+
     }
 
     @Override

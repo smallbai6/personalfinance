@@ -93,7 +93,15 @@ public class Product_DetailActivity extends AppCompatActivity implements View.On
             Product_Name.setText(cursor.getString(cursor.getColumnIndex("Product_Name")));
             Company.setText(cursor.getString(cursor.getColumnIndex("Company")));
             Yield.setText(cursor.getString(cursor.getColumnIndex("Yield"))+"%");
-            Purchase_Amount.setText(cursor.getString(cursor.getColumnIndex("Purchase_Amount")));
+            Log.d("liangjialing",cursor.getString(cursor.getColumnIndex("Purchase_Amount"))+"  kl");
+            if(cursor.getString(cursor.getColumnIndex("Purchase_Amount")).equals("")){
+                Purchase_Amount.setText("不限");
+
+            }else{
+                Purchase_Amount.setText(
+                        cursor.getString(cursor.getColumnIndex("Purchase_Amount"))+"元");
+            }
+           // Purchase_Amount.setText(cursor.getString(cursor.getColumnIndex("Purchase_Amount")));
             Introduct.setText(cursor.getString(cursor.getColumnIndex("Introduct")));
         }
     }

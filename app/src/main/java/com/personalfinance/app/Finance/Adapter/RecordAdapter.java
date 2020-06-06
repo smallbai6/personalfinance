@@ -2,6 +2,7 @@ package com.personalfinance.app.Finance.Adapter;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +74,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
             holder.Buy_Sale.setTextColor(Color.RED);
             if(record.getSure_Status().equals("1")){
                 holder.Yuan_Fen.setText("元");
+            }else{
+                holder.Yuan_Fen.setText("");
             }
 
         }else if(record.getBuy_Sale().equals("1")){
@@ -81,8 +84,9 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
             holder.Buy_Sale.setTextColor(Color.GREEN);
             if(record.getSure_Status().equals("1")){
                holder.Yuan_Fen.setText("份");
+            }else{
+                holder.Yuan_Fen.setText("");
             }
-
         }
     }
 

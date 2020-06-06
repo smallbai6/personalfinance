@@ -2,6 +2,7 @@ package com.personalfinance.app.Finance;
 
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -60,6 +62,8 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
     private String NetWork_Code = "500";
     private boolean flag = true;
 
+    private OkHttpClient client;
+    private int isDialogClose=1;
     private final static int success = 1;
     private final static int fail = 2;
     private Handler handler = new Handler() {
@@ -68,11 +72,14 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
             super.handleMessage(msg);
             switch (msg.what) {
                 case success:
+                    Money.setText("");
                     Toast.makeText(BuyActivity.this, "买入成功", Toast.LENGTH_SHORT).show();
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
                     break;
                 case fail:
                     Toast.makeText(BuyActivity.this, "买入失败", Toast.LENGTH_SHORT).show();
+                    isDialogClose=0;
                     loadDialogUtils.closeDialog(mDialog);
                     break;
 
@@ -119,7 +126,10 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
             Picture.setImageDrawable(drawable);
             Product_Name.setText(cursor.getString(cursor.getColumnIndex("Product_Name")));
             Purchase_Amount = cursor.getString(cursor.getColumnIndex("Purchase_Amount"));
-            Money.setHint("最低买入" + Purchase_Amount + "元");
+            if(Purchase_Amount.equals("")){
+                Money.setHint("");
+            }else{
+            Money.setHint("最低买入" + Purchase_Amount + "元");}
         }
         db.close();
     }
@@ -186,7 +196,7 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
         RequestBody requestBody = RequestBody.Companion.create(jsonObject.toString(), mediaType);
         String address = AppNetConfig.FinanceBuy;
         // Log.d("liangjialing", "request1");
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+        client=HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
@@ -209,10 +219,8 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
                         resultCode = jsonObject.getString("resultCode");
                         if (resultCode.equals("200")) {//
                             //重新加载holdproduct表和recordproduct表
-                            Log.d("liangjialing", "200");
-                            Log.d("liangjialing", jsonObject.getJSONArray("recordproduct").toString());
-                            WriteToRecordproduct(jsonObject.getJSONArray("recordproduct"));
-                            Money.setText("");
+                             WriteToRecordproduct(jsonObject.getJSONArray("recordproduct"));
+
                         } else {
                             Log.d("liang", "shujufanhuishibai");
                         }
@@ -278,5 +286,21 @@ public class BuyActivity extends AppCompatActivity implements View.OnClickListen
                 }
             }
         }).start();
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                int i=0;
+                for (Call call: client.dispatcher().runningCalls()) {
+                    i++;
+                    client.dispatcher().cancelAll();
+                }
+                if(i==0){
+                    if(isDialogClose==1){
+                        finish();
+                    }
+                }
+                isDialogClose=1;
+            }
+        });
     }
 }

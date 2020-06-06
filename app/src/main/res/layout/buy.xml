@@ -109,8 +109,7 @@
                 android:maxWidth="250dp"
                 android:singleLine="true"
                 android:textColor="@color/colorblack"
-                android:textSize="30dp" />
-
+                android:textSize="20dp" />
         </RelativeLayout>
 
 

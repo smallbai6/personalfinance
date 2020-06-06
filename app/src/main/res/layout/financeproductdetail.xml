@@ -151,11 +151,12 @@
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:text="50"
+                    android:layout_marginRight="5dp"
                     android:textColor="@color/colorblack"
-                    android:textSize="25dp" />
+                    android:textSize="25dp"
+                    android:text="liang"/>
 
-                <TextView
+                <!--<TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
@@ -166,7 +167,7 @@
                     android:layout_toRightOf="@+id/productdetail_purchaseamount"
                     android:text="元起购"
                     android:textColor="@color/colorgray"
-                    android:textSize="25dp" />
+                    android:textSize="25dp" />-->
 
 
             </RelativeLayout>
